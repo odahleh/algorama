@@ -10,7 +10,7 @@ const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.goo
 const Index = ({ userId, handleLogin, handleLogout }) => {
   return (
     <>
-      {userId ? (
+      {/* {userId ? (
         <GoogleLogout
           clientId={GOOGLE_CLIENT_ID}
           buttonText="Logout"
@@ -24,23 +24,31 @@ const Index = ({ userId, handleLogin, handleLogout }) => {
           onSuccess={handleLogin}
           onFailure={(err) => console.log(err)}
         />
-      )}
-      <h1>Good luck on your project :)</h1>
-      <h2> What you need to change in this skeleton</h2>
-      <ul>
-        <li>
-          Change the Frontend CLIENT_ID (Skeleton.js) to your team's CLIENT_ID (obtain this at
-          http://weblab.to/clientid)
-        </li>
-        <li>Change the Server CLIENT_ID to the same CLIENT_ID (auth.js)</li>
-        <li>
-          Change the Database SRV (mongoConnectionURL) for Atlas (server.js). You got this in the
-          MongoDB setup.
-        </li>
-        <li>Change the Database Name for MongoDB to whatever you put in the SRV (server.js)</li>
-      </ul>
-      <h2>How to go from this skeleton to our actual app</h2>
-      <a href="http://weblab.to/get-started">Check out this getting started guide</a>
+      )} */}
+      <div class="landing-page-container">
+        <div class="landing-page-title">Homepage Name</div>
+        <div class="landing-page-content">
+          {" "}
+          Homepage descirption Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod
+          tempor incidunt ut labore et dolore magna aliqua.{" "}
+        </div>
+        <GoogleLogin
+          clientId={GOOGLE_CLIENT_ID}
+          render={(renderProps) => (
+            <button
+              class="landing-page-button landing-page-content"
+              onClick={renderProps.onClick}
+              disabled={renderProps.disabled}
+            >
+              Get Started
+            </button>
+          )}
+          buttonText="Login"
+          onSuccess={handleLogin}
+          onFailure={(err) => console.log(err)}
+          cookiePolicy={"single_host_origin"}
+        />
+      </div>
     </>
   );
 };
