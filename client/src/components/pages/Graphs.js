@@ -26,7 +26,7 @@ const Graphs = ({ userId }) => {
       .append("svg")
       .attr("width", WIDTH)
       .attr("height", HEIGHT)
-      .style("background-color", "white");
+      .style("background-color", "blue");
 
     const graph = {
       links: [
@@ -74,6 +74,7 @@ const Graphs = ({ userId }) => {
       .append("circle")
       .attr("r", 10)
       .attr("fill", "black");
+    //.call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended));
 
     function ticked() {
       node
@@ -97,6 +98,23 @@ const Graphs = ({ userId }) => {
           return d.target.y;
         });
     }
+
+    /* function dragstarted(d) {
+      if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+
+    function dragged(d) {
+      d.fx = d3.event.x;
+      d.fy = d3.event.y;
+    }
+
+    function dragended(d) {
+      if (!d3.event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    } */
   });
 
   /* d3.json("/api/graph").then((json) => {
