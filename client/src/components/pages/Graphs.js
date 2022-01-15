@@ -9,7 +9,6 @@ const Graphs = ({ userId }) => {
   const [main, setRef1] = useState(React.createRef());
   const WIDTH = 600;
   const HEIGHT = 500;
-  const data = [2, 3, 4, 1];
 
   /* const svg = d3
     .select("#svg")
@@ -26,16 +25,14 @@ const Graphs = ({ userId }) => {
       .append("svg")
       .attr("width", WIDTH)
       .attr("height", HEIGHT)
-      .style("background-color", "blue");
+      .style("background-color", "white");
 
-    const graph = {
-      links: [
-        { source: "2", target: "1", weight: 1 },
-        { source: "3", target: "2", weight: 3 },
-      ],
+    let links = [
+      { source: "2", target: "1", weight: 1 },
+      { source: "3", target: "2", weight: 3 },
+    ];
 
-      nodes: [{ name: "1" }, { name: "2" }, { name: "3" }, { name: "4" }],
-    };
+    let nodes = [{ name: "1" }, { name: "2" }, { name: "3" }, { name: "4" }];
 
     /* links.forEach(function (link) {
       link.source = nodes[link.source] || (nodes[link.source] = { name: link.source });
@@ -43,7 +40,7 @@ const Graphs = ({ userId }) => {
     }); */
 
     let simulation = d3
-      .forceSimulation(graph.nodes)
+      .forceSimulation(nodes)
       .force(
         "link",
         d3
@@ -51,7 +48,7 @@ const Graphs = ({ userId }) => {
           .id(function (d) {
             return d.name;
           })
-          .links(graph.links)
+          .links(links)
       )
       .force("charge", d3.forceManyBody())
       .force("center", d3.forceCenter(WIDTH / 2, HEIGHT / 2))
@@ -60,7 +57,7 @@ const Graphs = ({ userId }) => {
     let link = svg
       .append("g")
       .selectAll("line")
-      .data(graph.links)
+      .data(links)
       .enter()
       .append("line")
       .attr("stroke-width", 5)
@@ -69,7 +66,7 @@ const Graphs = ({ userId }) => {
     let node = svg
       .append("g")
       .selectAll("circle")
-      .data(graph.nodes)
+      .data(nodes)
       .enter()
       .append("circle")
       .attr("r", 10)
