@@ -1,0 +1,13 @@
+.link {
+  stroke: #aaa;
+}
+
+.node text {
+  stroke: #333;
+}
+
+.node circle {
+  stroke: #fff;
+  stroke-width: 3px;
+  fill: #555;
+}
