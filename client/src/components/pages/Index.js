@@ -36,7 +36,8 @@ const Index = ({ userId, handleLogin, handleLogout }) => {
           clientId={GOOGLE_CLIENT_ID}
           render={(renderProps) => (
             <button
-              class="landing-page-button landing-page-content"
+              class="landing-page-button landing-page-content u-link:hover"
+              onHover
               onClick={renderProps.onClick}
               disabled={renderProps.disabled}
             >
