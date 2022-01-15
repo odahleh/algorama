@@ -50,7 +50,7 @@ const Graphs = ({ userId }) => {
           })
           .links(links)
       )
-      .force("charge", d3.forceManyBody())
+      .force("charge", d3.forceManyBody().strength(-70))
       .force("center", d3.forceCenter(WIDTH / 2, HEIGHT / 2))
       .on("tick", ticked);
 
