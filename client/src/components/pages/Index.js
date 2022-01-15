@@ -10,7 +10,7 @@ const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.goo
 const Index = ({ userId, handleLogin, handleLogout }) => {
   return (
     <>
-      {userId ? (
+      {/* {userId ? (
         <GoogleLogout
           clientId={GOOGLE_CLIENT_ID}
           buttonText="Logout"
@@ -24,7 +24,7 @@ const Index = ({ userId, handleLogin, handleLogout }) => {
           onSuccess={handleLogin}
           onFailure={(err) => console.log(err)}
         />
-      )}
+      )} */}
       <div class="landing-page-container">
         <div class="landing-page-title">Homepage Name</div>
         <div class="landing-page-content">
@@ -32,8 +32,22 @@ const Index = ({ userId, handleLogin, handleLogout }) => {
           Homepage descirption Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod
           tempor incidunt ut labore et dolore magna aliqua.{" "}
         </div>
-        
-        <button class="landing-page-button landing-page-content">Get Started!</button>
+        <GoogleLogin
+          clientId={GOOGLE_CLIENT_ID}
+          render={(renderProps) => (
+            <button
+              class="landing-page-button landing-page-content"
+              onClick={renderProps.onClick}
+              disabled={renderProps.disabled}
+            >
+              Get Started
+            </button>
+          )}
+          buttonText="Login"
+          onSuccess={handleLogin}
+          onFailure={(err) => console.log(err)}
+          cookiePolicy={"single_host_origin"}
+        />
       </div>
     </>
   );
