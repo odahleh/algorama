@@ -26,12 +26,13 @@ const Index = ({ userId, handleLogin, handleLogout }) => {
         />
       )}
       <div class="landing-page-container">
-        <h1 class="landing-page-title">Homepage Name</h1>
-        <h2 class="landing-page-content">
+        <div class="landing-page-title">Homepage Name</div>
+        <div class="landing-page-content">
           {" "}
           Homepage descirption Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod
           tempor incidunt ut labore et dolore magna aliqua.{" "}
-        </h2>
+        </div>
+        
         <button class="landing-page-button landing-page-content">Get Started!</button>
       </div>
     </>
