@@ -32,6 +32,15 @@ module.exports = {
   devtool: "inline-source-map",
   module: {
     rules: [
+      /* {
+        test: /\.json$/,
+        exclude: /(node_modules)/,
+        use: [
+          {
+            loader: "json-loader",
+          },
+        ],
+      }, */
       {
         test: /\.(js|jsx)$/,
         loader: "babel-loader",
@@ -57,6 +66,7 @@ module.exports = {
         ],
       },
     ],
+    /*  loaders: [{ test: /\.json$/, loader: "json-loader" }], */
   },
   resolve: {
     extensions: ["*", ".js", ".jsx"],

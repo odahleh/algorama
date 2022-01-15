@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Router } from "@reach/router";
 import NotFound from "./pages/NotFound.js";
 import Index from "./pages/Index.js";
+import Graphs from "./pages/Graphs.js";
 
 import "../utilities.css";
 
@@ -42,6 +43,7 @@ const App = () => {
     <>
       <Router>
         <Index path="/" handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
+        <Graphs path="/graphs" userId={userId} />
         <NotFound default />
       </Router>
     </>
