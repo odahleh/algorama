@@ -32,6 +32,13 @@ const Index = ({ userId, handleLogin, handleLogout }) => {
           Homepage descirption Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod
           tempor incidunt ut labore et dolore magna aliqua.{" "}
         </div>
+        {userId ? (
+        <GoogleLogout
+          clientId={GOOGLE_CLIENT_ID}
+          buttonText="Logout"
+          onLogoutSuccess={handleLogout}
+          onFailure={(err) => console.log(err)}
+        /> ) : (
         <GoogleLogin
           clientId={GOOGLE_CLIENT_ID}
           render={(renderProps) => (
@@ -48,7 +55,7 @@ const Index = ({ userId, handleLogin, handleLogout }) => {
           onSuccess={handleLogin}
           onFailure={(err) => console.log(err)}
           cookiePolicy={"single_host_origin"}
-        />
+        />)}
       </div>
     </>
   );
