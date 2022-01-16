@@ -8,20 +8,35 @@ import { stratify } from "d3";
 
 const Graphs = ({ userId }) => {
   const [main, setRef1] = useState(React.createRef());
-  //let [nodes, setNodes] = useState([{ name: "1" }, { name: "2" }, { name: "3" }, { name: "4" }]);
+  const [valueNodes, setValueNodes] = useState("");
+  const [valueEdges, setValueEdges] = useState("");
+  let [nodesState, setNodes] = useState([]);
+  let [linksState, setLinks] = useState([]);
   const WIDTH = 600;
   const HEIGHT = 500;
 
-  /* const svg = d3
-    .select("#svg")
-    .append("svg")
-    .attr("width", WIDTH)
-    .attr("height", HEIGHT)
-    .style("background-color", "red"); */
-  //  const width = svg.attr("width");
-  //const height = svg.attr("height");
+  const startGraph = () => {
+    let nodes = [];
+    let links = [];
+    for (let i = 0; i < parseInt(valueNodes); i++) {
+      console.log(i);
+      nodes.push({ name: i });
+    }
+    console.log(nodes);
+    if (valueEdges.length > 0) {
+      let linksArray = valueEdges.split(",");
+      for (let ele of linksArray) {
+        let ends = ele.split("-");
+        let start = parseInt(ends[0]);
+        let end = parseInt(ends[1]);
+        links.push({ source: start, target: end });
+      }
+      console.log(links);
+    }
+    GraphSimulation(nodes, links);
+  };
 
-  useEffect(() => {
+  const GraphSimulation = (nodes, links) => {
     console.log(nodes);
     const svg = d3
       .select(main.current)
@@ -30,13 +45,13 @@ const Graphs = ({ userId }) => {
       .style("background-color", "white")
       .on("mousedown", addNode);
 
-    let links = [
+    /* let links = [
       { source: 2, target: 1, weight: 1 },
       { source: 3, target: 2, weight: 3 },
     ];
 
     let nodes = [{ name: 1 }, { name: 2 }, { name: 3 }, { name: 4 }];
-
+ */
     //let nodes = [...nodesState];
 
     let simulation = d3
@@ -77,13 +92,14 @@ const Graphs = ({ userId }) => {
     simulation.force("link").links(links);
 
     function addNode(event) {
-      let e = event;
+      pass;
+      /* let e = event;
       if (e.button == 0) {
         let coords = e.currentTarget;
         let newNode = { x: coords[0], y: coords[1], name: 10 };
         nodes.push(newNode);
         simulation.restart();
-      }
+      } */
     }
 
     function ticked() {
@@ -125,11 +141,31 @@ const Graphs = ({ userId }) => {
       d.fx = null;
       d.fy = null;
     }
-  });
+  };
+
+  const handleChangeNodes = (event) => {
+    setValueNodes(event.target.value);
+  };
+
+  const handleChangeEdges = (event) => {
+    setValueEdges(event.target.value);
+  };
 
   return (
     <div>
-      <button>Lösche Nodes</button>
+      <button onClick={startGraph}> Start</button>
+      <input
+        type="text"
+        value={valueNodes}
+        onChange={handleChangeNodes}
+        placeholder={"number of nodes"}
+      />
+      <input
+        type="text"
+        value={valueEdges}
+        onChange={handleChangeEdges}
+        placeholder={"edges 0-1,2-0, ..."}
+      />
       <svg id="main" ref={main}>
         {" "}
       </svg>
