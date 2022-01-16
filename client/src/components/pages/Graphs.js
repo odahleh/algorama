@@ -8,12 +8,14 @@ import { stratify } from "d3";
 
 const Graphs = ({ userId }) => {
   const [main, setRef1] = useState(React.createRef());
-  const [valueNodes, setValueNodes] = useState("");
-  const [valueEdges, setValueEdges] = useState("");
-  let [nodesState, setNodes] = useState([]);
-  let [linksState, setLinks] = useState([]);
-  const WIDTH = 600;
-  const HEIGHT = 500;
+  let [valueNodes, setValueNodes] = useState("");
+  let [valueEdges, setValueEdges] = useState("");
+  let [displaySimulation, setDisplaySimulation] = useState(false);
+  let [WIDTH, setWidth] = useState(800);
+  let [HEIGHT, setHeight] = useState(500);
+
+  //const WIDTH = 800;
+  //const HEIGHT = 500;
 
   const startGraph = () => {
     let nodes = [];
@@ -37,9 +39,14 @@ const Graphs = ({ userId }) => {
   };
 
   const GraphSimulation = (nodes, links) => {
+    if (displaySimulation === true) {
+      d3.select("svg").remove();
+      setDisplaySimulation(false);
+    }
     console.log(nodes);
     const svg = d3
       .select(main.current)
+      .append("svg")
       .attr("width", WIDTH)
       .attr("height", HEIGHT)
       .style("background-color", "white")
@@ -103,12 +110,16 @@ const Graphs = ({ userId }) => {
     }
 
     function ticked() {
+      // let WIDTH = 800;
+      //let HEIGHT = 500;
+      let radius = 10;
       node
         .attr("cx", function (d) {
-          return d.x;
+          console.log(d.x);
+          return Math.max(radius, Math.min(WIDTH - radius, d.x));
         })
         .attr("cy", function (d) {
-          return d.y;
+          return Math.max(radius, Math.min(HEIGHT - radius, d.y));
         });
       link
         .attr("x1", function (d) {
@@ -141,6 +152,7 @@ const Graphs = ({ userId }) => {
       d.fx = null;
       d.fy = null;
     }
+    setDisplaySimulation(true);
   };
 
   const handleChangeNodes = (event) => {
@@ -166,9 +178,9 @@ const Graphs = ({ userId }) => {
         onChange={handleChangeEdges}
         placeholder={"edges 0-1,2-0, ..."}
       />
-      <svg id="main" ref={main}>
+      <div id="main" ref={main}>
         {" "}
-      </svg>
+      </div>
     </div>
   );
 };
