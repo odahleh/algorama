@@ -50,8 +50,9 @@ const Graphs = ({ userId }) => {
           })
           .distance(100)
       )
-      .force("charge", d3.forceManyBody())
-      .force("center", d3.forceCenter(WIDTH / 2, HEIGHT / 2));
+      .force("charge", d3.forceManyBody().strength(-70))
+      .force("center", d3.forceCenter(WIDTH / 2, HEIGHT / 2))
+      .on("tick", ticked);
 
     let link = svg
       .append("g")
@@ -69,9 +70,8 @@ const Graphs = ({ userId }) => {
       .enter()
       .append("circle")
       .attr("r", 10)
-      .attr("fill", "black");
-
-    //.call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended));
+      .attr("fill", "black")
+      .call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended));
 
     simulation.nodes(nodes).on("tick", ticked);
     simulation.force("link").links(links);
@@ -109,22 +109,22 @@ const Graphs = ({ userId }) => {
         });
     }
 
-    /* function dragstarted(d) {
-      if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+    function dragstarted(event, d) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
       d.fx = d.x;
       d.fy = d.y;
     }
 
-    function dragged(d) {
-      d.fx = d3.event.x;
-      d.fy = d3.event.y;
+    function dragged(event, d) {
+      d.fx = event.x;
+      d.fy = event.y;
     }
 
-    function dragended(d) {
-      if (!d3.event.active) simulation.alphaTarget(0);
+    function dragended(event, d) {
+      if (!event.active) simulation.alphaTarget(0);
       d.fx = null;
       d.fy = null;
-    } */
+    }
   });
 
   return (
