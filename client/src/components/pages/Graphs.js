@@ -4,9 +4,11 @@ import * as d3 from "d3";
 
 import "../../utilities.css";
 import "./Graphs.css";
+import { stratify } from "d3";
 
 const Graphs = ({ userId }) => {
   const [main, setRef1] = useState(React.createRef());
+  //let [nodes, setNodes] = useState([{ name: "1" }, { name: "2" }, { name: "3" }, { name: "4" }]);
   const WIDTH = 600;
   const HEIGHT = 500;
 
@@ -20,27 +22,25 @@ const Graphs = ({ userId }) => {
   //const height = svg.attr("height");
 
   useEffect(() => {
+    console.log(nodes);
     const svg = d3
       .select(main.current)
-      .append("svg")
       .attr("width", WIDTH)
       .attr("height", HEIGHT)
-      .style("background-color", "white");
+      .style("background-color", "white")
+      .on("mousedown", addNode);
 
     let links = [
-      { source: "2", target: "1", weight: 1 },
-      { source: "3", target: "2", weight: 3 },
+      { source: 2, target: 1, weight: 1 },
+      { source: 3, target: 2, weight: 3 },
     ];
 
-    let nodes = [{ name: "1" }, { name: "2" }, { name: "3" }, { name: "4" }];
+    let nodes = [{ name: 1 }, { name: 2 }, { name: 3 }, { name: 4 }];
 
-    /* links.forEach(function (link) {
-      link.source = nodes[link.source] || (nodes[link.source] = { name: link.source });
-      link.target = nodes[link.target] || (nodes[link.target] = { name: link.target });
-    }); */
+    //let nodes = [...nodesState];
 
     let simulation = d3
-      .forceSimulation(nodes)
+      .forceSimulation()
       .force(
         "link",
         d3
@@ -48,11 +48,10 @@ const Graphs = ({ userId }) => {
           .id(function (d) {
             return d.name;
           })
-          .links(links)
+          .distance(100)
       )
       .force("charge", d3.forceManyBody())
-      .force("center", d3.forceCenter(WIDTH / 2, HEIGHT / 2))
-      .on("tick", ticked);
+      .force("center", d3.forceCenter(WIDTH / 2, HEIGHT / 2));
 
     let link = svg
       .append("g")
@@ -71,7 +70,21 @@ const Graphs = ({ userId }) => {
       .append("circle")
       .attr("r", 10)
       .attr("fill", "black");
+
     //.call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended));
+
+    simulation.nodes(nodes).on("tick", ticked);
+    simulation.force("link").links(links);
+
+    function addNode(event) {
+      let e = event;
+      if (e.button == 0) {
+        let coords = e.currentTarget;
+        let newNode = { x: coords[0], y: coords[1], name: 10 };
+        nodes.push(newNode);
+        simulation.restart();
+      }
+    }
 
     function ticked() {
       node
@@ -115,9 +128,11 @@ const Graphs = ({ userId }) => {
   });
 
   return (
-    <div id="main" ref={main}>
-      {" "}
-      <div>a</div>
+    <div>
+      <button>Lösche Nodes</button>
+      <svg id="main" ref={main}>
+        {" "}
+      </svg>
     </div>
   );
 };
