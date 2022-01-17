@@ -11,3 +11,12 @@
   stroke-width: 3px;
   fill: #555;
 }
+
+.top-bar{
+  display: flex;
+  justify-content: space-between;
+}
+.left-side{
+  flex-grow: 1
+}
+

@@ -75,9 +75,8 @@ const Graphs = ({ userId }) => {
     const svg = d3
       .select(main.current)
       .append("svg")
-      .attr("height", windowHeight)
-      .attr("width", windowWidth)
-      .attr("viewbox", "0 0 500 800")
+      .attr("width", WIDTH)
+      .attr("height", HEIGHT)
       .style("background-color", "white")
       .on("mousedown", addNode);
 
@@ -102,7 +101,7 @@ const Graphs = ({ userId }) => {
           .distance(100)
       )
       .force("charge", d3.forceManyBody().strength(-70))
-      .force("center", d3.forceCenter(windowWidth / 2, windowHeight / 2))
+      .force("center", d3.forceCenter(WIDTH / 2, HEIGHT / 2))
       .on("tick", ticked);
 
     let edge = svg
@@ -139,16 +138,16 @@ const Graphs = ({ userId }) => {
     }
 
     function ticked() {
-      // let windowWidth = 800;
-      //let windowHeight = 500;
+      // let WIDTH = 800;
+      //let HEIGHT = 500;
       let radius = 10;
       vertex
         .attr("cx", function (d) {
           //console.log(d.x);
-          return Math.max(radius, Math.min(windowWidth - radius, d.x));
+          return Math.max(radius, Math.min(WIDTH - radius, d.x));
         })
         .attr("cy", function (d) {
-          return Math.max(radius, Math.min(windowHeight - radius, d.y));
+          return Math.max(radius, Math.min(HEIGHT - radius, d.y));
         });
       edge
         .attr("x1", function (d) {
