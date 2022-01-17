@@ -1,56 +1,21 @@
 import React, { Component, useEffect, useState } from "react";
 import * as d3 from "d3";
 //import { forceSimulation } from "https://cdn.skypack.dev/d3-force@3";
-import GoogleLogin, { GoogleLogout } from "react-google-login";
+
 import "../../utilities.css";
 import "./Graphs.css";
-import { color, stratify } from "d3";
+import { stratify } from "d3";
 
-const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
-
-
-const Graphs = ({ userId, handleLogout }) => {
+const Graphs = ({ userId }) => {
   const [main, setRef1] = useState(React.createRef());
   let [valueNodes, setValueNodes] = useState("");
   let [valueEdges, setValueEdges] = useState("");
-  let [currentSimulation, setCurrentSimulation] = useState(null);
   let [displaySimulation, setDisplaySimulation] = useState(false);
   let [WIDTH, setWidth] = useState(800);
   let [HEIGHT, setHeight] = useState(500);
-  let [windowHeight, setWindowHeight] = useState(window.innerHeight);
-  let [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-  useEffect(() => {
-    window.addEventListener(
-      "resize",
-      handleResize /* function () {
-      clearTimeout(adaptSizeTimer);
-      adaptSizeTimer = setTimeout(function () {
-        console.log("resize");
-      }, 500);
-    } */
-    );
-  });
-
-  const handleResize = () => {
-    setWindowHeight(window.innerHeight);
-    setWindowWidth(window.innerWidth);
-    if (displaySimulation) {
-      currentSimulation.force("center", d3.forceCenter(windowWidth / 2, windowHeight / 2));
-    }
-  };
-
-  const adaptSize = () => {
-    /* setWindowHeight(window.innerHeight);
-    setWindowWidth(window.innerWidth);
-    if (displaySimulation) {
-      currentSimulation.force("center", d3.forceCenter(windowWidth / 2, windowHeight / 2));
-    } */
-  };
-
-  useEffect(() => {
-    GraphSimulation([{ name: 0 }, { name: 1 }], [{ source: 0, target: 1, color: "blue" }]);
-  });
+  //const WIDTH = 800;
+  //const HEIGHT = 500;
 
   const startGraph = () => {
     let nodes = [];
@@ -72,9 +37,7 @@ const Graphs = ({ userId, handleLogout }) => {
     }
     GraphSimulation(nodes, links);
   };
-  const changeColor = (links) => {
-    links[0].attr("stroke", "blue");
-  };
+
   const GraphSimulation = (nodes, links) => {
     if (displaySimulation === true) {
       d3.select("svg").remove();
@@ -84,9 +47,8 @@ const Graphs = ({ userId, handleLogout }) => {
     const svg = d3
       .select(main.current)
       .append("svg")
-      .attr("height", windowHeight)
-      .attr("width", windowWidth)
-      .attr("viewbox", "0 0 500 800")
+      .attr("width", WIDTH)
+      .attr("height", HEIGHT)
       .style("background-color", "white")
       .on("mousedown", addNode);
 
@@ -111,7 +73,7 @@ const Graphs = ({ userId, handleLogout }) => {
           .distance(100)
       )
       .force("charge", d3.forceManyBody().strength(-70))
-      .force("center", d3.forceCenter(windowWidth / 2, windowHeight / 2))
+      .force("center", d3.forceCenter(WIDTH / 2, HEIGHT / 2))
       .on("tick", ticked);
 
     let link = svg
@@ -121,13 +83,7 @@ const Graphs = ({ userId, handleLogout }) => {
       .enter()
       .append("line")
       .attr("stroke-width", 5)
-      .attr("stroke", function (d) {
-        if (d.source === 0) {
-          return "red";
-        } else {
-          return "grey";
-        }
-      });
+      .attr("stroke", "grey");
 
     let node = svg
       .append("g")
@@ -154,16 +110,16 @@ const Graphs = ({ userId, handleLogout }) => {
     }
 
     function ticked() {
-      // let windowWidth = 800;
-      //let windowHeight = 500;
+      // let WIDTH = 800;
+      //let HEIGHT = 500;
       let radius = 10;
       node
         .attr("cx", function (d) {
-          //console.log(d.x);
-          return Math.max(radius, Math.min(windowWidth - radius, d.x));
+          console.log(d.x);
+          return Math.max(radius, Math.min(WIDTH - radius, d.x));
         })
         .attr("cy", function (d) {
-          return Math.max(radius, Math.min(windowHeight - radius, d.y));
+          return Math.max(radius, Math.min(HEIGHT - radius, d.y));
         });
       link
         .attr("x1", function (d) {
@@ -197,7 +153,6 @@ const Graphs = ({ userId, handleLogout }) => {
       d.fy = null;
     }
     setDisplaySimulation(true);
-    setCurrentSimulation(simulation);
   };
 
   const handleChangeNodes = (event) => {
