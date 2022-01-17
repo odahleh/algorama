@@ -44,7 +44,7 @@ const App = () => {
     <>
       <Router>
         <Index path="/" handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
-        <Graphs path="/graphs" userId={userId} />
+        <Graphs path="/graphs" userId={userId} handleLogout={handleLogout} userId={userId}/>
         {/* <NewGraphs path="/newgraphs" userId={userId} /> */}
         <NotFound default />
       </Router>
