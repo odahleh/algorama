@@ -1,12 +1,15 @@
 import React, { Component, useEffect, useState } from "react";
 import * as d3 from "d3";
 //import { forceSimulation } from "https://cdn.skypack.dev/d3-force@3";
-
+import GoogleLogin, { GoogleLogout } from "react-google-login";
 import "../../utilities.css";
 import "./Graphs.css";
 import { stratify } from "d3";
 
-const Graphs = ({ userId }) => {
+const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
+
+
+const Graphs = ({ userId, handleLogout }) => {
   const [main, setRef1] = useState(React.createRef());
   let [valueNodes, setValueNodes] = useState("");
   let [valueEdges, setValueEdges] = useState("");
@@ -195,21 +198,34 @@ const Graphs = ({ userId }) => {
 
   return (
     <div>
-      <button onClick={startGraph}> Start</button>
-      <input
-        type="text"
-        value={valueNodes}
-        onChange={handleChangeNodes}
-        placeholder={"number of nodes"}
-      />
-      <input
-        type="text"
-        value={valueEdges}
-        onChange={handleChangeEdges}
-        placeholder={"edges 0-1,2-0, ..."}
-      />
-      <div id="main" ref={main} /* width="500px" height="500px" */>
-        {" "}
+      <div className="top-bar">
+      <div className="left-side">
+        <button onClick={startGraph}> Start</button>
+        <input
+          type="text"
+          value={valueNodes}
+          onChange={handleChangeNodes}
+          placeholder={"number of nodes"}
+        />
+
+        <input
+          type="text"
+          value={valueEdges}
+          onChange={handleChangeEdges}
+          placeholder={"edges 0-1,2-0, ..."}
+        />
+      </div>
+      <div className="right-side">
+          <GoogleLogout
+              clientId={GOOGLE_CLIENT_ID}
+              buttonText="Logout"
+              onLogoutSuccess={handleLogout}
+              onFailure={(err) => console.log(err)}
+          />
+        </div>
+        <div id="main" ref={main} /* width="500px" height="500px" */>
+          {" "}
+        </div>
       </div>
     </div>
   );
