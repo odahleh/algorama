@@ -16,6 +16,10 @@ const Graphs = ({ userId }) => {
   let [HEIGHT, setHeight] = useState(500);
   let [windowHeight, setWindowHeight] = useState(window.innerHeight);
   let [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  let [nodes, setNodes] = useState({ name: 0 }, { name: 1 });
+  let [links, setLinks] = useState({ souce: 0, target: 1 });
+  let [vertexObjs, setVertexObjs] = useState(null);
+  let [edgeObjs, setEdgeObjs] = useState(null);
 
   useEffect(() => {
     window.addEventListener(
@@ -28,14 +32,6 @@ const Graphs = ({ userId }) => {
     } */
     );
   });
-
-  const handleResize = () => {
-    setWindowHeight(window.innerHeight);
-    setWindowWidth(window.innerWidth);
-    if (displaySimulation) {
-      currentSimulation.force("center", d3.forceCenter(windowWidth / 2, windowHeight / 2));
-    }
-  };
 
   const adaptSize = () => {
     /* setWindowHeight(window.innerHeight);
@@ -63,10 +59,14 @@ const Graphs = ({ userId }) => {
       }
       console.log(links);
     }
+    setNodes(nodes);
+    setLinks(links);
     GraphSimulation(nodes, links);
   };
 
-  const GraphSimulation = (nodes, links) => {
+  const GraphSimulation = (vertices, edges) => {
+    let nodes = vertices;
+    let links = edges;
     if (displaySimulation === true) {
       d3.select("svg").remove();
       setDisplaySimulation(false);
@@ -105,7 +105,7 @@ const Graphs = ({ userId }) => {
       .force("center", d3.forceCenter(windowWidth / 2, windowHeight / 2))
       .on("tick", ticked);
 
-    let link = svg
+    let edge = svg
       .append("g")
       .selectAll("line")
       .data(links)
@@ -114,7 +114,7 @@ const Graphs = ({ userId }) => {
       .attr("stroke-width", 5)
       .attr("stroke", "grey");
 
-    let node = svg
+    let vertex = svg
       .append("g")
       .selectAll("circle")
       .data(nodes)
@@ -142,7 +142,7 @@ const Graphs = ({ userId }) => {
       // let windowWidth = 800;
       //let windowHeight = 500;
       let radius = 10;
-      node
+      vertex
         .attr("cx", function (d) {
           //console.log(d.x);
           return Math.max(radius, Math.min(windowWidth - radius, d.x));
@@ -150,7 +150,7 @@ const Graphs = ({ userId }) => {
         .attr("cy", function (d) {
           return Math.max(radius, Math.min(windowHeight - radius, d.y));
         });
-      link
+      edge
         .attr("x1", function (d) {
           return d.source.x;
         })
@@ -183,6 +183,8 @@ const Graphs = ({ userId }) => {
     }
     setDisplaySimulation(true);
     setCurrentSimulation(simulation);
+    setEdgeObjs(edge);
+    setVertexObjs(vertex);
   };
 
   const handleChangeNodes = (event) => {
@@ -191,6 +193,32 @@ const Graphs = ({ userId }) => {
 
   const handleChangeEdges = (event) => {
     setValueEdges(event.target.value);
+  };
+
+  function addNode() {
+    let newNode = { x: 200, y: 200, name: 3 };
+    setNodes([...nodes, newNode]);
+    //console.log(nodes);
+    restart();
+  }
+
+  const restart = () => {
+    nodes = vertices.data(nodes, function (d) {
+      return d.id;
+    });
+    vertices.exit().remove();
+
+    vertices.selectAll("text").text(function (d) {
+      return d.degree;
+    });
+  };
+
+  const handleResize = () => {
+    setWindowHeight(window.innerHeight);
+    setWindowWidth(window.innerWidth);
+    if (displaySimulation) {
+      currentSimulation.force("center", d3.forceCenter(windowWidth / 2, windowHeight / 2));
+    }
   };
 
   return (
@@ -208,6 +236,7 @@ const Graphs = ({ userId }) => {
         onChange={handleChangeEdges}
         placeholder={"edges 0-1,2-0, ..."}
       />
+      <button onClick={addNode}> Start</button>
       <div id="main" ref={main} /* width="500px" height="500px" */>
         {" "}
       </div>
