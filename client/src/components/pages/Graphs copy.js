@@ -103,6 +103,34 @@ const Graphs = ({ userId }) => {
       .attr("stroke-width", 5)
       .attr("stroke", "grey");
 
+    /* let vertex = svg
+      .selectAll("circle")
+      .data(nodes)
+      .enter()
+      .append("circle")
+      .attr("r", 10)
+      .attr("fill", "black"); */
+    //.call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended));
+
+    //vertex.attr("fill", "red");
+    /* vertex.on("mouseover", function (d) {
+      d3.select(this).attr("r", 30);
+    }); */
+
+    const addNode = (vertex, simulation, ticked, new_nodes) => {
+      vertex = d3
+        .select("svg")
+        .selectAll("circle")
+        .data(new_nodes)
+        .enter()
+        .append("circle")
+        .merge(vertex)
+        .attr("r", 10);
+      simulation.nodes(new_nodes).on("tick", ticked);
+    };
+
+    nodes = [{ name: 1 }, { name: 2 }, { name: 3 }, { name: 4 }];
+
     let vertex = d3
       .select("svg")
       .selectAll("circles")
@@ -110,13 +138,27 @@ const Graphs = ({ userId }) => {
       .enter()
       .append("circle")
       .attr("r", 10)
-      .attr("fill", "black")
-      .call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended));
+      .attr("fill", "green");
 
     simulation.nodes(nodes).on("tick", ticked);
     simulation.force("link").links(links);
 
+    let new_nodes = [{ name: 1 }, { name: 2 }, { name: 3 }, { name: 4 }, { name: 5 }];
+
+    /* vertex = d3
+      .select("svg")
+      .selectAll("circle")
+      .data(new_nodes)
+      .enter()
+      .append("circle")
+      .merge(vertex)
+      .attr("r", 10);
+    simulation.nodes(new_nodes).on("tick", ticked); */
+    addNode(vertex, simulation, ticked, new_nodes);
+
     function ticked() {
+      // let WIDTH = 800;
+      //let HEIGHT = 500;
       let radius = 10;
       vertex
         .attr("cx", function (d) {
