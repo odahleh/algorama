@@ -44,7 +44,7 @@ router.post("/initsocket", (req, res) => {
 });
 
 router.post("/saveGraph", (req, res) => {
-  const newGraphEntry = new GraphEntry({user:req.body.user, nodes:req.body.numberNodes, edges:req.body.edges}); 
+  const newGraphEntry = new GraphEntry({user:req.body.user, name: req.body.name, nodes:req.body.numberNodes, edges:req.body.edges}); 
   newGraphEntry.save(); 
 });
 

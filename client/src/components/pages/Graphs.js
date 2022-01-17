@@ -16,6 +16,7 @@ const Graphs = ({ userId, handleLogout }) => {
   const [main, setRef1] = useState(React.createRef());
   let [valueNodes, setValueNodes] = useState("");
   let [valueEdges, setValueEdges] = useState("");
+  let [valueGraphName, setValueNames] = useState(""); 
   let [currentSimulation, setCurrentSimulation] = useState(null);
   let [displaySimulation, setDisplaySimulation] = useState(false);
   let [WIDTH, setWidth] = useState(800);
@@ -73,9 +74,11 @@ const Graphs = ({ userId, handleLogout }) => {
   };
 
   const saveGraph = () => {
-    const graphDoc = {user:userId, numberNodes:nodes, edges:links}; 
+    const graphDoc = {user:userId, numberNodes:nodes, edges:links, name: valueGraphName}; 
     post("/api/savegraph", graphDoc); 
   }
+
+
 
   const GraphSimulation = (vertices, edges) => {
     let nodes = vertices;
@@ -207,6 +210,9 @@ const Graphs = ({ userId, handleLogout }) => {
     setValueEdges(event.target.value);
   };
 
+  const handleChangeName = (event) => {
+    setValueNames(event.target.value); 
+  };
 
   if (userId === undefined){
     userIDList.push(userId); 
@@ -237,7 +243,14 @@ const Graphs = ({ userId, handleLogout }) => {
           onChange={handleChangeEdges}
           placeholder={"edges 0-1,2-0, ..."}
         />
+        <input
+          type="text"
+          value={valueGraphName}
+          onChange={handleChangeName}
+          placeholder={"graph name"}
+        />
         <button onClick={saveGraph}> Save </button>
+
       </div>
       <div className="right-side">
           <GoogleLogout
