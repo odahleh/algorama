@@ -10,12 +10,30 @@ const Graphs = ({ userId }) => {
   const [main, setRef1] = useState(React.createRef());
   let [valueNodes, setValueNodes] = useState("");
   let [valueEdges, setValueEdges] = useState("");
+  let [currentSimulation, setCurrentSimulation] = useState(null);
   let [displaySimulation, setDisplaySimulation] = useState(false);
   let [WIDTH, setWidth] = useState(800);
   let [HEIGHT, setHeight] = useState(500);
+  let [windowHeight, setWindowHeight] = useState(window.innerHeight);
+  let [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-  //const WIDTH = 800;
-  //const HEIGHT = 500;
+  useEffect(() => {
+    window.addEventListener("resize", function () {
+      clearTimeout(adaptSizeTimer);
+      adaptSizeTimer = setTimeout(adaptSize, 500);
+    });
+  });
+
+  const handleResize = () => {};
+
+  const adaptSize = () => {
+    console.log("resize");
+    setWindowHeight(window.innerHeight);
+    setWindowWidth(window.innerWidth);
+    if (displaySimulation) {
+      currentSimulation.force("center", d3.forceCenter(windowWidth / 2, windowHeight / 2));
+    }
+  };
 
   const startGraph = () => {
     let nodes = [];
@@ -47,8 +65,9 @@ const Graphs = ({ userId }) => {
     const svg = d3
       .select(main.current)
       .append("svg")
-      .attr("width", WIDTH)
-      .attr("height", HEIGHT)
+      .attr("height", windowHeight)
+      .attr("width", windowWidth)
+      .attr("viewbox", "0 0 500 800")
       .style("background-color", "white")
       .on("mousedown", addNode);
 
@@ -73,7 +92,7 @@ const Graphs = ({ userId }) => {
           .distance(100)
       )
       .force("charge", d3.forceManyBody().strength(-70))
-      .force("center", d3.forceCenter(WIDTH / 2, HEIGHT / 2))
+      .force("center", d3.forceCenter(windowWidth / 2, windowHeight / 2))
       .on("tick", ticked);
 
     let link = svg
@@ -110,16 +129,16 @@ const Graphs = ({ userId }) => {
     }
 
     function ticked() {
-      // let WIDTH = 800;
-      //let HEIGHT = 500;
+      // let windowWidth = 800;
+      //let windowHeight = 500;
       let radius = 10;
       node
         .attr("cx", function (d) {
-          console.log(d.x);
-          return Math.max(radius, Math.min(WIDTH - radius, d.x));
+          //console.log(d.x);
+          return Math.max(radius, Math.min(windowWidth - radius, d.x));
         })
         .attr("cy", function (d) {
-          return Math.max(radius, Math.min(HEIGHT - radius, d.y));
+          return Math.max(radius, Math.min(windowHeight - radius, d.y));
         });
       link
         .attr("x1", function (d) {
@@ -153,6 +172,7 @@ const Graphs = ({ userId }) => {
       d.fy = null;
     }
     setDisplaySimulation(true);
+    setCurrentSimulation(simulation);
   };
 
   const handleChangeNodes = (event) => {
@@ -178,7 +198,7 @@ const Graphs = ({ userId }) => {
         onChange={handleChangeEdges}
         placeholder={"edges 0-1,2-0, ..."}
       />
-      <div id="main" ref={main}>
+      <div id="main" ref={main} /* width="500px" height="500px" */>
         {" "}
       </div>
     </div>
