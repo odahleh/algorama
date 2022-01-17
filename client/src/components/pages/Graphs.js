@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import GoogleLogin, { GoogleLogout } from "react-google-login";
 import "../../utilities.css";
 import "./Graphs.css";
-import { stratify } from "d3";
+import { color, stratify } from "d3";
 
 const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
 
@@ -48,6 +48,10 @@ const Graphs = ({ userId, handleLogout }) => {
     } */
   };
 
+  useEffect(() => {
+    GraphSimulation([{ name: 0 }, { name: 1 }], [{ source: 0, target: 1, color: "blue" }]);
+  });
+
   const startGraph = () => {
     let nodes = [];
     let links = [];
@@ -68,7 +72,9 @@ const Graphs = ({ userId, handleLogout }) => {
     }
     GraphSimulation(nodes, links);
   };
-
+  const changeColor = (links) => {
+    links[0].attr("stroke", "blue");
+  };
   const GraphSimulation = (nodes, links) => {
     if (displaySimulation === true) {
       d3.select("svg").remove();
@@ -115,7 +121,13 @@ const Graphs = ({ userId, handleLogout }) => {
       .enter()
       .append("line")
       .attr("stroke-width", 5)
-      .attr("stroke", "grey");
+      .attr("stroke", function (d) {
+        if (d.source === 0) {
+          return "red";
+        } else {
+          return "grey";
+        }
+      });
 
     let node = svg
       .append("g")
