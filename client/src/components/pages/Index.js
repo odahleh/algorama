@@ -32,9 +32,9 @@ const Index = ({ userId, handleLogin, handleLogout }) => {
           onFailure={(err) => console.log(err)}
         />
       )} */}
-      <div class="landing-page-container">
-        <div class="landing-page-title">Homepage Name</div>
-        <div class="landing-page-content">
+      <div className="landing-page-container">
+        <div className="landing-page-title">Homepage Name</div>
+        <div className="landing-page-content">
           {" "}
           Homepage descirption Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod
           tempor incidunt ut labore et dolore magna aliqua.{" "}
@@ -50,8 +50,7 @@ const Index = ({ userId, handleLogin, handleLogout }) => {
           clientId={GOOGLE_CLIENT_ID}
           render={(renderProps) => (
             <button
-              class="landing-page-button landing-page-content u-link:hover"
-              onHover
+              className="landing-page-button landing-page-content u-link:hover"
               onClick={renderProps.onClick}
               disabled={renderProps.disabled}
             >

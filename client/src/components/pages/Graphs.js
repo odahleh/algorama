@@ -4,15 +4,21 @@ import * as d3 from "d3";
 
 import "../../utilities.css";
 import "./Graphs.css";
+import GoogleLogin, { GoogleLogout } from "react-google-login";
 import { stratify } from "d3";
 
-const Graphs = ({ userId }) => {
+const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
+let userIDList = []; 
+
+const Graphs = ({ userId, handleLogout }) => {
   const [main, setRef1] = useState(React.createRef());
   let [valueNodes, setValueNodes] = useState("");
   let [valueEdges, setValueEdges] = useState("");
   let [displaySimulation, setDisplaySimulation] = useState(false);
   let [WIDTH, setWidth] = useState(800);
   let [HEIGHT, setHeight] = useState(500);
+
+
 
   //const WIDTH = 800;
   //const HEIGHT = 500;
@@ -163,6 +169,18 @@ const Graphs = ({ userId }) => {
     setValueEdges(event.target.value);
   };
 
+  if (userId === undefined){
+    userIDList.push(userId); 
+    if (userIDList.length === 2 && userIDList[-1] === undefined){
+      userIDList = []; 
+      return (
+        <>
+          <meta http-equiv = "refresh" content = "0; url = 'http://localhost:5000'" />
+        </>
+      )
+    }
+  } 
+  
   return (
     <div>
       <div className="top-bar">
@@ -174,7 +192,6 @@ const Graphs = ({ userId }) => {
           onChange={handleChangeNodes}
           placeholder={"number of nodes"}
         />
-
         <input
           type="text"
           value={valueEdges}
