@@ -4,7 +4,7 @@ import * as d3 from "d3";
 
 import "../../utilities.css";
 import "./Graphs.css";
-import { stratify } from "d3";
+import { color, stratify } from "d3";
 
 const Graphs = ({ userId }) => {
   const [main, setRef1] = useState(React.createRef());
@@ -16,6 +16,10 @@ const Graphs = ({ userId }) => {
 
   //const WIDTH = 800;
   //const HEIGHT = 500;
+
+  useEffect(() => {
+    GraphSimulation([{ name: 0 }, { name: 1 }], [{ source: 0, target: 1, color: "blue" }]);
+  });
 
   const startGraph = () => {
     let nodes = [];
@@ -37,7 +41,9 @@ const Graphs = ({ userId }) => {
     }
     GraphSimulation(nodes, links);
   };
-
+  const changeColor = (links) => {
+    links[0].attr("stroke", "blue");
+  };
   const GraphSimulation = (nodes, links) => {
     if (displaySimulation === true) {
       d3.select("svg").remove();
@@ -83,7 +89,13 @@ const Graphs = ({ userId }) => {
       .enter()
       .append("line")
       .attr("stroke-width", 5)
-      .attr("stroke", "grey");
+      .attr("stroke", function (d) {
+        if (d.source === 0) {
+          return "red";
+        } else {
+          return "grey";
+        }
+      });
 
     let node = svg
       .append("g")
@@ -178,6 +190,7 @@ const Graphs = ({ userId }) => {
         onChange={handleChangeEdges}
         placeholder={"edges 0-1,2-0, ..."}
       />
+      <button onClick={changeColor}> Start</button>
       <div id="main" ref={main}>
         {" "}
       </div>
