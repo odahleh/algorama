@@ -7,6 +7,8 @@ import "./Graphs.css";
 import GoogleLogin, { GoogleLogout } from "react-google-login";
 import { stratify } from "d3";
 
+import { post } from "../../utilities";
+
 const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
 let userIDList = []; 
 
@@ -25,17 +27,18 @@ const Graphs = ({ userId, handleLogout }) => {
   let [vertexObjs, setVertexObjs] = useState(null);
   let [edgeObjs, setEdgeObjs] = useState(null);
 
-  useEffect(() => {
-    window.addEventListener(
-      "resize",
-      handleResize /* function () {
-      clearTimeout(adaptSizeTimer);
-      adaptSizeTimer = setTimeout(function () {
-        console.log("resize");
-      }, 500);
-    } */
-    );
-  });
+  // useEffect(() => {
+  //   window.addEventListener(
+  //     "resize",
+  //     //handleResize
+  //      /* function () {
+  //     clearTimeout(adaptSizeTimer);
+  //     adaptSizeTimer = setTimeout(function () {
+  //       console.log("resize");
+  //     }, 500);
+  //   } */
+  //   );
+  // });
 
   const adaptSize = () => {
     /* setWindowHeight(window.innerHeight);
@@ -68,6 +71,11 @@ const Graphs = ({ userId, handleLogout }) => {
     setLinks(links);
     GraphSimulation(nodes, links);
   };
+
+  const saveGraph = () => {
+    const graphDoc = {user:userId, numberNodes:nodes, edges:links}; 
+    post("/api/savegraph", graphDoc); 
+  }
 
   const GraphSimulation = (vertices, edges) => {
     let nodes = vertices;
@@ -229,6 +237,7 @@ const Graphs = ({ userId, handleLogout }) => {
           onChange={handleChangeEdges}
           placeholder={"edges 0-1,2-0, ..."}
         />
+        <button onClick={saveGraph}> Save </button>
       </div>
       <div className="right-side">
           <GoogleLogout

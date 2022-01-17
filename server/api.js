@@ -12,6 +12,8 @@ const express = require("express");
 // import models so we can interact with the database
 const User = require("./models/user");
 
+const GraphEntry = require("./models/graphEntry");
+
 // import authentication library
 const auth = require("./auth");
 
@@ -40,6 +42,12 @@ router.post("/initsocket", (req, res) => {
     socketManager.addUser(req.user, socketManager.getSocketFromSocketID(req.body.socketid));
   res.send({});
 });
+
+router.post("/saveGraph", (req, res) => {
+  const newGraphEntry = new GraphEntry({user:req.body.user, nodes:req.body.numberNodes, edges:req.body.edges}); 
+  newGraphEntry.save(); 
+});
+
 
 router.get("/graph", (req, res) => {
   res.send(graph);
