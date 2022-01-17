@@ -18,15 +18,24 @@ const Graphs = ({ userId }) => {
   let [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   useEffect(() => {
-    window.addEventListener("resize", function () {
+    window.addEventListener(
+      "resize",
+      handleResize /* function () {
       clearTimeout(adaptSizeTimer);
       adaptSizeTimer = setTimeout(function () {
         console.log("resize");
       }, 500);
-    });
+    } */
+    );
   });
 
-  const handleResize = () => {};
+  const handleResize = () => {
+    setWindowHeight(window.innerHeight);
+    setWindowWidth(window.innerWidth);
+    if (displaySimulation) {
+      currentSimulation.force("center", d3.forceCenter(windowWidth / 2, windowHeight / 2));
+    }
+  };
 
   const adaptSize = () => {
     /* setWindowHeight(window.innerHeight);
