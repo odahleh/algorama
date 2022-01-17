@@ -220,7 +220,7 @@ const Graphs = ({ userId }) => {
         onChange={handleChangeEdges}
         placeholder={"edges 0-1,2-0, ..."}
       />
-      <button onClick={changeColor}> Start</button>
+      <button onClick={changeColor}> Change Color</button>
       <div id="main" ref={main} /* width="500px" height="500px" */>
         {" "}
       </div>
