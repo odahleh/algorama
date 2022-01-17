@@ -20,19 +20,20 @@ const Graphs = ({ userId }) => {
   useEffect(() => {
     window.addEventListener("resize", function () {
       clearTimeout(adaptSizeTimer);
-      adaptSizeTimer = setTimeout(adaptSize, 500);
+      adaptSizeTimer = setTimeout(function () {
+        console.log("resize");
+      }, 500);
     });
   });
 
   const handleResize = () => {};
 
   const adaptSize = () => {
-    console.log("resize");
-    setWindowHeight(window.innerHeight);
+    /* setWindowHeight(window.innerHeight);
     setWindowWidth(window.innerWidth);
     if (displaySimulation) {
       currentSimulation.force("center", d3.forceCenter(windowWidth / 2, windowHeight / 2));
-    }
+    } */
   };
 
   const startGraph = () => {
