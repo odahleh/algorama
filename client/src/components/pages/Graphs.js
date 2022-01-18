@@ -33,6 +33,9 @@ const Graphs = ({ userId, handleLogout }) => {
   let [vertexObjs, setVertexObjs] = useState(null);
   let [edgeObjs, setEdgeObjs] = useState(null);
   let [loadedGraphs, setLoadedGraphs] = useState([]);
+  let [showBFSProgress, setShowBFSProgress] = useState(false);
+  let [BFS_STEP, setBFS_STEP] = useState([]);
+  let [BFS_INDEX, setBFS_INDEX] = useState(0);
 
   let [currentSvg, setCurrentSvg] = useState(null);
 
@@ -249,19 +252,13 @@ const Graphs = ({ userId, handleLogout }) => {
   };
 
   const recolorNode = (i, color) => {
-    i = 0;
-    color = "red";
     let nodeId = "#v" + i.toString();
-    console.log(nodeId);
     d3.select(main.current).select("svg").select(nodeId).attr("fill", color);
   };
 
   const recolorEdge = (i, j, color) => {
-    i = 0;
-    j = 2;
     color = "green";
     let edgeId = "#e" + i.toString() + "-" + j.toString();
-    console.log(edgeId);
     d3.select(main.current).select("svg").select(edgeId).attr("stroke", color);
   };
 
@@ -276,14 +273,15 @@ const Graphs = ({ userId, handleLogout }) => {
     }
     return neighbors;
   }
-
   function BFS(start) {
+    changeShowBFSProgress();
     start = { name: 0 };
     let links = linksState;
     let nodes = nodesState;
     let visited = new Set();
     visited.add(start.name);
     let distanceArray = [];
+    let BFS_STEP = [];
     for (let node in nodes) {
       distanceArray.push(0);
     }
@@ -292,6 +290,7 @@ const Graphs = ({ userId, handleLogout }) => {
     queue = Array.from(neighbors);
     let level = 1;
     while (queue.length > 0) {
+      BFS_STEP.push([...distanceArray]);
       console.log(distanceArray);
       neighbors = [];
 
@@ -313,8 +312,35 @@ const Graphs = ({ userId, handleLogout }) => {
       }
       queue = neighbors;
     }
+    BFS_STEP.push([...distanceArray]);
     console.log(distanceArray);
+    setBFS_STEP(BFS_STEP);
   }
+  const changeShowBFSProgress = () => {
+    setShowBFSProgress(!showBFSProgress);
+  };
+  function BFS_stepper(index) {
+    d3.select(main.current).select("svg").selectAll("circle").attr("fill", "black");
+    recolorNode(0, "red");
+    console.log(BFS_STEP);
+    console.log(index);
+    for (let node in BFS_STEP[index]) {
+      // if value of node has changed
+      if (BFS_STEP[index - 1][node] !== BFS_STEP[index][node]) {
+        recolorNode(node, "green");
+        console.log(node);
+      }
+    }
+  }
+
+  const nextStep = () => {
+    BFS_stepper(Math.min(BFS_STEP.length - 1, Math.max(1 + BFS_INDEX, 0)));
+    setBFS_INDEX(Math.min(BFS_STEP.length - 1, Math.max(1 + BFS_INDEX, 0)));
+  };
+  const prevStep = () => {
+    BFS_stepper(Math.min(BFS_STEP.length - 1, Math.max(BFS_INDEX - 1, 0)));
+    setBFS_INDEX(Math.min(BFS_STEP.length - 1, Math.max(BFS_INDEX - 1, 0)));
+  };
 
   let redirect = <div></div>;
   //console.log(userId);
@@ -379,6 +405,18 @@ const Graphs = ({ userId, handleLogout }) => {
             <button onClick={BFS} className="button">
               BFS
             </button>
+            {showBFSProgress ? (
+              <div>
+                <button onClick={prevStep} className="button">
+                  Previous Step
+                </button>
+                <button onClick={nextStep} className="button">
+                  Next Step
+                </button>
+              </div>
+            ) : (
+              <div></div>
+            )}
           </div>
           <div className="right-side">
             <GoogleLogout
