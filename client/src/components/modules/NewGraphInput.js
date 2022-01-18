@@ -40,7 +40,7 @@ const NewGraphInput = (props) => {
   };
 
   return (
-    <div>
+    <>
       <input
         type="text"
         value={valueNodes}
@@ -56,10 +56,10 @@ const NewGraphInput = (props) => {
         className="InputBox"
       />
 
-      <button onClick={onSubmit} className="button">
+      <button onClick={onSubmit} className="button u-marginButton">
         Display
       </button>
-    </div>
+    </>
   );
 };
 

@@ -246,14 +246,8 @@ const Graphs = ({ userId, handleLogout }) => {
     <div className="Graphs-pageContainer">
       {redirect}
       <div className="top-bar-container">
-        <div className="Graphs-title"> Welcome to Algorama! </div>
-        <div className="top-bar">
-          <div className="left-side u-flex">
-            <NewGraphInput GraphSimulation={GraphSimulation} />
-            <button onClick={BFS} className="button">
-              Run BFS
-            </button>
-          </div>
+        <div className="u-flex">
+          <div className="Graphs-title left-side "> Welcome to Algorama!</div>
           <div className="right-side">
             <GoogleLogout
               clientId={GOOGLE_CLIENT_ID}
@@ -263,6 +257,16 @@ const Graphs = ({ userId, handleLogout }) => {
             />
           </div>
         </div>
+        <div className="Graphs-text">Create a new graph or run an algorithm</div>
+        <div className="Graphs-topbar">
+          <div className=" u-flex">
+            <NewGraphInput GraphSimulation={GraphSimulation} />
+            <button onClick={BFS} className="button u-marginButton">
+              Run BFS
+            </button>
+          </div>
+        </div>
+        <div className="Graphs-text">Save and load your graphs</div>
         <div className="second-bar">
           <SaveLoadGraph
             userId={userId}

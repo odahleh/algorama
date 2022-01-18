@@ -55,9 +55,13 @@ const SaveLoadGraph = (props) => {
 
   if (loadedGraphs.length > 0) {
     graphList = loadedGraphs.map((s, index) => (
-      <span className="graph-names">
+      <span className="Graph-names u-flex u-flex-alignCenter">
         {s.name}
-        <button onClick={generateGraph} id={"loadedGraph" + index.toString()} className="button">
+        <button
+          onClick={generateGraph}
+          id={"loadedGraph" + index.toString()}
+          className="button u-marginButtonLeft"
+        >
           {" "}
           Display
         </button>
@@ -66,8 +70,8 @@ const SaveLoadGraph = (props) => {
   }
 
   return (
-    <div className="Graphs-loadingMenu" id="Graphs-loadingMenu">
-      <button onClick={saveGraph} className="button">
+    <div className="Graphs-topbar" id="Graphs-loadingMenu">
+      <button onClick={saveGraph} className="button u-marginButton">
         Save
       </button>
       <input
@@ -77,7 +81,7 @@ const SaveLoadGraph = (props) => {
         placeholder={"Graph Name"}
         className="InputBox"
       />
-      <button onClick={loadGraph} className="button">
+      <button onClick={loadGraph} className="button u-marginButton">
         {" "}
         Load{" "}
       </button>
