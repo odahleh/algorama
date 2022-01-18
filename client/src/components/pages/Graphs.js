@@ -32,7 +32,7 @@ const Graphs = ({ userId, handleLogout }) => {
   let [vertexObjs, setVertexObjs] = useState(null);
   let [edgeObjs, setEdgeObjs] = useState(null);
   let [loadedGraphs, setLoadedGraphs] = useState([]);
-  
+
   let [currentSvg, setCurrentSvg] = useState(null);
 
   useEffect(() => {
@@ -81,30 +81,27 @@ const Graphs = ({ userId, handleLogout }) => {
   };
 
   const saveGraph = () => {
-    const graphDoc = {user:userId, numberNodes:nodes, edges:links, name: valueGraphName}; 
-    post("/api/savegraph", graphDoc); 
-  }
+    const graphDoc = { user: userId, numberNodes: nodes, edges: links, name: valueGraphName };
+    post("/api/savegraph", graphDoc);
+  };
 
   const generateGraph = (event) => {
-    console.log("generate")
-    let id = event.target.id
-    let i = parseInt(id.charAt(id.length-1))
-    console.log(i)
+    console.log("generate");
+    let id = event.target.id;
+    let i = parseInt(id.charAt(id.length - 1));
+    console.log(i);
     GraphSimulation(loadedGraphs[i].nodes, loadedGraphs[i].edges);
-   // console.log("Will be available soon!");
-  }
+    // console.log("Will be available soon!");
+  };
 
-  let graphList
+  let graphList;
   const loadGraph = () => {
-    const user = userId; 
-    const graphDoc = {user:user}; 
+    const user = userId;
+    const graphDoc = { user: user };
     get("/api/loadgraph", graphDoc).then((graphs) => {
-       setLoadedGraphs(graphs);
-    }
-    ); 
-  }
-
-
+      setLoadedGraphs(graphs);
+    });
+  };
 
   const GraphSimulation = (vertices, edges) => {
     let nodes = vertices;
@@ -142,7 +139,10 @@ const Graphs = ({ userId, handleLogout }) => {
       .enter()
       .append("line")
       .attr("stroke-width", 5)
-      .attr("stroke", "grey");
+      .attr("stroke", "grey")
+      .attr("id", function (d) {
+        return "e" + d.source.toString() + "-" + d.target.toString();
+      });
 
     let vertex = svg
       .selectAll("circles")
@@ -151,6 +151,9 @@ const Graphs = ({ userId, handleLogout }) => {
       .append("circle")
       .attr("r", 10)
       .attr("fill", "black")
+      .attr("id", function (d) {
+        return "v" + d.name.toString();
+      })
       .call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended));
 
     simulation.nodes(nodes).on("tick", ticked);
@@ -215,31 +218,54 @@ const Graphs = ({ userId, handleLogout }) => {
     setValueNames(event.target.value);
   };
 
-let redirect = <div></div>;
-//console.log(userId);
-if (userId === undefined) {
-  userIDList.push(userId);
-  //console.log(userIDList);
-  if (userIDList.length === 4 && userIDList[-1] === undefined) {
-    userIDList = [];
-    redirect = <meta http-equiv="refresh" content="0; url = 'http://localhost:5000'" />;
+  const recolorNode = (i, color) => {
+    i = 2;
+    color = "green";
+    let nodeId = "#v" + i.toString();
+    console.log(nodeId);
+    d3.select(main.current).select("svg").select(nodeId).attr("fill", color);
+  };
+
+  const recolorEdge = (i, j, color) => {
+    i = 0;
+    j = 2;
+    color = "green";
+    let edgeId = "#e" + i.toString() + "-" + j.toString();
+    console.log(edgeId);
+    d3.select(main.current).select("svg").select(edgeId).attr("stroke", color);
+  };
+
+  const BFS = (start) => {};
+
+  let redirect = <div></div>;
+  //console.log(userId);
+  if (userId === undefined) {
+    userIDList.push(userId);
+    //console.log(userIDList);
+    if (userIDList.length === 4 && userIDList[-1] === undefined) {
+      userIDList = [];
+      redirect = <meta http-equiv="refresh" content="0; url = 'http://localhost:5000'" />;
+    }
   }
-}
-  
 
   if (loadedGraphs.length > 0) {
     // for (let graph of loadedGraphs){
     //   oldNodes = graph.nodes;
     //   oldEdges = graph.edges;
     // }
-    graphList = 
-    <div>
-      {loadedGraphs.map((s,index) => 
+    graphList = (
       <div>
-        {s.name}
-        <button onClick={generateGraph} id={"loadedGraph"+index.toString()}> Generate Graph</button>
-        </div>)}
-    </div>
+        {loadedGraphs.map((s, index) => (
+          <div>
+            {s.name}
+            <button onClick={generateGraph} id={"loadedGraph" + index.toString()}>
+              {" "}
+              Generate Graph
+            </button>
+          </div>
+        ))}
+      </div>
+    );
   }
 
   return (
@@ -268,6 +294,9 @@ if (userId === undefined) {
           />
           <button onClick={saveGraph}> Save </button>
           <button onClick={loadGraph}> Load </button>
+          <button onClick={recolorNode}>Recolor Node</button>
+          <button onClick={recolorEdge}>Recolor Edge</button>
+          <button onClick={BFS}>BFS</button>
           {graphList}
         </div>
         <div className="right-side">
