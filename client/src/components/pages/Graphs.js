@@ -7,8 +7,8 @@ import "./Graphs.css";
 import GoogleLogin, { GoogleLogout } from "react-google-login";
 import { least, stratify } from "d3";
 
-import { post } from "../../utilities";
-import { get } from "../../utilities";
+import NewGraphInput from "../modules/NewGraphInput.js";
+import SaveLoadGraph from "../modules/SaveLoadGraph.js";
 
 const GOOGLE_CLIENT_ID =
   "git747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
@@ -16,9 +16,6 @@ let userIDList = [];
 
 const Graphs = ({ userId, handleLogout }) => {
   const [main, setRef1] = useState(React.createRef());
-  let [valueNodes, setValueNodes] = useState("");
-  let [valueEdges, setValueEdges] = useState("");
-  let [valueGraphName, setValueNames] = useState("");
   let [currentSimulation, setCurrentSimulation] = useState(null);
   let [displaySimulation, setDisplaySimulation] = useState(false);
   let [WIDTH, setWidth] = useState(800);
@@ -32,7 +29,6 @@ const Graphs = ({ userId, handleLogout }) => {
   ]);
   let [vertexObjs, setVertexObjs] = useState(null);
   let [edgeObjs, setEdgeObjs] = useState(null);
-  let [loadedGraphs, setLoadedGraphs] = useState([]);
   let [showBFSProgress, setShowBFSProgress] = useState(false);
   let [BFS_STEP, setBFS_STEP] = useState([]);
   let [BFS_INDEX, setBFS_INDEX] = useState(0);
@@ -61,68 +57,6 @@ const Graphs = ({ userId, handleLogout }) => {
     if (displaySimulation) {
       currentSimulation.force("center", d3.forceCenter(windowWidth / 2, windowHeight / 2));
     }
-  };
-
-  const startGraph = () => {
-    let nodes = [];
-    let links = [];
-    for (let i = 0; i < parseInt(valueNodes); i++) {
-      console.log(i);
-      nodes.push({ name: i /* , x: i * 100, y: 100 */ });
-    }
-    console.log(nodes);
-    if (valueEdges.length > 0) {
-      let linksArray = valueEdges.split(",");
-      for (let ele of linksArray) {
-        let ends = ele.split("-");
-        let start = parseInt(ends[0]);
-        let end = parseInt(ends[1]);
-        links.push({ source: start, target: end });
-      }
-      console.log(links);
-    }
-    GraphSimulation(nodes, links);
-  };
-
-  const saveGraph = () => {
-    let nodeNames = [];
-    let edgeNames = [];
-    for (let node of nodesState) {
-      nodeNames.push({ name: node.name });
-    }
-    for (let edge of linksState) {
-      edgeNames.push({ source: edge.source.name, target: edge.target.name });
-    }
-    const graphDoc = {
-      user: userId,
-      numberNodes: nodeNames,
-      edges: edgeNames,
-      name: valueGraphName,
-    };
-    post("/api/savegraph", graphDoc);
-  };
-
-  const generateGraph = (event) => {
-    console.log("generate");
-    //setDisplaySimulation(false);
-    let id = event.target.id;
-    let i = parseInt(id.charAt(id.length - 1));
-    console.log(i);
-    console.log(loadedGraphs[i].edges);
-    GraphSimulation(loadedGraphs[i].nodes, loadedGraphs[i].edges);
-    // console.log("Will be available soon!");
-  };
-
-  let graphList;
-
-  const loadGraph = () => {
-    setLoadedGraphs([]);
-    const user = userId;
-    const graphDoc = { user: user };
-    get("/api/loadgraph", graphDoc).then((graphs) => {
-      setLoadedGraphs(graphs);
-      document.getElementById("Graphs-loadingMenu").style.bordercolor = "white";
-    });
   };
 
   const GraphSimulation = (nodes, links) => {
@@ -190,8 +124,6 @@ const Graphs = ({ userId, handleLogout }) => {
     simulation.nodes(nodes).on("tick", ticked);
     simulation.force("link").links(links);
 
-    recolorNode(0, "red");
-
     function ticked() {
       let radius = 10;
       vertex
@@ -239,25 +171,12 @@ const Graphs = ({ userId, handleLogout }) => {
     setVertexObjs(vertex);
   };
 
-  const handleChangeNodes = (event) => {
-    setValueNodes(event.target.value);
-  };
-
-  const handleChangeEdges = (event) => {
-    setValueEdges(event.target.value);
-  };
-
-  const handleChangeName = (event) => {
-    setValueNames(event.target.value);
-  };
-
   const recolorNode = (i, color) => {
     let nodeId = "#v" + i.toString();
     d3.select(main.current).select("svg").select(nodeId).attr("fill", color);
   };
 
   const recolorEdge = (i, j, color) => {
-    color = "green";
     let edgeId = "#e" + i.toString() + "-" + j.toString();
     d3.select(main.current).select("svg").select(edgeId).attr("stroke", color);
   };
@@ -353,57 +272,16 @@ const Graphs = ({ userId, handleLogout }) => {
     }
   }
 
-  if (loadedGraphs.length > 0) {
-    // for (let graph of loadedGraphs){
-    //   oldNodes = graph.nodes;
-    //   oldEdges = graph.edges;
-    // }
-    graphList = loadedGraphs.map((s, index) => (
-      <span className="graph-names">
-        {s.name}
-        <button onClick={generateGraph} id={"loadedGraph" + index.toString()} className="button">
-          {" "}
-          Display
-        </button>
-      </span>
-    ));
-  }
-
   return (
     <div className="Graphs-pageContainer">
       {redirect}
       <div className="top-bar-container">
-        <div className="title"> {""} Welcome to Algorama! </div>
+        <div className="Graphs-title"> Welcome to Algorama! </div>
         <div className="top-bar">
-          <div className="left-side">
-            <input
-              type="text"
-              value={valueNodes}
-              onChange={handleChangeNodes}
-              placeholder={"number of nodes"}
-              className="InputBox"
-            />
-            <input
-              type="text"
-              value={valueEdges}
-              onChange={handleChangeEdges}
-              placeholder={"edges 0-1,2-0, ..."}
-              className="InputBox"
-            />
-
-            <button onClick={startGraph} className="button">
-              {" "}
-              Start
-            </button>
-
-            <button onClick={recolorNode} className="button">
-              Recolor Node
-            </button>
-            <button onClick={recolorEdge} className="button">
-              Recolor Edge
-            </button>
+          <div className="left-side u-flex">
+            <NewGraphInput GraphSimulation={GraphSimulation} />
             <button onClick={BFS} className="button">
-              BFS
+              Run BFS
             </button>
             {showBFSProgress ? (
               <div>
@@ -428,25 +306,12 @@ const Graphs = ({ userId, handleLogout }) => {
           </div>
         </div>
         <div className="second-bar">
-          <div className="Graphs-loadingMenu" id="Graphs-loadingMenu">
-            <button onClick={saveGraph} className="button">
-              {" "}
-              Save{" "}
-            </button>
-            <input
-              type="text"
-              value={valueGraphName}
-              onChange={handleChangeName}
-              placeholder={"Graph Name"}
-              className="InputBox"
-            />
-            <button onClick={loadGraph} className="button">
-              {" "}
-              Load{" "}
-            </button>
-
-            {graphList}
-          </div>
+          <SaveLoadGraph
+            userId={userId}
+            nodesState={nodesState}
+            linksState={linksState}
+            GraphSimulation={GraphSimulation}
+          />
         </div>
       </div>
       <div id="main" className="Graphs-svgContainer" ref={main} /* width="500px" height="500px" */>
