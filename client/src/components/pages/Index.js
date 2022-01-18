@@ -33,11 +33,10 @@ const Index = ({ userId, handleLogin, handleLogout }) => {
         />
       )} */}
       <div className="landing-page-container">
-        <div className="landing-page-title">Homepage Name</div>
+        <div className="landing-page-title">Algorama</div>
         <div className="landing-page-content">
           {" "}
-          Homepage descirption Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod
-          tempor incidunt ut labore et dolore magna aliqua.{" "}
+          Graph and Data visualizer to help you understand your 6.006 algorithms! {" "}
         </div>
         {userId ? (
         <GoogleLogout

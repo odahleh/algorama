@@ -5,7 +5,7 @@ import * as d3 from "d3";
 import "../../utilities.css";
 import "./Graphs.css";
 import GoogleLogin, { GoogleLogout } from "react-google-login";
-import { stratify } from "d3";
+import { least, stratify } from "d3";
 
 import { post } from "../../utilities";
 import { get } from "../../utilities";
@@ -24,8 +24,8 @@ const Graphs = ({ userId, handleLogout }) => {
   let [HEIGHT, setHeight] = useState(500);
   let [windowHeight, setWindowHeight] = useState(window.innerHeight);
   let [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  let [nodes, setNodes] = useState([{ name: 1 }, { name: 2 }, { name: 3 }, { name: 4 }]);
-  let [links, setLinks] = useState([
+  let [nodesState, setNodes] = useState([{ name: 1 }, { name: 2 }, { name: 3 }, { name: 4 }]);
+  let [linksState, setLinks] = useState([
     { source: 2, target: 1, weight: 1 },
     { source: 3, target: 2, weight: 3 },
   ]);
@@ -75,18 +75,16 @@ const Graphs = ({ userId, handleLogout }) => {
       }
       console.log(links);
     }
-    setNodes(nodes);
-    setLinks(links);
     GraphSimulation(nodes, links);
   };
 
   const saveGraph = () => {
     let nodeNames = [];
     let edgeNames = [];
-    for (let node of nodes) {
+    for (let node of nodesState) {
       nodeNames.push({ name: node.name });
     }
-    for (let edge of links) {
+    for (let edge of linksState) {
       edgeNames.push({ source: edge.source.name, target: edge.target.name });
     }
     const graphDoc = {
@@ -100,7 +98,7 @@ const Graphs = ({ userId, handleLogout }) => {
 
   const generateGraph = (event) => {
     console.log("generate");
-    setDisplaySimulation(false);
+    //setDisplaySimulation(false);
     let id = event.target.id;
     let i = parseInt(id.charAt(id.length - 1));
     console.log(i);
@@ -118,12 +116,11 @@ const Graphs = ({ userId, handleLogout }) => {
     });
   };
 
-  const GraphSimulation = (vertices, edges) => {
-    let nodes = vertices;
-    let links = edges;
+  const GraphSimulation = (nodes, links) => {
+    setNodes(nodes);
+    setLinks(links);
     if (displaySimulation === true) {
       d3.selectAll("svg").remove();
-      //d3.select(main.current).append("svg").attr("width", WIDTH).attr("height", HEIGHT);
       setDisplaySimulation(false);
     }
     const svg = d3
@@ -154,7 +151,10 @@ const Graphs = ({ userId, handleLogout }) => {
       .enter()
       .append("line")
       .attr("stroke-width", 5)
-      .attr("stroke", "grey");
+      .attr("stroke", "grey")
+      .attr("id", function (d) {
+        return "e" + d.source.toString() + "-" + d.target.toString();
+      });
 
     let vertex = svg
       .selectAll("circles")
@@ -163,7 +163,20 @@ const Graphs = ({ userId, handleLogout }) => {
       .append("circle")
       .attr("r", 10)
       .attr("fill", "black")
+      .attr("id", function (d) {
+        return "v" + d.name.toString();
+      })
       .call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended));
+
+    vertex.append("title").text(function (d) {
+      return "A";
+    });
+
+    vertex.append("text").text(function (d) {
+      return "A";
+    });
+
+    // TODO: Finish adding labels, see https://stackoverflow.com/questions/13364566/labels-text-on-the-nodes-of-a-d3-force-directed-graph
 
     simulation.nodes(nodes).on("tick", ticked);
     simulation.force("link").links(links);
@@ -227,6 +240,73 @@ const Graphs = ({ userId, handleLogout }) => {
     setValueNames(event.target.value);
   };
 
+  const recolorNode = (i, color) => {
+    i = 2;
+    color = "green";
+    let nodeId = "#v" + i.toString();
+    console.log(nodeId);
+    d3.select(main.current).select("svg").select(nodeId).attr("fill", color);
+  };
+
+  const recolorEdge = (i, j, color) => {
+    i = 0;
+    j = 2;
+    color = "green";
+    let edgeId = "#e" + i.toString() + "-" + j.toString();
+    console.log(edgeId);
+    d3.select(main.current).select("svg").select(edgeId).attr("stroke", color);
+  };
+
+  function findNeighbors(start, links) {
+    let neighbors = new Set();
+    for (let edge of links) {
+      if (edge.source.name === start.name) {
+        neighbors.add(edge.target.name);
+      } else if (edge.target.name === start.name) {
+        neighbors.add(edge.source.name);
+      }
+    }
+    return neighbors;
+  }
+
+  function BFS(start) {
+    start = { name: 0 };
+    let links = linksState;
+    let nodes = nodesState;
+    let visited = new Set();
+    visited.add(start.name);
+    let distanceArray = [];
+    for (let node of nodes) {
+      distanceArray.push(0);
+    }
+    let queue = [];
+    let neighbors = findNeighbors(start, links);
+    queue = Array.from(neighbors);
+    while (queue.length > 0) {
+      console.log(distanceArray);
+      neighbors = [];
+
+      for (let next of queue) {
+        if (!visited.has(next)) {
+          visited.add(next);
+          console.log(next, "node");
+          distanceArray[next] += 1;
+        }
+      }
+      for (let next of queue) {
+        let currNeighbors = findNeighbors({ name: next }, links);
+        for (let neigh of currNeighbors) {
+          if (!visited.has(neigh)) {
+            distanceArray[neigh] += 1;
+            neighbors.push(neigh);
+          }
+        }
+      }
+      queue = neighbors;
+    }
+    console.log(distanceArray);
+  }
+
   let redirect = <div></div>;
   //console.log(userId);
   if (userId === undefined) {
@@ -246,9 +326,9 @@ const Graphs = ({ userId, handleLogout }) => {
     graphList = (
       <div>
         {loadedGraphs.map((s, index) => (
-          <div>
+          <div className="graph-names">
             {s.name}
-            <button onClick={generateGraph} id={"loadedGraph" + index.toString()}>
+            <button onClick={generateGraph} id={"loadedGraph" + index.toString()} className="generate-button">
               {" "}
               Generate Graph
             </button>
@@ -261,30 +341,15 @@ const Graphs = ({ userId, handleLogout }) => {
   return (
     <div>
       {redirect}
+      <div className="title"> {""} Welcome to Algorama! </div>
       <div className="top-bar">
         <div className="left-side">
-          <button onClick={startGraph}> Start</button>
-          <input
-            type="text"
-            value={valueNodes}
-            onChange={handleChangeNodes}
-            placeholder={"number of nodes"}
-          />
-          <input
-            type="text"
-            value={valueEdges}
-            onChange={handleChangeEdges}
-            placeholder={"edges 0-1,2-0, ..."}
-          />
-          <input
-            type="text"
-            value={valueGraphName}
-            onChange={handleChangeName}
-            placeholder={"graph name"}
-          />
-          <button onClick={saveGraph}> Save </button>
-          <button onClick={loadGraph}> Load </button>
-          {graphList}
+          <button onClick={startGraph} className="button"> Start</button>
+          <button onClick={saveGraph} className ="button"> Save </button>
+          <button onClick={loadGraph} className ="button"> Load </button>
+          <button onClick={recolorNode} className ="button">Recolor Node</button>
+          <button onClick={recolorEdge} className ="button">Recolor Edge</button>
+          <button onClick={BFS} className="button">BFS</button>
         </div>
         <div className="right-side">
           <GoogleLogout
@@ -295,6 +360,27 @@ const Graphs = ({ userId, handleLogout }) => {
           />
         </div>
       </div>
+      <div className="second-bar">
+        <input
+              type="text"
+              value={valueNodes}
+              onChange={handleChangeNodes}
+              placeholder={"number of nodes"}
+            />
+            <input
+              type="text"
+              value={valueEdges}
+              onChange={handleChangeEdges}
+              placeholder={"edges 0-1,2-0, ..."}
+            />
+            <input
+              type="text"
+              value={valueGraphName}
+              onChange={handleChangeName}
+              placeholder={"graph name"}
+            />
+      </div>
+      {graphList}
       <div id="main" ref={main} /* width="500px" height="500px" */>
         {""}
       </div>
