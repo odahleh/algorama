@@ -344,7 +344,7 @@ const Graphs = ({ userId, handleLogout }) => {
     <div className="Graphs-pageContainer">
       {redirect}
       <div className="top-bar-container">
-        <div className="title"> {""} Welcome to Algorama! </div>
+        <div className="Graphs-title"> Welcome to Algorama! </div>
         <div className="top-bar">
           <div className="left-side">
             <input
