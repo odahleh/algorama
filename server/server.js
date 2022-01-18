@@ -17,8 +17,9 @@
 // this is a tool provided by staff, so you don't need to worry about it
 const validator = require("./validator");
 validator.checkSetup();
-require('dotenv').config()
+
 //import libraries needed for the webserver to work!
+require("dotenv").config();
 const http = require("http");
 const express = require("express"); // backend framework for our node server.
 const session = require("express-session"); // library that stores info about each connected user
@@ -95,10 +96,11 @@ app.use((err, req, res, next) => {
 });
 
 // hardcode port to 3000 for now
-const port = 3000;
+const port = process.env.YOUR_PORT || process.env.PORT || 3000;
+const serverHost = process.env.YOUR_HOST || "0.0.0.0";
 const server = http.Server(app);
 socketManager.init(server);
 
-server.listen(port, () => {
+server.listen(port, serverHost, () => {
   console.log(`Server running on port: ${port}`);
 });
