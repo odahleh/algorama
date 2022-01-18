@@ -10,7 +10,8 @@ import { least, stratify } from "d3";
 import { post } from "../../utilities";
 import { get } from "../../utilities";
 
-const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID =
+  "git747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
 let userIDList = [];
 
 const Graphs = ({ userId, handleLogout }) => {
@@ -106,6 +107,7 @@ const Graphs = ({ userId, handleLogout }) => {
     console.log(i);
     console.log(loadedGraphs[i].edges);
     GraphSimulation(loadedGraphs[i].nodes, loadedGraphs[i].edges);
+    // console.log("Will be available soon!");
   };
 
   let graphList;
