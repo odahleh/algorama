@@ -8,6 +8,7 @@ import GoogleLogin, { GoogleLogout } from "react-google-login";
 import { stratify } from "d3";
 
 import { post } from "../../utilities";
+import { get } from "../../utilities";
 
 const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
 let userIDList = []; 
@@ -27,8 +28,11 @@ const Graphs = ({ userId, handleLogout }) => {
   let [links, setLinks] = useState({ souce: 0, target: 1 });
   let [vertexObjs, setVertexObjs] = useState(null);
   let [edgeObjs, setEdgeObjs] = useState(null);
+  let [loadedGraphs, setLoadedGraphs] = useState([]);
+  let oldNodes; 
+  let oldEdges; 
 
-  // useEffect(() => {
+  //useEffect(() => {console.log("render")})
   //   window.addEventListener(
   //     "resize",
   //     //handleResize
@@ -78,6 +82,25 @@ const Graphs = ({ userId, handleLogout }) => {
     post("/api/savegraph", graphDoc); 
   }
 
+  const generateGraph = (event) => {
+    console.log("generate")
+    let id = event.target.id
+    let i = parseInt(id.charAt(id.length-1))
+    console.log(i)
+    GraphSimulation(loadedGraphs[i].nodes, loadedGraphs[i].edges);
+   // console.log("Will be available soon!");
+  }
+
+  let graphList
+  const loadGraph = () => {
+    const user = userId; 
+    const graphDoc = {user:user}; 
+    get("/api/loadgraph", graphDoc).then((graphs) => {
+       setLoadedGraphs(graphs);
+    }
+    ); 
+  }
+
 
 
   const GraphSimulation = (vertices, edges) => {
@@ -94,7 +117,6 @@ const Graphs = ({ userId, handleLogout }) => {
       .attr("width", WIDTH)
       .attr("height", HEIGHT)
       .style("background-color", "white")
-      .on("mousedown", addNode);
 
     /* let links = [
       { source: 2, target: 1, weight: 1 },
@@ -216,6 +238,7 @@ const Graphs = ({ userId, handleLogout }) => {
 
   if (userId === undefined){
     userIDList.push(userId); 
+    console.log(userIDList); 
     if (userIDList.length === 2 && userIDList[-1] === undefined){
       userIDList = []; 
       return (
@@ -226,43 +249,60 @@ const Graphs = ({ userId, handleLogout }) => {
     }
   } 
   
+
+  if (loadedGraphs.length > 0) {
+    // for (let graph of loadedGraphs){
+    //   oldNodes = graph.nodes;
+    //   oldEdges = graph.edges;
+    // }
+    graphList = 
+    <div>
+      {loadedGraphs.map((s,index) => 
+      <div>
+        {s.name}
+        <button onClick={generateGraph} id={"loadedGraph"+index.toString()}> Generate Graph</button>
+        </div>)}
+    </div>
+  }
+
   return (
     <div>
       <div className="top-bar">
-      <div className="left-side">
-        <button onClick={startGraph}> Start</button>
-        <input
-          type="text"
-          value={valueNodes}
-          onChange={handleChangeNodes}
-          placeholder={"number of nodes"}
-        />
-        <input
-          type="text"
-          value={valueEdges}
-          onChange={handleChangeEdges}
-          placeholder={"edges 0-1,2-0, ..."}
-        />
-        <input
-          type="text"
-          value={valueGraphName}
-          onChange={handleChangeName}
-          placeholder={"graph name"}
-        />
-        <button onClick={saveGraph}> Save </button>
-
-      </div>
-      <div className="right-side">
-          <GoogleLogout
-              clientId={GOOGLE_CLIENT_ID}
-              buttonText="Logout"
-              onLogoutSuccess={handleLogout}
-              onFailure={(err) => console.log(err)}
+        <div className="left-side">
+          <button onClick={startGraph}> Start</button>
+          <input
+            type="text"
+            value={valueNodes}
+            onChange={handleChangeNodes}
+            placeholder={"number of nodes"}
           />
+          <input
+            type="text"
+            value={valueEdges}
+            onChange={handleChangeEdges}
+            placeholder={"edges 0-1,2-0, ..."}
+          />
+          <input
+            type="text"
+            value={valueGraphName}
+            onChange={handleChangeName}
+            placeholder={"graph name"}
+          />
+          <button onClick={saveGraph}> Save </button>
+          <button onClick={loadGraph}> Load </button>
+          {graphList}
         </div>
-        <div id="main" ref={main} /* width="500px" height="500px" */>
+        <div className="right-side">
+            <GoogleLogout
+                clientId={GOOGLE_CLIENT_ID}
+                buttonText="Logout"
+                onLogoutSuccess={handleLogout}
+                onFailure={(err) => console.log(err)}
+            />
+          </div>
+      </div>
+      <div id="main" ref={main} /* width="500px" height="500px" */>
           {" "}
-        </div>
       </div>
     </div>
   );
