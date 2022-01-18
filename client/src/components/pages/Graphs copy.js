@@ -4,20 +4,12 @@ import * as d3 from "d3";
 
 import "../../utilities.css";
 import "./Graphs.css";
-import GoogleLogin, { GoogleLogout } from "react-google-login";
 import { stratify } from "d3";
 
-import { post } from "../../utilities";
-import { get } from "../../utilities";
-
-const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
-let userIDList = [];
-
-const Graphs = ({ userId, handleLogout }) => {
+const Graphs = ({ userId }) => {
   const [main, setRef1] = useState(React.createRef());
   let [valueNodes, setValueNodes] = useState("");
   let [valueEdges, setValueEdges] = useState("");
-  let [valueGraphName, setValueNames] = useState("");
   let [currentSimulation, setCurrentSimulation] = useState(null);
   let [displaySimulation, setDisplaySimulation] = useState(false);
   let [WIDTH, setWidth] = useState(800);
@@ -31,8 +23,6 @@ const Graphs = ({ userId, handleLogout }) => {
   ]);
   let [vertexObjs, setVertexObjs] = useState(null);
   let [edgeObjs, setEdgeObjs] = useState(null);
-  let [loadedGraphs, setLoadedGraphs] = useState([]);
-  
   let [currentSvg, setCurrentSvg] = useState(null);
 
   useEffect(() => {
@@ -49,12 +39,12 @@ const Graphs = ({ userId, handleLogout }) => {
     );
   });
 
-  const handleResize = () => {
-    setWindowHeight(window.innerHeight);
+  const adaptSize = () => {
+    /* setWindowHeight(window.innerHeight);
     setWindowWidth(window.innerWidth);
     if (displaySimulation) {
       currentSimulation.force("center", d3.forceCenter(windowWidth / 2, windowHeight / 2));
-    }
+    } */
   };
 
   const startGraph = () => {
@@ -80,46 +70,15 @@ const Graphs = ({ userId, handleLogout }) => {
     GraphSimulation(nodes, links);
   };
 
-  const saveGraph = () => {
-    const graphDoc = {user:userId, numberNodes:nodes, edges:links, name: valueGraphName}; 
-    post("/api/savegraph", graphDoc); 
-  }
-
-  const generateGraph = (event) => {
-    console.log("generate")
-    let id = event.target.id
-    let i = parseInt(id.charAt(id.length-1))
-    console.log(i)
-    GraphSimulation(loadedGraphs[i].nodes, loadedGraphs[i].edges);
-   // console.log("Will be available soon!");
-  }
-
-  let graphList
-  const loadGraph = () => {
-    const user = userId; 
-    const graphDoc = {user:user}; 
-    get("/api/loadgraph", graphDoc).then((graphs) => {
-       setLoadedGraphs(graphs);
-    }
-    ); 
-  }
-
-
-
   const GraphSimulation = (vertices, edges) => {
     let nodes = vertices;
     let links = edges;
     if (displaySimulation === true) {
       d3.selectAll("svg").remove();
-      //d3.select(main.current).append("svg").attr("width", WIDTH).attr("height", HEIGHT);
+      d3.select(main.current).append("svg").attr("width", WIDTH).attr("height", HEIGHT);
       setDisplaySimulation(false);
     }
-    const svg = d3
-      .select(main.current)
-      .append("svg")
-      .attr("width", WIDTH)
-      .attr("height", HEIGHT)
-      .style("background-color", "white");
+    const svg = d3.select("svg").style("background-color", "white").on("mousedown", addNode);
 
     let simulation = d3
       .forceSimulation()
@@ -144,19 +103,62 @@ const Graphs = ({ userId, handleLogout }) => {
       .attr("stroke-width", 5)
       .attr("stroke", "grey");
 
-    let vertex = svg
+    /* let vertex = svg
+      .selectAll("circle")
+      .data(nodes)
+      .enter()
+      .append("circle")
+      .attr("r", 10)
+      .attr("fill", "black"); */
+    //.call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended));
+
+    //vertex.attr("fill", "red");
+    /* vertex.on("mouseover", function (d) {
+      d3.select(this).attr("r", 30);
+    }); */
+
+    const addNode = (vertex, simulation, ticked, new_nodes) => {
+      vertex = d3
+        .select("svg")
+        .selectAll("circle")
+        .data(new_nodes)
+        .enter()
+        .append("circle")
+        .merge(vertex)
+        .attr("r", 10);
+      simulation.nodes(new_nodes).on("tick", ticked);
+    };
+
+    nodes = [{ name: 1 }, { name: 2 }, { name: 3 }, { name: 4 }];
+
+    let vertex = d3
+      .select("svg")
       .selectAll("circles")
       .data(nodes)
       .enter()
       .append("circle")
       .attr("r", 10)
-      .attr("fill", "black")
-      .call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended));
+      .attr("fill", "green");
 
     simulation.nodes(nodes).on("tick", ticked);
     simulation.force("link").links(links);
 
+    let new_nodes = [{ name: 1 }, { name: 2 }, { name: 3 }, { name: 4 }, { name: 5 }];
+
+    /* vertex = d3
+      .select("svg")
+      .selectAll("circle")
+      .data(new_nodes)
+      .enter()
+      .append("circle")
+      .merge(vertex)
+      .attr("r", 10);
+    simulation.nodes(new_nodes).on("tick", ticked); */
+    addNode(vertex, simulation, ticked, new_nodes);
+
     function ticked() {
+      // let WIDTH = 800;
+      //let HEIGHT = 500;
       let radius = 10;
       vertex
         .attr("cx", function (d) {
@@ -211,76 +213,68 @@ const Graphs = ({ userId, handleLogout }) => {
     setValueEdges(event.target.value);
   };
 
-  const handleChangeName = (event) => {
-    setValueNames(event.target.value);
+  const addNode = () => {
+    pass;
   };
 
-let redirect = <div></div>;
-//console.log(userId);
-if (userId === undefined) {
-  userIDList.push(userId);
-  //console.log(userIDList);
-  if (userIDList.length === 4 && userIDList[-1] === undefined) {
-    userIDList = [];
-    redirect = <meta http-equiv="refresh" content="0; url = 'http://localhost:5000'" />;
-  }
-}
-  
+  const restart = () => {
+    let vertices = vertexObjs.data("nodes", function (d) {
+      return d.name;
+    });
+    console.log(vertices);
+    vertices.exit().remove();
 
-  if (loadedGraphs.length > 0) {
-    // for (let graph of loadedGraphs){
-    //   oldNodes = graph.nodes;
-    //   oldEdges = graph.edges;
-    // }
-    graphList = 
-    <div>
-      {loadedGraphs.map((s,index) => 
-      <div>
-        {s.name}
-        <button onClick={generateGraph} id={"loadedGraph"+index.toString()}> Generate Graph</button>
-        </div>)}
-    </div>
-  }
+    /* let vertex = vertexObjs;
+    console.log(nodes);
+    vertex = vertex.data(nodes, function (d) {
+      return d.name;
+    });
+    vertex.attr("color", "red"); */
+    //vertex.exit().remove();
+    /* vertex.selectAll("text").text(function (d) {
+      return d.degree;
+    }); */
+    let vertex = vertices
+      .enter()
+      .append("g")
+      .selectAll("circle")
+      //.data(nodes)
+      .append("circle")
+      .attr("r", 20)
+      .style("fill", "blue");
+
+    vertices = vertex.merge(vertices);
+
+    currentSimulation.nodes(nodes);
+    currentSimulation.alpha(0.8).restart();
+  };
+
+  const handleResize = () => {
+    setWindowHeight(window.innerHeight);
+    setWindowWidth(window.innerWidth);
+    if (displaySimulation) {
+      currentSimulation.force("center", d3.forceCenter(windowWidth / 2, windowHeight / 2));
+    }
+  };
 
   return (
     <div>
-      {redirect}
-      <div className="top-bar">
-        <div className="left-side">
-          <button onClick={startGraph}> Start</button>
-          <input
-            type="text"
-            value={valueNodes}
-            onChange={handleChangeNodes}
-            placeholder={"number of nodes"}
-          />
-          <input
-            type="text"
-            value={valueEdges}
-            onChange={handleChangeEdges}
-            placeholder={"edges 0-1,2-0, ..."}
-          />
-          <input
-            type="text"
-            value={valueGraphName}
-            onChange={handleChangeName}
-            placeholder={"graph name"}
-          />
-          <button onClick={saveGraph}> Save </button>
-          <button onClick={loadGraph}> Load </button>
-          {graphList}
-        </div>
-        <div className="right-side">
-          <GoogleLogout
-            clientId={GOOGLE_CLIENT_ID}
-            buttonText="Logout"
-            onLogoutSuccess={handleLogout}
-            onFailure={(err) => console.log(err)}
-          />
-        </div>
-      </div>
+      <button onClick={startGraph}> Start</button>
+      <input
+        type="text"
+        value={valueNodes}
+        onChange={handleChangeNodes}
+        placeholder={"number of nodes"}
+      />
+      <input
+        type="text"
+        value={valueEdges}
+        onChange={handleChangeEdges}
+        placeholder={"edges 0-1,2-0, ..."}
+      />
+      <button onClick={addNode}> Start</button>
       <div id="main" ref={main} /* width="500px" height="500px" */>
-        {""}
+        <svg width={WIDTH} height={HEIGHT} />
       </div>
     </div>
   );
