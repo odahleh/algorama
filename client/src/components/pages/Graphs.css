@@ -20,3 +20,51 @@
   flex-grow: 1
 }
 
+.title{
+  font-family: DM Sans;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 36px;
+  line-height: 47px;
+  text-align: center;
+  margin: 1% 15%;
+  /* display: flex;
+    align-content: center;
+    text-align: center; */
+
+  color: #000000;
+}
+
+.button {
+  background: #5E5DF0;
+  border-radius: 50px;
+  color: #FFFFFF;
+  cursor: pointer;
+  font-family: DM Sans; 
+  font-size: 13spx;
+  line-height: 15px;
+  padding: 8px 18px;
+  touch-action: manipulation;
+  border: 0;
+  margin: 8px
+}
+
+.generate-button {
+  background: #5E5DF0;
+  border-radius: 50px;
+  color: #FFFFFF;
+  cursor: pointer;
+  font-family: DM Sans; 
+  font-size: 10px;
+  line-height: 15px;
+  padding: 6px 10px;
+  touch-action: manipulation;
+  border: 0;
+  margin: 4px
+}
+.graph-names{
+  font-weight: bold;
+  font-family: DM Sans; 
+}
+
+

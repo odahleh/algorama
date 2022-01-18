@@ -271,9 +271,9 @@ const Graphs = ({ userId, handleLogout }) => {
     graphList = (
       <div>
         {loadedGraphs.map((s, index) => (
-          <div>
+          <div className="graph-names">
             {s.name}
-            <button onClick={generateGraph} id={"loadedGraph" + index.toString()}>
+            <button onClick={generateGraph} id={"loadedGraph" + index.toString()} className="generate-button">
               {" "}
               Generate Graph
             </button>
@@ -286,33 +286,15 @@ const Graphs = ({ userId, handleLogout }) => {
   return (
     <div>
       {redirect}
+      <div className="title"> {""} Welcome to Algorama! </div>
       <div className="top-bar">
         <div className="left-side">
-          <button onClick={startGraph}> Start</button>
-          <input
-            type="text"
-            value={valueNodes}
-            onChange={handleChangeNodes}
-            placeholder={"number of nodes"}
-          />
-          <input
-            type="text"
-            value={valueEdges}
-            onChange={handleChangeEdges}
-            placeholder={"edges 0-1,2-0, ..."}
-          />
-          <input
-            type="text"
-            value={valueGraphName}
-            onChange={handleChangeName}
-            placeholder={"graph name"}
-          />
-          <button onClick={saveGraph}> Save </button>
-          <button onClick={loadGraph}> Load </button>
-          <button onClick={recolorNode}>Recolor Node</button>
-          <button onClick={recolorEdge}>Recolor Edge</button>
-          <button onClick={BFS}>BFS</button>
-          {graphList}
+          <button onClick={startGraph} className="button"> Start</button>
+          <button onClick={saveGraph} className ="button"> Save </button>
+          <button onClick={loadGraph} className ="button"> Load </button>
+          <button onClick={recolorNode} className ="button">Recolor Node</button>
+          <button onClick={recolorEdge} className ="button">Recolor Edge</button>
+          <button onClick={BFS} className="button">BFS</button>
         </div>
         <div className="right-side">
           <GoogleLogout
@@ -323,6 +305,27 @@ const Graphs = ({ userId, handleLogout }) => {
           />
         </div>
       </div>
+      <div className="second-bar">
+        <input
+              type="text"
+              value={valueNodes}
+              onChange={handleChangeNodes}
+              placeholder={"number of nodes"}
+            />
+            <input
+              type="text"
+              value={valueEdges}
+              onChange={handleChangeEdges}
+              placeholder={"edges 0-1,2-0, ..."}
+            />
+            <input
+              type="text"
+              value={valueGraphName}
+              onChange={handleChangeName}
+              placeholder={"graph name"}
+            />
+      </div>
+      {graphList}
       <div id="main" ref={main} /* width="500px" height="500px" */>
         {""}
       </div>
