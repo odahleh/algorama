@@ -32,7 +32,7 @@ const Graphs = ({ userId, handleLogout }) => {
   let [showBFSProgress, setShowBFSProgress] = useState(false);
   let [BFS_STEP, setBFS_STEP] = useState([]);
   let [BFS_INDEX, setBFS_INDEX] = useState(0);
-
+  let [startNodeBFS, setStartNodeBFS] = useState("");
   let [currentSvg, setCurrentSvg] = useState(null);
 
   useEffect(() => {
@@ -192,9 +192,13 @@ const Graphs = ({ userId, handleLogout }) => {
     }
     return neighbors;
   }
-  function BFS(start) {
-    changeShowBFSProgress();
-    start = { name: 0 };
+  function BFS() {
+    d3.select(main.current).select("svg").selectAll("circle").attr("fill", "black");
+    recolorNode(startNodeBFS, "red");
+    // BFS_stepper(0);
+    // setBFS_INDEX(0);
+    let start = { name: parseInt(startNodeBFS) };
+    setShowBFSProgress(true);
     let links = linksState;
     let nodes = nodesState;
     let visited = new Set();
@@ -235,12 +239,10 @@ const Graphs = ({ userId, handleLogout }) => {
     console.log(distanceArray);
     setBFS_STEP(BFS_STEP);
   }
-  const changeShowBFSProgress = () => {
-    setShowBFSProgress(!showBFSProgress);
-  };
+
   function BFS_stepper(index) {
     d3.select(main.current).select("svg").selectAll("circle").attr("fill", "black");
-    recolorNode(0, "red");
+    recolorNode(startNodeBFS, "red");
     console.log(BFS_STEP);
     console.log(index);
     for (let node in BFS_STEP[index]) {
@@ -251,6 +253,10 @@ const Graphs = ({ userId, handleLogout }) => {
       }
     }
   }
+
+  const handleStartNodeBFS = (event) => {
+    setStartNodeBFS(event.target.value);
+  };
 
   const nextStep = () => {
     BFS_stepper(Math.min(BFS_STEP.length - 1, Math.max(1 + BFS_INDEX, 0)));
@@ -280,6 +286,13 @@ const Graphs = ({ userId, handleLogout }) => {
         <div className="top-bar">
           <div className="left-side u-flex">
             <NewGraphInput GraphSimulation={GraphSimulation} />
+            <input
+              type="text"
+              value={startNodeBFS}
+              onChange={handleStartNodeBFS}
+              placeholder={"BFS start node"}
+              className="InputBox"
+            />
             <button onClick={BFS} className="button">
               Run BFS
             </button>
