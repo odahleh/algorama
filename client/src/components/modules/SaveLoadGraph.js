@@ -8,6 +8,13 @@ const SaveLoadGraph = (props) => {
   let [valueGraphName, setValueNames] = useState("");
   let [loadedGraphs, setLoadedGraphs] = useState([]);
 
+  useEffect(() => {
+    if (loadedGraphs.length === 0 && props.userId) {
+      console.log("yallah");
+      loadGraph();
+    }
+  }, props.userId);
+
   const handleChangeName = (event) => {
     setValueNames(event.target.value);
   };
@@ -27,7 +34,10 @@ const SaveLoadGraph = (props) => {
       edges: edgeNames,
       name: valueGraphName,
     };
-    post("/api/savegraph", graphDoc);
+    post("/api/savegraph", graphDoc).then((graph) => {
+      setLoadedGraphs([...loadedGraphs, graph]);
+      console.log(graph);
+    });
   };
 
   const loadGraph = () => {
@@ -70,21 +80,25 @@ const SaveLoadGraph = (props) => {
   }
 
   return (
-    <div className="Graphs-topbar" id="Graphs-loadingMenu">
-      <button onClick={saveGraph} className="button u-marginButton">
-        Save
-      </button>
-      <input
-        type="text"
-        value={valueGraphName}
-        onChange={handleChangeName}
-        placeholder={"Graph Name"}
-        className="InputBox"
-      />
-      <button onClick={loadGraph} className="button u-marginButton">
+    <div className="Graphs-topbar u-flex u-flex-wrap " id="Graphs-loadingMenu">
+      {console.log("render")}
+      <span className="Graph-names u-flex u-flex-alignCenter">
+        <input
+          type="text"
+          value={valueGraphName}
+          onChange={handleChangeName}
+          placeholder={"Graph Name"}
+          className="InputBoxInside"
+        />
+        <button onClick={saveGraph} className="button u-marginButtonLeft">
+          Save
+        </button>
+      </span>
+
+      {/* <button onClick={loadGraph} className="button u-marginButton">
         {" "}
         Load{" "}
-      </button>
+      </button> */}
 
       {graphList}
     </div>

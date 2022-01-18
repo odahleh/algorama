@@ -44,14 +44,17 @@ router.post("/initsocket", (req, res) => {
 });
 
 router.post("/savegraph", (req, res) => {
-  const newGraphEntry = new GraphEntry({user:req.body.user, name: req.body.name, nodes:req.body.numberNodes, edges:req.body.edges}); 
-  newGraphEntry.save(); 
+  const newGraphEntry = new GraphEntry({
+    user: req.body.user,
+    name: req.body.name,
+    nodes: req.body.numberNodes,
+    edges: req.body.edges,
+  });
+  newGraphEntry.save().then((graph) => res.send(graph));
 });
 
 router.get("/loadgraph", (req, res) => {
-  GraphEntry.find({user:req.query.user})
-  .then((graphs) => 
-    res.send(graphs)); 
+  GraphEntry.find({ user: req.query.user }).then((graphs) => res.send(graphs));
 });
 
 router.get("/graph", (req, res) => {

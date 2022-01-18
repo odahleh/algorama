@@ -64,6 +64,10 @@ form {
   display: inline-block;
 }
 
+.u-flex-wrap {
+  flex-wrap: wrap;
+}
+
 .u-bold {
   font-weight: 600;
 }
@@ -103,4 +107,8 @@ form {
   margin-top: -1px;
   margin-right: -1px;
   margin-bottom: -1px;
+}
+
+.u-marginInputBottom {
+  margin-bottom: -4px;
 }
