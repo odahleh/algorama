@@ -10,7 +10,7 @@ import { stratify } from "d3";
 import { post } from "../../utilities";
 import { get } from "../../utilities";
 
-const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "git747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
 let userIDList = [];
 
 const Graphs = ({ userId, handleLogout }) => {
@@ -32,7 +32,7 @@ const Graphs = ({ userId, handleLogout }) => {
   let [vertexObjs, setVertexObjs] = useState(null);
   let [edgeObjs, setEdgeObjs] = useState(null);
   let [loadedGraphs, setLoadedGraphs] = useState([]);
-  
+
   let [currentSvg, setCurrentSvg] = useState(null);
 
   useEffect(() => {
@@ -81,40 +81,42 @@ const Graphs = ({ userId, handleLogout }) => {
   };
 
   const saveGraph = () => {
-    let nodeNames = []; 
-    let edgeNames = []; 
-    for (let node of nodes){
-      nodeNames.push({name:node.name}); 
+    let nodeNames = [];
+    let edgeNames = [];
+    for (let node of nodes) {
+      nodeNames.push({ name: node.name });
     }
-    for (let edge of links){
-      edgeNames.push({source:edge.source.name, target:edge.target.name}); 
+    for (let edge of links) {
+      edgeNames.push({ source: edge.source.name, target: edge.target.name });
     }
-    const graphDoc = {user:userId, numberNodes:nodeNames, edges:edgeNames, name: valueGraphName}; 
-    post("/api/savegraph", graphDoc); 
-  }
+    const graphDoc = {
+      user: userId,
+      numberNodes: nodeNames,
+      edges: edgeNames,
+      name: valueGraphName,
+    };
+    post("/api/savegraph", graphDoc);
+  };
 
   const generateGraph = (event) => {
     console.log("generate");
     setDisplaySimulation(false);
     let id = event.target.id;
-    let i = parseInt(id.charAt(id.length-1));
+    let i = parseInt(id.charAt(id.length - 1));
     console.log(i);
     console.log(loadedGraphs[i].edges);
     GraphSimulation(loadedGraphs[i].nodes, loadedGraphs[i].edges);
-   // console.log("Will be available soon!");
-  }
+    // console.log("Will be available soon!");
+  };
 
-  let graphList
+  let graphList;
   const loadGraph = () => {
-    const user = userId; 
-    const graphDoc = {user:user}; 
+    const user = userId;
+    const graphDoc = { user: user };
     get("/api/loadgraph", graphDoc).then((graphs) => {
-       setLoadedGraphs(graphs);
-    }
-    ); 
-  }
-
-
+      setLoadedGraphs(graphs);
+    });
+  };
 
   const GraphSimulation = (vertices, edges) => {
     let nodes = vertices;
@@ -225,31 +227,35 @@ const Graphs = ({ userId, handleLogout }) => {
     setValueNames(event.target.value);
   };
 
-let redirect = <div></div>;
-//console.log(userId);
-if (userId === undefined) {
-  userIDList.push(userId);
-  //console.log(userIDList);
-  if (userIDList.length === 4 && userIDList[-1] === undefined) {
-    userIDList = [];
-    redirect = <meta http-equiv="refresh" content="0; url = '/'" />;
+  let redirect = <div></div>;
+  //console.log(userId);
+  if (userId === undefined) {
+    userIDList.push(userId);
+    //console.log(userIDList);
+    if (userIDList.length === 4 && userIDList[-1] === undefined) {
+      userIDList = [];
+      redirect = <meta http-equiv="refresh" content="0; url = '/'" />;
+    }
   }
-}
-  
 
   if (loadedGraphs.length > 0) {
     // for (let graph of loadedGraphs){
     //   oldNodes = graph.nodes;
     //   oldEdges = graph.edges;
     // }
-    graphList = 
-    <div>
-      {loadedGraphs.map((s,index) => 
+    graphList = (
       <div>
-        {s.name}
-        <button onClick={generateGraph} id={"loadedGraph"+index.toString()}> Generate Graph</button>
-        </div>)}
-    </div>
+        {loadedGraphs.map((s, index) => (
+          <div>
+            {s.name}
+            <button onClick={generateGraph} id={"loadedGraph" + index.toString()}>
+              {" "}
+              Generate Graph
+            </button>
+          </div>
+        ))}
+      </div>
+    );
   }
 
   return (
