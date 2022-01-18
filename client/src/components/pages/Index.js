@@ -11,7 +11,7 @@ const Index = ({ userId, handleLogin, handleLogout }) => {
   if (userId){
     return (
       <>
-        <meta http-equiv = "refresh" content = "0; url = 'http://localhost:5000/graphs'" />
+        <meta http-equiv = "refresh" content = "0; url = '/graphs'" />
       </>
     );
   } 
