@@ -37,7 +37,9 @@ const Graphs = ({ userId, handleLogout }) => {
   let [currentSvg, setCurrentSvg] = useState(null);
 
   useEffect(() => {
-    setHeight(window.innerHeight);
+    let navbox = document.querySelector(".top-bar-container");
+    let offsetTop = navbox.clientHeight;
+    setHeight(window.innerHeight - navbox.clientHeight);
     setWidth(window.innerWidth);
     window.addEventListener(
       "resize",
@@ -109,11 +111,14 @@ const Graphs = ({ userId, handleLogout }) => {
   };
 
   let graphList;
+
   const loadGraph = () => {
+    setLoadedGraphs([]);
     const user = userId;
     const graphDoc = { user: user };
     get("/api/loadgraph", graphDoc).then((graphs) => {
       setLoadedGraphs(graphs);
+      document.getElementById("Graphs-loadingMenu").style.bordercolor = "white";
     });
   };
 
@@ -327,84 +332,86 @@ const Graphs = ({ userId, handleLogout }) => {
     //   oldNodes = graph.nodes;
     //   oldEdges = graph.edges;
     // }
-    graphList = (
-      <div>
-        {loadedGraphs.map((s, index) => (
-          <div className="graph-names">
-            {s.name}
-            <button
-              onClick={generateGraph}
-              id={"loadedGraph" + index.toString()}
-              className="generate-button"
-            >
-              {" "}
-              Generate Graph
-            </button>
-          </div>
-        ))}
-      </div>
-    );
+    graphList = loadedGraphs.map((s, index) => (
+      <span className="graph-names">
+        {s.name}
+        <button onClick={generateGraph} id={"loadedGraph" + index.toString()} className="button">
+          {" "}
+          Display
+        </button>
+      </span>
+    ));
   }
 
   return (
-    <div>
+    <div className="Graphs-pageContainer">
       {redirect}
-      <div className="title"> {""} Welcome to Algorama! </div>
-      <div className="top-bar">
-        <div className="left-side">
-          <button onClick={startGraph} className="button">
-            {" "}
-            Start
-          </button>
-          <button onClick={saveGraph} className="button">
-            {" "}
-            Save{" "}
-          </button>
-          <button onClick={loadGraph} className="button">
-            {" "}
-            Load{" "}
-          </button>
-          <button onClick={recolorNode} className="button">
-            Recolor Node
-          </button>
-          <button onClick={recolorEdge} className="button">
-            Recolor Edge
-          </button>
-          <button onClick={BFS} className="button">
-            BFS
-          </button>
+      <div className="top-bar-container">
+        <div className="title"> {""} Welcome to Algorama! </div>
+        <div className="top-bar">
+          <div className="left-side">
+            <input
+              type="text"
+              value={valueNodes}
+              onChange={handleChangeNodes}
+              placeholder={"number of nodes"}
+              className="InputBox"
+            />
+            <input
+              type="text"
+              value={valueEdges}
+              onChange={handleChangeEdges}
+              placeholder={"edges 0-1,2-0, ..."}
+              className="InputBox"
+            />
+
+            <button onClick={startGraph} className="button">
+              {" "}
+              Start
+            </button>
+
+            <button onClick={recolorNode} className="button">
+              Recolor Node
+            </button>
+            <button onClick={recolorEdge} className="button">
+              Recolor Edge
+            </button>
+            <button onClick={BFS} className="button">
+              BFS
+            </button>
+          </div>
+          <div className="right-side">
+            <GoogleLogout
+              clientId={GOOGLE_CLIENT_ID}
+              buttonText="Logout"
+              onLogoutSuccess={handleLogout}
+              onFailure={(err) => console.log(err)}
+            />
+          </div>
         </div>
-        <div className="right-side">
-          <GoogleLogout
-            clientId={GOOGLE_CLIENT_ID}
-            buttonText="Logout"
-            onLogoutSuccess={handleLogout}
-            onFailure={(err) => console.log(err)}
-          />
+        <div className="second-bar">
+          <div className="Graphs-loadingMenu" id="Graphs-loadingMenu">
+            <button onClick={saveGraph} className="button">
+              {" "}
+              Save{" "}
+            </button>
+            <input
+              type="text"
+              value={valueGraphName}
+              onChange={handleChangeName}
+              placeholder={"Graph Name"}
+              className="InputBox"
+            />
+            <button onClick={loadGraph} className="button">
+              {" "}
+              Load{" "}
+            </button>
+
+            {graphList}
+          </div>
         </div>
       </div>
-      <div className="second-bar">
-        <input
-          type="text"
-          value={valueNodes}
-          onChange={handleChangeNodes}
-          placeholder={"number of nodes"}
-        />
-        <input
-          type="text"
-          value={valueEdges}
-          onChange={handleChangeEdges}
-          placeholder={"edges 0-1,2-0, ..."}
-        />
-        <input
-          type="text"
-          value={valueGraphName}
-          onChange={handleChangeName}
-          placeholder={"graph name"}
-        />
-      </div>
-      {graphList}
-      <div id="main" ref={main} /* width="500px" height="500px" */>
+      <div id="main" className="Graphs-svgContainer" ref={main} /* width="500px" height="500px" */>
         {""}
       </div>
     </div>

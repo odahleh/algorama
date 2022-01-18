@@ -12,15 +12,15 @@
   fill: #555;
 }
 
-.top-bar{
+.top-bar {
   display: flex;
   justify-content: space-between;
 }
-.left-side{
-  flex-grow: 1
+.left-side {
+  flex-grow: 1;
 }
 
-.title{
+.title {
   font-family: DM Sans;
   font-style: normal;
   font-weight: normal;
@@ -36,35 +36,74 @@
 }
 
 .button {
-  background: #5E5DF0;
-  border-radius: 50px;
-  color: #FFFFFF;
+  background: var(--primary);
+  border-radius: var(--xl);
+  color: #ffffff;
   cursor: pointer;
-  font-family: DM Sans; 
-  font-size: 13spx;
-  line-height: 15px;
-  padding: 8px 18px;
+  font-family: DM Sans;
+  font-size: 12spx;
+  line-height: 16px;
+  padding: 8px 16px;
   touch-action: manipulation;
   border: 0;
-  margin: 8px
+  margin: 8px;
 }
 
-.generate-button {
-  background: #5E5DF0;
-  border-radius: 50px;
-  color: #FFFFFF;
+.button:hover {
+  background: var(--primary--dim);
+}
+
+/* .generate-button {
+  background: var(--primary);
+  border-radius: var(--xl);
+  color: #ffffff;
   cursor: pointer;
-  font-family: DM Sans; 
-  font-size: 10px;
-  line-height: 15px;
-  padding: 6px 10px;
+  font-family: DM Sans;
+  font-size: 12px;
+  line-height: 16px;
+  padding: 8px 16px;
   touch-action: manipulation;
   border: 0;
-  margin: 4px
-}
-.graph-names{
+  margin: 8px;
+} */
+.graph-names {
   font-weight: bold;
-  font-family: DM Sans; 
+  font-family: DM Sans;
 }
 
+.Graphs-pageContainer {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+}
 
+.Graphs-svgContainer {
+  width: 100%;
+  height: 100%;
+}
+
+.Graphs-loadingMenu {
+  margin: 8px;
+  display: flex;
+  border: 1px solid;
+  border-color: #000000;
+  border-radius: var(--xl);
+  max-width: 100;
+  transition: all 1s;
+}
+
+.InputBox {
+  margin: 8px;
+  border: 0px;
+  border-bottom: 2px solid;
+  border-color: #aaa;
+}
+
+.InputBox:focus {
+  outline: none;
+  border: 0px;
+  border-bottom: 2px solid;
+  border-color: var(--primary);
+  transition: all 0.5s;
+}
