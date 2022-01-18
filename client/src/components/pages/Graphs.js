@@ -32,9 +32,9 @@ const Graphs = ({ userId, handleLogout }) => {
   let [edgeObjs, setEdgeObjs] = useState(null);
   let [currentSvg, setCurrentSvg] = useState(null);
 
-  /* useEffect(() => {
-    /* setHeight(window.innerHeight);
-    setWidth(window.innerWidth); 
+  useEffect(() => {
+    setHeight(window.innerHeight);
+    setWidth(window.innerWidth);
     window.addEventListener(
       "resize",
       handleResize /* function () {
@@ -42,17 +42,17 @@ const Graphs = ({ userId, handleLogout }) => {
       adaptSizeTimer = setTimeout(function () {
         console.log("resize");
       }, 500);
-    } 
+    } */
     );
-  }); */
+  });
 
-  /* const handleResize = () => {
+  const handleResize = () => {
     setWindowHeight(window.innerHeight);
     setWindowWidth(window.innerWidth);
     if (displaySimulation) {
       currentSimulation.force("center", d3.forceCenter(windowWidth / 2, windowHeight / 2));
     }
-  }; */
+  };
 
   const startGraph = () => {
     let nodes = [];
