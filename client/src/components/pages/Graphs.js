@@ -10,7 +10,8 @@ import { least, stratify } from "d3";
 import { post } from "../../utilities";
 import { get } from "../../utilities";
 
-const GOOGLE_CLIENT_ID = "git747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID =
+  "git747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
 let userIDList = [];
 
 const Graphs = ({ userId, handleLogout }) => {
@@ -169,17 +170,19 @@ const Graphs = ({ userId, handleLogout }) => {
       .call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended));
 
     vertex.append("title").text(function (d) {
-      return "A";
+      return d.name;
     });
 
     vertex.append("text").text(function (d) {
-      return "A";
+      return d.name;
     });
 
     // TODO: Finish adding labels, see https://stackoverflow.com/questions/13364566/labels-text-on-the-nodes-of-a-d3-force-directed-graph
 
     simulation.nodes(nodes).on("tick", ticked);
     simulation.force("link").links(links);
+
+    recolorNode(0, "red");
 
     function ticked() {
       let radius = 10;
@@ -241,8 +244,8 @@ const Graphs = ({ userId, handleLogout }) => {
   };
 
   const recolorNode = (i, color) => {
-    i = 2;
-    color = "green";
+    i = 0;
+    color = "red";
     let nodeId = "#v" + i.toString();
     console.log(nodeId);
     d3.select(main.current).select("svg").select(nodeId).attr("fill", color);
@@ -276,12 +279,13 @@ const Graphs = ({ userId, handleLogout }) => {
     let visited = new Set();
     visited.add(start.name);
     let distanceArray = [];
-    for (let node of nodes) {
+    for (let node in nodes) {
       distanceArray.push(0);
     }
     let queue = [];
     let neighbors = findNeighbors(start, links);
     queue = Array.from(neighbors);
+    let level = 1;
     while (queue.length > 0) {
       console.log(distanceArray);
       neighbors = [];
@@ -290,14 +294,14 @@ const Graphs = ({ userId, handleLogout }) => {
         if (!visited.has(next)) {
           visited.add(next);
           console.log(next, "node");
-          distanceArray[next] += 1;
+          distanceArray[next] = level;
         }
       }
+      level += 1;
       for (let next of queue) {
         let currNeighbors = findNeighbors({ name: next }, links);
         for (let neigh of currNeighbors) {
           if (!visited.has(neigh)) {
-            distanceArray[neigh] += 1;
             neighbors.push(neigh);
           }
         }
@@ -328,7 +332,11 @@ const Graphs = ({ userId, handleLogout }) => {
         {loadedGraphs.map((s, index) => (
           <div className="graph-names">
             {s.name}
-            <button onClick={generateGraph} id={"loadedGraph" + index.toString()} className="generate-button">
+            <button
+              onClick={generateGraph}
+              id={"loadedGraph" + index.toString()}
+              className="generate-button"
+            >
               {" "}
               Generate Graph
             </button>
@@ -344,12 +352,27 @@ const Graphs = ({ userId, handleLogout }) => {
       <div className="title"> {""} Welcome to Algorama! </div>
       <div className="top-bar">
         <div className="left-side">
-          <button onClick={startGraph} className="button"> Start</button>
-          <button onClick={saveGraph} className ="button"> Save </button>
-          <button onClick={loadGraph} className ="button"> Load </button>
-          <button onClick={recolorNode} className ="button">Recolor Node</button>
-          <button onClick={recolorEdge} className ="button">Recolor Edge</button>
-          <button onClick={BFS} className="button">BFS</button>
+          <button onClick={startGraph} className="button">
+            {" "}
+            Start
+          </button>
+          <button onClick={saveGraph} className="button">
+            {" "}
+            Save{" "}
+          </button>
+          <button onClick={loadGraph} className="button">
+            {" "}
+            Load{" "}
+          </button>
+          <button onClick={recolorNode} className="button">
+            Recolor Node
+          </button>
+          <button onClick={recolorEdge} className="button">
+            Recolor Edge
+          </button>
+          <button onClick={BFS} className="button">
+            BFS
+          </button>
         </div>
         <div className="right-side">
           <GoogleLogout
@@ -362,23 +385,23 @@ const Graphs = ({ userId, handleLogout }) => {
       </div>
       <div className="second-bar">
         <input
-              type="text"
-              value={valueNodes}
-              onChange={handleChangeNodes}
-              placeholder={"number of nodes"}
-            />
-            <input
-              type="text"
-              value={valueEdges}
-              onChange={handleChangeEdges}
-              placeholder={"edges 0-1,2-0, ..."}
-            />
-            <input
-              type="text"
-              value={valueGraphName}
-              onChange={handleChangeName}
-              placeholder={"graph name"}
-            />
+          type="text"
+          value={valueNodes}
+          onChange={handleChangeNodes}
+          placeholder={"number of nodes"}
+        />
+        <input
+          type="text"
+          value={valueEdges}
+          onChange={handleChangeEdges}
+          placeholder={"edges 0-1,2-0, ..."}
+        />
+        <input
+          type="text"
+          value={valueGraphName}
+          onChange={handleChangeName}
+          placeholder={"graph name"}
+        />
       </div>
       {graphList}
       <div id="main" ref={main} /* width="500px" height="500px" */>
