@@ -81,15 +81,30 @@ const Graphs = ({ userId, handleLogout }) => {
   };
 
   const saveGraph = () => {
-    const graphDoc = { user: userId, numberNodes: nodes, edges: links, name: valueGraphName };
+    let nodeNames = [];
+    let edgeNames = [];
+    for (let node of nodes) {
+      nodeNames.push({ name: node.name });
+    }
+    for (let edge of links) {
+      edgeNames.push({ source: edge.source.name, target: edge.target.name });
+    }
+    const graphDoc = {
+      user: userId,
+      numberNodes: nodeNames,
+      edges: edgeNames,
+      name: valueGraphName,
+    };
     post("/api/savegraph", graphDoc);
   };
 
   const generateGraph = (event) => {
     console.log("generate");
+    setDisplaySimulation(false);
     let id = event.target.id;
     let i = parseInt(id.charAt(id.length - 1));
     console.log(i);
+    console.log(loadedGraphs[i].edges);
     GraphSimulation(loadedGraphs[i].nodes, loadedGraphs[i].edges);
     // console.log("Will be available soon!");
   };
@@ -244,7 +259,7 @@ const Graphs = ({ userId, handleLogout }) => {
     //console.log(userIDList);
     if (userIDList.length === 4 && userIDList[-1] === undefined) {
       userIDList = [];
-      redirect = <meta http-equiv="refresh" content="0; url = 'http://localhost:5000'" />;
+      redirect = <meta http-equiv="refresh" content="0; url = '/'" />;
     }
   }
 
