@@ -10,11 +10,10 @@ import { least, stratify } from "d3";
 import NewGraphInput from "../modules/NewGraphInput.js";
 import SaveLoadGraph from "../modules/SaveLoadGraph.js";
 
-const GOOGLE_CLIENT_ID =
-  "git747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
 let userIDList = [];
 
-const Graphs = ({ userId, handleLogout }) => {
+const Graphs = ({ userId, handleLogout, userName }) => {
   const [main, setRef1] = useState(React.createRef());
   let [currentSimulation, setCurrentSimulation] = useState(null);
   let [displaySimulation, setDisplaySimulation] = useState(false);
@@ -22,11 +21,8 @@ const Graphs = ({ userId, handleLogout }) => {
   let [HEIGHT, setHeight] = useState(500);
   let [windowHeight, setWindowHeight] = useState(window.innerHeight);
   let [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  let [nodesState, setNodes] = useState([{ name: 1 }, { name: 2 }, { name: 3 }, { name: 4 }]);
-  let [linksState, setLinks] = useState([
-    { source: 2, target: 1, weight: 1 },
-    { source: 3, target: 2, weight: 3 },
-  ]);
+  let [nodesState, setNodes] = useState([]);
+  let [linksState, setLinks] = useState([]);
   let [vertexObjs, setVertexObjs] = useState(null);
   let [edgeObjs, setEdgeObjs] = useState(null);
   let [showBFSProgress, setShowBFSProgress] = useState(false);
@@ -268,13 +264,15 @@ const Graphs = ({ userId, handleLogout }) => {
   };
 
   let redirect = <div></div>;
-  //console.log(userId);
+  console.log(userId);
   if (userId === undefined) {
+    console.log(userIDList);
     userIDList.push(userId);
     //console.log(userIDList);
-    if (userIDList.length === 4 && userIDList[-1] === undefined) {
-      userIDList = [];
+    if (userIDList.length > 2 && userIDList[-1] === undefined) {
       redirect = <meta http-equiv="refresh" content="0; url = '/'" />;
+      console.log("redirect");
+      //userIDList = [];
     }
   }
 
@@ -283,7 +281,12 @@ const Graphs = ({ userId, handleLogout }) => {
       {redirect}
       <div className="top-bar-container">
         <div className="u-flex">
-          <div className="Graphs-title left-side "> Welcome to Algorama!</div>
+          <div className="Graphs-title left-side ">
+            {" "}
+            {userName
+              ? "Welcome to Algorama, " + userName.split(" ")[0] + "!"
+              : "Welcome to Algorama!"}
+          </div>
           <div className="right-side">
             <GoogleLogout
               clientId={GOOGLE_CLIENT_ID}
@@ -295,30 +298,32 @@ const Graphs = ({ userId, handleLogout }) => {
         </div>
         <div className="Graphs-text">Create a new graph or run an algorithm</div>
         <div className="Graphs-topbar">
-          <div className=" u-flex">
+          <div className=" u-flex u-flex-wrap">
             <NewGraphInput GraphSimulation={GraphSimulation} />
-            <input
-              type="text"
-              value={startNodeBFS}
-              onChange={handleStartNodeBFS}
-              placeholder={"BFS start node"}
-              className="InputBox"
-            />
-            <button onClick={BFS} className="button u-marginButton">
-              Run BFS
-            </button>
-            {showBFSProgress ? (
-              <div>
-                <button onClick={prevStep} className="button u-marginButton">
-                  Previous Step
-                </button>
-                <button onClick={nextStep} className="button u-marginButton">
-                  Next Step
-                </button>
-              </div>
-            ) : (
-              <div></div>
-            )}
+            <div>
+              <input
+                type="text"
+                value={startNodeBFS}
+                onChange={handleStartNodeBFS}
+                placeholder={"BFS start node"}
+                className="InputBox"
+              />
+              <button onClick={BFS} className="button u-marginButton">
+                Run BFS
+              </button>
+              {showBFSProgress ? (
+                <div>
+                  <button onClick={prevStep} className="button u-marginButton">
+                    Previous Step
+                  </button>
+                  <button onClick={nextStep} className="button u-marginButton">
+                    Next Step
+                  </button>
+                </div>
+              ) : (
+                <div></div>
+              )}
+            </div>
           </div>
         </div>
         <div className="Graphs-text">Save and load your graphs</div>

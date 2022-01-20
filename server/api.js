@@ -57,6 +57,10 @@ router.get("/loadgraph", (req, res) => {
   GraphEntry.find({ user: req.query.user }).then((graphs) => res.send(graphs));
 });
 
+router.post("/deletegraph", (req, res) => {
+  GraphEntry.deleteOne({ _id: req.body.id }).then((graph) => res.send(graph));
+});
+
 router.get("/graph", (req, res) => {
   res.send(graph);
 });

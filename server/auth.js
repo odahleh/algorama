@@ -1,5 +1,6 @@
 const { OAuth2Client } = require("google-auth-library");
 const User = require("./models/user");
+const GraphEntry = require("./models/graphEntry");
 const socketManager = require("./server-socket");
 
 // create a new OAuth client used to verify google sign-in
@@ -28,7 +29,46 @@ function getOrCreateUser(user) {
       googleid: user.sub,
     });
 
-    return newUser.save();
+    return newUser.save().then((user) => {
+      const newGraphEntry = new GraphEntry({
+        user: user._id,
+        name: "Sample Graph 1",
+        nodes: [
+          { name: 0 },
+          { name: 1 },
+          { name: 2 },
+          { name: 3 },
+          { name: 4 },
+          { name: 5 },
+          { name: 6 },
+          { name: 7 },
+          { name: 8 },
+          { name: 9 },
+          { name: 10 },
+          { name: 11 },
+          { name: 12 },
+        ],
+        edges: [
+          { source: 0, target: 7 },
+          { source: 0, target: 9 },
+          { source: 0, target: 11 },
+          { source: 1, target: 10 },
+          { source: 1, target: 8 },
+          { source: 2, target: 3 },
+          { source: 2, target: 12 },
+          { source: 3, target: 4 },
+          { source: 3, target: 7 },
+          { source: 5, target: 6 },
+          { source: 6, target: 7 },
+          { source: 7, target: 11 },
+          { source: 8, target: 9 },
+          { source: 8, target: 12 },
+          { source: 9, target: 10 },
+        ],
+      });
+
+      newGraphEntry.save();
+    });
   });
 }
 
