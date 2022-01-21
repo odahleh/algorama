@@ -11,6 +11,7 @@ import { least, stratify } from "d3";
 import NewGraphInput from "../modules/NewGraphInput.js";
 import SaveLoadGraph from "../modules/SaveLoadGraph.js";
 import BFS from "../modules/BFS.js";
+import Dijkstra from "../modules/Dijkstra.js";
 
 const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
 let userIDList = [];
@@ -240,53 +241,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     setDirected(1 - isDirected);
   };
 
-  function returnEdgeWeights(u, v, links) {
-    for (let edge of links) {
-      if (
-        (edge.source.name === u && edge.target.name === v) ||
-        (edge.source.name === v && edge.target.name === v)
-      ) {
-        return edge.weight;
-      }
-    }
-  }
-
-  function dijkstra() {
-    let startNode = 0;
-    let links = linksState;
-    let nodes = nodesState;
-    let distanceArray = [0]; //MODIFY FOR DIFFERENT STARTING NODE
-    let parentArray = [];
-    let pqueue = [];
-    for (let node of nodes) {
-      if (node.name !== startNode) {
-        distanceArray.push(Infinity);
-      }
-      pqueue.push(node.name);
-    }
-    let counter = 0;
-    while (pqueue.length > 0 && counter <= 200) {
-      let u = null;
-      let curMin = Infinity;
-      for (let node in distanceArray) {
-        if (pqueue.includes(parseInt(node)) && distanceArray[node] <= curMin) {
-          u = parseInt(node);
-          curMin = distanceArray[node];
-        }
-      }
-      let uIndex = pqueue.indexOf(u);
-      pqueue.splice(uIndex, 1);
-      let neighbors = findNeighbors({ name: u }, links);
-      for (let v of neighbors) {
-        let alt = distanceArray[u] + returnEdgeWeights(u, v, links);
-        if (alt < distanceArray[v]) {
-          distanceArray[v] = alt;
-          parentArray[v] = u;
-        }
-      }
-    }
-    console.log(distanceArray);
-  }
   let redirect = <div></div>;
   console.log(userId);
   if (userId === undefined) {
@@ -329,9 +283,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
               changeDirected={changeDirected}
             />
             <BFS recolorNode={recolorNode} linksState={linksState} nodesState={nodesState} />
-            <button onClick={dijkstra} className="button u-marginButton">
-              Run Dijkstra
-            </button>
+            <Dijkstra recolorNode={recolorNode} linksState={linksState} nodesState={nodesState} />
           </div>
         </div>
         <div className="Graphs-text">Save and load your graphs</div>
