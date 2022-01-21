@@ -56,3 +56,28 @@
   align-items: center;
   height: 100vh;
 }
+
+#text {
+	display: inline-block;
+	vertical-align: middle;
+	color: black;
+	letter-spacing: 2px;
+}
+
+#cursor {
+	display: inline-block;
+	vertical-align: middle;
+	width: 3px;
+	height: 50px;
+	background-color: black;
+	animation: blink .75s step-end infinite;
+}
+
+@keyframes blink {
+	from, to { 
+		background-color: transparent 
+	}
+	50% { 
+		background-color: orange; 
+	}
+}
