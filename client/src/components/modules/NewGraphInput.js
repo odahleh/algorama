@@ -1,10 +1,13 @@
 import React, { Component, useEffect, useState } from "react";
+import Switch from "react-switch";
 import "../../utilities.css";
 import "../pages/Graphs.css";
 
 const NewGraphInput = (props) => {
   let [valueNodes, setValueNodes] = useState("");
   let [valueEdges, setValueEdges] = useState("");
+
+  const [directed, setDirected] = useState(0);
 
   const handleChangeNodes = (event) => {
     setValueNodes(event.target.value);
@@ -16,6 +19,10 @@ const NewGraphInput = (props) => {
 
   const onSubmit = () => {
     startGraph(valueNodes, valueEdges);
+  };
+
+  const handleSliderChange = () => {
+    setDirected(1 - directed);
   };
 
   const startGraph = (valueNodes, valueEdges) => {
@@ -36,11 +43,23 @@ const NewGraphInput = (props) => {
       }
       console.log(links);
     }
-    props.GraphSimulation(nodes, links);
+    props.GraphSimulation(nodes, links, directed);
   };
 
   return (
-    <>
+    <div className="u-flex">
+      <div className="Graph-names u-flex u-flex-alignCenter">
+        <input
+          type="range"
+          min="0"
+          max="1"
+          value={props.directed}
+          onChange={props.changeDirected}
+          //onClick={handleSliderChange}
+          className="Graphs-switch"
+        />
+        <div className="Graphs-textInside">directed</div>
+      </div>
       <input
         type="text"
         value={valueNodes}
@@ -55,11 +74,10 @@ const NewGraphInput = (props) => {
         placeholder={"edges 0-1,2-0, ..."}
         className="InputBox"
       />
-
       <button onClick={onSubmit} className="button u-marginButton">
         Display
       </button>
-    </>
+    </div>
   );
 };
 

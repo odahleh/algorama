@@ -126,6 +126,10 @@
 .Graphs-text {
   margin: 8px 25px 0px;
 }
+.Graphs-textInside {
+  margin: 0px 8px 0px 0px;
+  font-size: 14px;
+}
 
 .InputBox {
   margin: 8px;
@@ -158,8 +162,8 @@
 }
 
 .Graphs-switch {
-  border: 1px solid;
-  border-color: #aaa;
-  height: 20px;
-  outline: none;
+  margin: 8px;
+  background: #000;
+  color: var(--primary);
+  width: 50px;
 }

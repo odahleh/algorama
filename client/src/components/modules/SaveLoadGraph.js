@@ -76,7 +76,7 @@ const SaveLoadGraph = (props) => {
 
     setTimeout(function () {
       setLoadedGraphs(loadedGraphs.slice(0, i).concat(loadedGraphs.slice(i + 1)));
-    }, 1000);
+    }, 0);
 
     post("/api/deletegraph", { id: graphId }).then((returnedText) => {
       console.log(returnedText);

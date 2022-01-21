@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useState } from "react";
-import Switch from "react-switch";
+
 import * as d3 from "d3";
 //import { forceSimulation } from "https://cdn.skypack.dev/d3-force@3";
 
@@ -15,6 +15,7 @@ const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.goo
 let userIDList = [];
 
 const Graphs = ({ userId, handleLogout, userName }) => {
+  const [isDirected, setDirected] = useState(0);
   const [main, setRef1] = useState(React.createRef());
   let [currentSimulation, setCurrentSimulation] = useState(null);
   let [displaySimulation, setDisplaySimulation] = useState(false);
@@ -26,7 +27,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   let [BFS_STEP, setBFS_STEP] = useState([]);
   let [BFS_INDEX, setBFS_INDEX] = useState(0);
   let [startNodeBFS, setStartNodeBFS] = useState("");
-  const [directed, setDirected] = useState(false);
 
   useEffect(() => {
     let navbox = document.querySelector(".top-bar-container");
@@ -313,8 +313,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     setBFS_INDEX(Math.min(BFS_STEP.length - 1, Math.max(BFS_INDEX - 1, 0)));
   };
 
-  const handleButtonChange = () => {
-    setDirected(!directed);
+  const changeDirected = (int) => {
+    setDirected(1 - isDirected);
   };
 
   let redirect = <div></div>;
@@ -353,22 +353,11 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         <div className="Graphs-text">Create a new graph or run an algorithm</div>
         <div className="Graphs-topbar">
           <div className=" u-flex u-flex-wrap">
-            Directed
-            <Switch
-              checked={directed}
-              onChange={handleButtonChange}
-              className="Graphs-switch"
-              uncheckedIcon={false}
-              checkedIcon={false}
-              handleDiameter={12}
-              height={20}
-              onColor="#fff"
-              offColor="#fff"
-              offHandleColor="#aaa"
-              onHandleColor="#ffa630"
+            <NewGraphInput
+              GraphSimulation={GraphSimulation}
+              directed={isDirected}
+              changeDirected={changeDirected}
             />
-            Undirected
-            <NewGraphInput GraphSimulation={GraphSimulation} />
             <div>
               <input
                 type="text"

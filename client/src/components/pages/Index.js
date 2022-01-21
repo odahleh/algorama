@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import GoogleLogin, { GoogleLogout } from "react-google-login";
-
+import Typewriter from "typewriter-effect";
 import "../../utilities.css";
 import "./Index.css";
 
@@ -32,8 +32,16 @@ const Index = ({ userId, handleLogin, handleLogout }) => {
           onFailure={(err) => console.log(err)}
         />
       )} */}
-      <div className="landing-page-container">
-        <div className="landing-page-title">Algorama</div>
+      <div className="landing-page-container u-textCenter">
+        <div className="landing-page-title">
+          <Typewriter
+            options={{
+              strings: ["Algorama", "Algorithm Visualizer", "Data Visualizer", "MIT 6.006 Helper"],
+              autoStart: true,
+              loop: true,
+            }}
+          />
+        </div>
         <div className="landing-page-content">
           {" "}
           A Graph and Data Visualizer to help you understand your MIT 6.006 Algorithms!{" "}
