@@ -109,6 +109,10 @@ form {
   margin-bottom: -1px;
 }
 
+.u-marginLeft {
+  margin-left: 8px;
+}
+
 .u-marginInputBottom {
   margin-bottom: -4px;
 }

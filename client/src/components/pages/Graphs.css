@@ -43,6 +43,7 @@
   touch-action: manipulation;
   border: 0;
   transition: all 0.3s;
+  height: 32px;
 }
 
 .button:hover {
@@ -67,7 +68,35 @@
   border-color: #aaa;
   margin: 8px;
   border-radius: 32px;
-  padding-left: 16px;
+  height: 30px;
+  transition: all 1s;
+}
+.Graph-names--faded {
+  border: 1px solid;
+  border-color: #aaa;
+  margin: 8px;
+  border-radius: 32px;
+  height: 30px;
+  transition: all 1s;
+  opacity: 0;
+}
+
+.Graphs-x {
+  margin-left: 8px;
+  border: 1px solid;
+  border-color: rgb(141, 141, 141);
+  border-radius: 32px;
+  font-size: 10px;
+}
+
+.Graphs-x:hover {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.Graphs-bubbleText {
+  margin: 0px 8px 0px 16px;
 }
 
 .Graphs-pageContainer {
@@ -114,7 +143,7 @@
 }
 
 .InputBoxInside {
-  margin: 4px 0px 4px 0px;
+  margin: 4px 0px 4px 16px;
   border: 0px;
   border-bottom: 2px solid;
   border-color: #aaa;
@@ -126,4 +155,11 @@
   border-bottom: 2px solid;
   border-color: var(--primary);
   transition: all 0.5s;
+}
+
+.Graphs-switch {
+  border: 1px solid;
+  border-color: #aaa;
+  height: 20px;
+  outline: none;
 }

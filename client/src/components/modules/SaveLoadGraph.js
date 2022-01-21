@@ -73,7 +73,10 @@ const SaveLoadGraph = (props) => {
     let graphToDelete = loadedGraphs[i];
     let graphId = graphToDelete._id;
     console.log(graphId);
-    setLoadedGraphs(loadedGraphs.slice(0, i).concat(loadedGraphs.slice(i + 1)));
+
+    setTimeout(function () {
+      setLoadedGraphs(loadedGraphs.slice(0, i).concat(loadedGraphs.slice(i + 1)));
+    }, 1000);
 
     post("/api/deletegraph", { id: graphId }).then((returnedText) => {
       console.log(returnedText);
@@ -85,10 +88,10 @@ const SaveLoadGraph = (props) => {
   if (loadedGraphs.length > 0) {
     graphList = loadedGraphs.map((s, index) => (
       <span key={"savedGraph" + index.toString()} className="Graph-names u-flex u-flex-alignCenter">
-        <button onClick={deleteGraph} id={"deleteGraph" + index.toString()}>
+        <button className="Graphs-x" onClick={deleteGraph} id={"deleteGraph" + index.toString()}>
           X
         </button>
-        {s.name}
+        <div className="Graphs-bubbleText">{s.name}</div>
         <button
           onClick={generateGraph}
           id={"loadedGraph" + index.toString()}

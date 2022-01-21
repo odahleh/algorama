@@ -1,4 +1,5 @@
 import React, { Component, useEffect, useState } from "react";
+import Switch from "react-switch";
 import * as d3 from "d3";
 //import { forceSimulation } from "https://cdn.skypack.dev/d3-force@3";
 
@@ -17,19 +18,15 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   const [main, setRef1] = useState(React.createRef());
   let [currentSimulation, setCurrentSimulation] = useState(null);
   let [displaySimulation, setDisplaySimulation] = useState(false);
-  let [WIDTH, setWidth] = useState(800);
-  let [HEIGHT, setHeight] = useState(500);
-  let [windowHeight, setWindowHeight] = useState(window.innerHeight);
-  let [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  let [WIDTH, setWidth] = useState(null);
+  let [HEIGHT, setHeight] = useState(null);
   let [nodesState, setNodes] = useState([]);
   let [linksState, setLinks] = useState([]);
-  let [vertexObjs, setVertexObjs] = useState(null);
-  let [edgeObjs, setEdgeObjs] = useState(null);
   let [showBFSProgress, setShowBFSProgress] = useState(false);
   let [BFS_STEP, setBFS_STEP] = useState([]);
   let [BFS_INDEX, setBFS_INDEX] = useState(0);
   let [startNodeBFS, setStartNodeBFS] = useState("");
-  let [currentSvg, setCurrentSvg] = useState(null);
+  const [directed, setDirected] = useState(false);
 
   useEffect(() => {
     let navbox = document.querySelector(".top-bar-container");
@@ -48,10 +45,19 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   });
 
   const handleResize = () => {
-    setWindowHeight(window.innerHeight);
-    setWindowWidth(window.innerWidth);
+    d3.select(main.current)
+      .selectAll("svg")
+      .attr("height", window.innerHeight - navbox.clientHeight)
+      .attr("width", window.innerWidth);
+    let navbox = document.querySelector(".top-bar-container");
+    console.log("resize");
+    setHeight(window.innerHeight - navbox.clientHeight);
+    setWidth(window.innerWidth);
     if (displaySimulation) {
-      currentSimulation.force("center", d3.forceCenter(windowWidth / 2, windowHeight / 2));
+      currentSimulation.force(
+        "center",
+        d3.forceCenter(window.innerWidth / 2, (window.innerHeight - navbox.clientHeight) / 2)
+      );
     }
   };
 
@@ -65,8 +71,12 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     const svg = d3
       .select(main.current)
       .append("svg")
-      .attr("width", WIDTH)
-      .attr("height", HEIGHT)
+      .attr("width", window.innerWidth)
+      .attr(
+        "height",
+        window.innerHeight - document.querySelector(".top-bar-container").clientHeight
+      )
+      //.attr("viewbox", "0 0 100 100")
       .style("background-color", "white");
 
     let simulation = d3
@@ -81,24 +91,37 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           .distance(100)
       )
       .force("charge", d3.forceManyBody().strength(-70))
-      .force("center", d3.forceCenter(WIDTH / 2, HEIGHT / 2))
+      .force(
+        "center",
+        d3.forceCenter(
+          window.innerWidth / 2,
+          (window.innerHeight - document.querySelector(".top-bar-container").clientHeight) / 2
+        )
+      )
       .on("tick", ticked);
 
     let edge = svg
-      .selectAll("line")
+      .selectAll(".gLine")
       .data(links)
       .enter()
+      .append("g")
+      .attr("class", "gLine")
       .append("line")
+      //.attr("marker-end", "url(#arrow)")
       .attr("stroke-width", 5)
       .attr("stroke", "grey")
       .attr("id", function (d) {
         return "e" + d.source.toString() + "-" + d.target.toString();
       });
 
+    //svg.selectAll("g").append("text").text("lol").attr("x", 6).attr("y", 3);
+
     let vertex = svg
-      .selectAll("circles")
+      .selectAll(".gNode")
       .data(nodes)
       .enter()
+      .append("g")
+      .attr("class", "gNode")
       .append("circle")
       .attr("r", 10)
       .attr("fill", "black")
@@ -120,6 +143,19 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     simulation.nodes(nodes).on("tick", ticked);
     simulation.force("link").links(links);
 
+    let linkText = svg
+      .selectAll(".gLine")
+      .data(links)
+      .append("text")
+      .attr("background-color", "white")
+      .text(function (d) {
+        if (d.weight) {
+          return d.weight.toString();
+        } else {
+          return "1";
+        }
+      });
+
     function ticked() {
       let radius = 10;
       vertex
@@ -132,6 +168,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         });
       edge
         .attr("x1", function (d) {
+          //console.log(d.source.x);
           return d.source.x;
         })
         .attr("y1", function (d) {
@@ -142,6 +179,21 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         })
         .attr("y2", function (d) {
           return d.target.y;
+        });
+      linkText
+        .attr("x", function (d) {
+          if (d.target.x > d.source.x) {
+            return d.source.x + (d.target.x - d.source.x) / 2;
+          } else {
+            return d.target.x + (d.source.x - d.target.x) / 2;
+          }
+        })
+        .attr("y", function (d) {
+          if (d.target.y > d.source.y) {
+            return d.source.y + (d.target.y - d.source.y) / 2;
+          } else {
+            return d.target.y + (d.source.y - d.target.y) / 2;
+          }
         });
     }
 
@@ -163,8 +215,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     }
     setDisplaySimulation(true);
     setCurrentSimulation(simulation);
-    setEdgeObjs(edge);
-    setVertexObjs(vertex);
   };
 
   const recolorNode = (i, color) => {
@@ -263,6 +313,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     setBFS_INDEX(Math.min(BFS_STEP.length - 1, Math.max(BFS_INDEX - 1, 0)));
   };
 
+  const handleButtonChange = () => {
+    setDirected(!directed);
+  };
+
   let redirect = <div></div>;
   console.log(userId);
   if (userId === undefined) {
@@ -299,6 +353,21 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         <div className="Graphs-text">Create a new graph or run an algorithm</div>
         <div className="Graphs-topbar">
           <div className=" u-flex u-flex-wrap">
+            Directed
+            <Switch
+              checked={directed}
+              onChange={handleButtonChange}
+              className="Graphs-switch"
+              uncheckedIcon={false}
+              checkedIcon={false}
+              handleDiameter={12}
+              height={20}
+              onColor="#fff"
+              offColor="#fff"
+              offHandleColor="#aaa"
+              onHandleColor="#ffa630"
+            />
+            Undirected
             <NewGraphInput GraphSimulation={GraphSimulation} />
             <div>
               <input
