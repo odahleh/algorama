@@ -115,6 +115,14 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       return d.name;
     });
 
+    edge.append("text").text(function (d) {
+      return d.weight;
+    });
+
+    edge.append("title").text(function (d) {
+      return d.weight;
+    });
+
     // TODO: Finish adding labels, see https://stackoverflow.com/questions/13364566/labels-text-on-the-nodes-of-a-d3-force-directed-graph
 
     simulation.nodes(nodes).on("tick", ticked);
@@ -263,6 +271,53 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     setBFS_INDEX(Math.min(BFS_STEP.length - 1, Math.max(BFS_INDEX - 1, 0)));
   };
 
+  function returnEdgeWeights(u, v, links) {
+    for (let edge of links) {
+      if (
+        (edge.source.name === u && edge.target.name === v) ||
+        (edge.source.name === v && edge.target.name === v)
+      ) {
+        return edge.weight;
+      }
+    }
+  }
+
+  function dijkstra() {
+    let startNode = 0;
+    let links = linksState;
+    let nodes = nodesState;
+    let distanceArray = [0]; //MODIFY FOR DIFFERENT STARTING NODE
+    let parentArray = [];
+    let pqueue = [];
+    for (let node of nodes) {
+      if (node.name !== startNode) {
+        distanceArray.push(Infinity);
+      }
+      pqueue.push(node.name);
+    }
+    let counter = 0;
+    while (pqueue.length > 0 && counter <= 200) {
+      let u = null;
+      let curMin = Infinity;
+      for (let node in distanceArray) {
+        if (pqueue.includes(parseInt(node)) && distanceArray[node] <= curMin) {
+          u = parseInt(node);
+          curMin = distanceArray[node];
+        }
+      }
+      let uIndex = pqueue.indexOf(u);
+      pqueue.splice(uIndex, 1);
+      let neighbors = findNeighbors({ name: u }, links);
+      for (let v of neighbors) {
+        let alt = distanceArray[u] + returnEdgeWeights(u, v, links);
+        if (alt < distanceArray[v]) {
+          distanceArray[v] = alt;
+          parentArray[v] = u;
+        }
+      }
+    }
+    console.log(distanceArray);
+  }
   let redirect = <div></div>;
   console.log(userId);
   if (userId === undefined) {
@@ -323,6 +378,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
               ) : (
                 <div></div>
               )}
+              <button onClick={dijkstra} className="button u-marginButton">
+                Run Dijkstra
+              </button>
             </div>
           </div>
         </div>
