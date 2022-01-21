@@ -3,6 +3,7 @@ import "../../utilities.css";
 import "../pages/Graphs.css";
 import { post } from "../../utilities";
 import { get } from "../../utilities";
+import * as d3 from "d3";
 
 const SaveLoadGraph = (props) => {
   let [valueGraphName, setValueNames] = useState("");
@@ -10,7 +11,6 @@ const SaveLoadGraph = (props) => {
 
   useEffect(() => {
     if (loadedGraphs.length === 0 && props.userId) {
-      console.log("yallah");
       loadGraph();
     }
   }, props.userId);
@@ -28,16 +28,22 @@ const SaveLoadGraph = (props) => {
     for (let edge of props.linksState) {
       edgeNames.push({ source: edge.source.name, target: edge.target.name });
     }
-    const graphDoc = {
-      user: props.userId,
-      numberNodes: nodeNames,
-      edges: edgeNames,
-      name: valueGraphName,
-    };
-    post("/api/savegraph", graphDoc).then((graph) => {
-      setLoadedGraphs([...loadedGraphs, graph]);
-      console.log(graph);
-    });
+    console.log(nodeNames, edgeNames);
+    if (nodeNames.length > 0 && valueGraphName.length > 0) {
+      const graphDoc = {
+        user: props.userId,
+        numberNodes: nodeNames,
+        edges: edgeNames,
+        name: valueGraphName,
+      };
+
+      post("/api/savegraph", graphDoc).then((graph) => {
+        setLoadedGraphs([...loadedGraphs, graph]);
+        console.log(graph);
+      });
+    } else {
+      alert("You cannot save a graph that is empty and/or does not have a name.");
+    }
   };
 
   const loadGraph = () => {
@@ -61,11 +67,27 @@ const SaveLoadGraph = (props) => {
     // console.log("Will be available soon!");
   };
 
+  const deleteGraph = (event) => {
+    let objectId = event.target.id;
+    let i = parseInt(objectId.charAt(objectId.length - 1));
+    let graphToDelete = loadedGraphs[i];
+    let graphId = graphToDelete._id;
+    console.log(graphId);
+    setLoadedGraphs(loadedGraphs.slice(0, i).concat(loadedGraphs.slice(i + 1)));
+
+    post("/api/deletegraph", { id: graphId }).then((returnedText) => {
+      console.log(returnedText);
+    });
+  };
+
   let graphList;
 
   if (loadedGraphs.length > 0) {
     graphList = loadedGraphs.map((s, index) => (
-      <span className="Graph-names u-flex u-flex-alignCenter">
+      <span key={"savedGraph" + index.toString()} className="Graph-names u-flex u-flex-alignCenter">
+        <button onClick={deleteGraph} id={"deleteGraph" + index.toString()}>
+          X
+        </button>
         {s.name}
         <button
           onClick={generateGraph}
@@ -81,7 +103,6 @@ const SaveLoadGraph = (props) => {
 
   return (
     <div className="Graphs-topbar u-flex u-flex-wrap " id="Graphs-loadingMenu">
-      {console.log("render")}
       <span className="Graph-names u-flex u-flex-alignCenter">
         <input
           type="text"
