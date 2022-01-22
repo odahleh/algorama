@@ -35,6 +35,8 @@ const SaveLoadGraph = (props) => {
         numberNodes: nodeNames,
         edges: edgeNames,
         name: valueGraphName,
+        directed: props.isCurrentDirected,
+        weighted: props.isCurrentWeighted,
       };
 
       post("/api/savegraph", graphDoc).then((graph) => {

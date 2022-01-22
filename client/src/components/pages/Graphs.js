@@ -17,7 +17,6 @@ const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.goo
 let userIDList = [];
 
 const Graphs = ({ userId, handleLogout, userName }) => {
-  const [isDirected, setDirected] = useState(0);
   const [main, setRef1] = useState(React.createRef());
   let [currentSimulation, setCurrentSimulation] = useState(null);
   let [displaySimulation, setDisplaySimulation] = useState(false);
@@ -25,6 +24,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   let [HEIGHT, setHeight] = useState(null);
   let [nodesState, setNodes] = useState([]);
   let [linksState, setLinks] = useState([]);
+  const [isDirected, setDirected] = useState(0);
+  const [isWeighted, setWeighted] = useState(0);
+  const [isCurrentDirected, setCurrentDirected] = useState(0);
+  const [isCurrentWeighted, setCurrentWeighted] = useState(0);
 
   useEffect(() => {
     let navbox = document.querySelector(".top-bar-container");
@@ -62,10 +65,14 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   const GraphSimulation = (nodes, links) => {
     setNodes(nodes);
     setLinks(links);
+    setCurrentDirected(isDirected);
+    setCurrentWeighted(isWeighted);
     if (displaySimulation === true) {
       d3.selectAll("svg").remove();
       setDisplaySimulation(false);
     }
+
+    //dcreating main svg
     const svg = d3
       .select(main.current)
       .append("svg")
@@ -77,6 +84,24 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       //.attr("viewbox", "0 0 100 100")
       .style("background-color", "white");
 
+    //defining arrowheads
+    let arrowheads = d3
+      .select(main.current)
+      .selectAll("svg")
+      .append("defs")
+      .append("marker")
+      .attr("id", "arrow")
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 14)
+      .attr("refY", 0)
+      .attr("markerWidth", 3)
+      .attr("markerHeight", 3)
+      .attr("orient", "auto")
+      .append("svg:path")
+      .attr("fill", "grey")
+      .attr("d", "M0,-5L10,0L0,5");
+
+    //creating forcesimulation
     let simulation = d3
       .forceSimulation()
       .force(
@@ -98,6 +123,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       )
       .on("tick", ticked);
 
+    //creating edges
     let edge = svg
       .selectAll(".gLine")
       .data(links)
@@ -105,15 +131,19 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .append("g")
       .attr("class", "gLine")
       .append("line")
-      //.attr("marker-end", "url(#arrow)")
+      .attr("marker-end", "url(#arrow)")
       .attr("stroke-width", 5)
       .attr("stroke", "grey")
       .attr("id", function (d) {
         return "e" + d.source.toString() + "-" + d.target.toString();
       });
+    if (isDirected === 0) {
+      d3.select(main.current).select("path").attr("opacity", 0);
+    }
 
     //svg.selectAll("g").append("text").text("lol").attr("x", 6).attr("y", 3);
 
+    //creating vertices
     let vertex = svg
       .selectAll(".gNode")
       .data(nodes)
@@ -149,19 +179,24 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     simulation.nodes(nodes).on("tick", ticked);
     simulation.force("link").links(links);
 
+    // edgelabels
     let linkText = svg
       .selectAll(".gLine")
       .data(links)
       .append("text")
-      .attr("background-color", "white")
       .text(function (d) {
         if (d.weight) {
           return d.weight.toString();
         } else {
           return "1";
         }
-      });
+      })
+      .style("font-size", 16);
+    if (isWeighted === 0) {
+      linkText.attr("opacity", 0);
+    }
 
+    //force upon creation
     function ticked() {
       let radius = 10;
       vertex
@@ -203,6 +238,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         });
     }
 
+    //forces for dragging nodes
     function dragstarted(event, d) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
       d.fx = d.x;
@@ -241,11 +277,32 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   };
 
   const changeDirected = (int) => {
+    if (isDirected === 0) {
+      d3.select(main.current).select("path").attr("opacity", 1);
+    } else {
+      d3.select(main.current).select("path").attr("opacity", 0);
+    }
     setDirected(1 - isDirected);
   };
 
+  const changeWeighted = (int) => {
+    if (isWeighted === 0) {
+      d3.select(main.current)
+        .selectAll("svg")
+        .selectAll(".gLine")
+        .selectAll("text")
+        .style("opacity", 1);
+    } else {
+      d3.select(main.current)
+        .selectAll("svg")
+        .selectAll(".gLine")
+        .selectAll("text")
+        .style("opacity", 0);
+    }
+    setWeighted(1 - isWeighted);
+  };
+
   let redirect = <div></div>;
-  console.log(userId);
   if (userId === undefined) {
     console.log(userIDList);
     userIDList.push(userId);
@@ -284,6 +341,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
               GraphSimulation={GraphSimulation}
               directed={isDirected}
               changeDirected={changeDirected}
+              weighted={isWeighted}
+              changeWeighted={changeWeighted}
             />
             <BFS
               recolorNode={recolorNode}
@@ -301,6 +360,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             nodesState={nodesState}
             linksState={linksState}
             GraphSimulation={GraphSimulation}
+            isCurrentDirected={isCurrentDirected}
+            isCurrentWeighted={isCurrentWeighted}
           />
         </div>
       </div>

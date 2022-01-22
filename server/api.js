@@ -49,6 +49,8 @@ router.post("/savegraph", (req, res) => {
     name: req.body.name,
     nodes: req.body.numberNodes,
     edges: req.body.edges,
+    directed: req.body.directed,
+    weighted: req.body.weighted,
   });
   newGraphEntry.save().then((graph) => res.send(graph));
 });
