@@ -162,8 +162,28 @@
 }
 
 .Graphs-switch {
+  overflow: hidden;
   margin: 8px;
-  background: #000;
+  background-color: #fff;
+  border: 1px solid;
+  width: 35px;
+  border-radius: 32px;
+  -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
   color: var(--primary);
-  width: 50px;
+  border-radius: 32px;
+  -webkit-appearance: none;
+  height: 16px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  width: 16px;
+  -webkit-appearance: none;
+  height: 16px;
+  margin: 0px 0px;
+  border-radius: 32px;
+  background: #434343;
+  box-shadow: -85px 0 0 80px var(--primary);
 }

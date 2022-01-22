@@ -38,8 +38,15 @@ const NewGraphInput = (props) => {
       for (let ele of linksArray) {
         let ends = ele.split("-");
         let start = parseInt(ends[0]);
-        let end = parseInt(ends[1]);
-        links.push({ source: start, target: end });
+        //let end = parseInt(ends[1]);
+        let end = parseInt(ends[1].split("/")[0]);
+        if (ends[1].split("/").length > 0) {
+          let weight = ends[1].split("/")[1];
+          console.log(weight);
+          links.push({ source: start, target: end, weight: parseInt(weight) });
+        } else {
+          links.push({ source: start, target: end, weight: 1 });
+        }
       }
       console.log(links);
     }
@@ -48,18 +55,6 @@ const NewGraphInput = (props) => {
 
   return (
     <div className="u-flex">
-      <div className="Graph-names u-flex u-flex-alignCenter">
-        <input
-          type="range"
-          min="0"
-          max="1"
-          value={props.directed}
-          onChange={props.changeDirected}
-          //onClick={handleSliderChange}
-          className="Graphs-switch"
-        />
-        <div className="Graphs-textInside">directed</div>
-      </div>
       <input
         type="text"
         value={valueNodes}
@@ -74,6 +69,31 @@ const NewGraphInput = (props) => {
         placeholder={"edges 0-1,2-0, ..."}
         className="InputBox"
       />
+
+      <div className="Graph-names u-flex u-flex-alignCenter">
+        <input
+          type="range"
+          min="0"
+          max="1"
+          value={props.weighted}
+          //onChange={props.changeWeighted}
+          onClick={props.changeWeighted}
+          className="Graphs-switch"
+        />
+        <div className="Graphs-textInside">weighted</div>
+      </div>
+      <div className="Graph-names u-flex u-flex-alignCenter">
+        <input
+          type="range"
+          min="0"
+          max="1"
+          value={props.directed}
+          //onChange={props.changeDirected}
+          onClick={props.changeDirected}
+          className="Graphs-switch"
+        />
+        <div className="Graphs-textInside">directed</div>
+      </div>
       <button onClick={onSubmit} className="button u-marginButton">
         Display
       </button>
