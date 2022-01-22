@@ -2,11 +2,14 @@ import React, { Component, useEffect, useState } from "react";
 import "../../utilities.css";
 import "../pages/Graphs.css";
 
-const BFS = ({ recolorNode, recolorEdge, linksState, nodesState }) => {
+
+const BFS = ({ recolorNode, recolorEdge, linksState, nodesState, displayLegend}) => {
   let [showBFSProgress, setShowBFSProgress] = useState(false);
   let [BFS_STEP_State, setBFS_STEP] = useState([]);
   let [BFS_INDEX, setBFS_INDEX] = useState(-1);
   let [startNodeBFS, setStartNodeBFS] = useState("");
+
+  
 
   function findNeighbors(start, links) {
     let neighbors = [];
@@ -25,13 +28,16 @@ const BFS = ({ recolorNode, recolorEdge, linksState, nodesState }) => {
     return [neighbors, neighborsEdges];
   }
   function BFS() {
+
     recolorNode("all", "black");
     // BFS_stepper(0);
     // setBFS_INDEX(0);
     if (startNodeBFS === "") {
       alert("Please set a start node for BFS.");
     } else {
+      displayLegend(); 
       recolorNode(startNodeBFS, "red");
+      setBFS_INDEX(-1);
       let start = { name: parseInt(startNodeBFS) };
       setShowBFSProgress(true);
       let links = linksState;
@@ -77,15 +83,32 @@ const BFS = ({ recolorNode, recolorEdge, linksState, nodesState }) => {
     }
   }
 
+
+
   function BFS_stepper(index) {
     //BFS_STEP saves every edge and target node that BFS looks at, both visited and unvisited.
     console.log(index);
     recolorNode("all", "black");
     recolorEdge("all", "all", "grey");
+    const source = BFS_STEP_State[index][0].source.name; 
+    const target = BFS_STEP_State[index][0].target.name; 
+    for (let i = 0; i <= index -1; i++){
+      const currStart = BFS_STEP_State[i][0].source.name;
+      const currEnd = BFS_STEP_State[i][0].target.name; 
+      recolorNode(currStart, "blue");
+      recolorEdge(currStart, currEnd, "blue");
+      recolorNode(currEnd, "blue");  
+    }
     recolorNode(parseInt(startNodeBFS), "red");
+    if(source === BFS_STEP_State[index][1]){
+      recolorNode(target, "yellow");
+    }
+    else if(target === BFS_STEP_State[index][1]){
+      recolorNode(source, "yellow"); 
+    }
     recolorEdge(BFS_STEP_State[index][0].source.name, BFS_STEP_State[index][0].target.name, "aqua");
     if (BFS_STEP_State[index][2]) {
-      recolorNode(BFS_STEP_State[index][1], "blue");
+      recolorNode(BFS_STEP_State[index][1], "aqua");
     }
   }
 

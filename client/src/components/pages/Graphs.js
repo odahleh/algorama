@@ -28,6 +28,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   const [isWeighted, setWeighted] = useState(0);
   const [isCurrentDirected, setCurrentDirected] = useState(0);
   const [isCurrentWeighted, setCurrentWeighted] = useState(0);
+  let [showLegend, setShowedLegend] = useState(false);
 
   useEffect(() => {
     let navbox = document.querySelector(".top-bar-container");
@@ -135,7 +136,13 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .attr("stroke-width", 5)
       .attr("stroke", "grey")
       .attr("id", function (d) {
-        return "e" + d.source.toString() + "-" + d.target.toString();
+        console.log(d.source, d.target)
+        if (typeof d.source === "number"){
+          return "e" + d.source.toString() + "-" + d.target.toString();
+        }
+        else {
+          return "e" + d.source.name.toString() + "-" + d.target.name.toString();
+        }
       });
     if (isDirected === 0) {
       d3.select(main.current).select("path").attr("opacity", 0);
@@ -302,6 +309,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     setWeighted(1 - isWeighted);
   };
 
+  const displayLegend = () => {
+    setShowedLegend(true); 
+  }
+
   let redirect = <div></div>;
   if (userId === undefined) {
     console.log(userIDList);
@@ -314,6 +325,37 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     }
   }
 
+  let legend = <div></div>; 
+  console.log(showLegend, "legend");
+  if (showLegend === true){
+    legend = <div className="Algorithm-legend"> <table className="legend-table">
+      <tr>
+        <th>BFS Legend</th>
+      </tr>
+      <tr>
+       <td width="34%"/>
+    </tr>
+      <tr>
+        <td><div className="redCircle"/></td> <td>Start Node</td>
+      </tr>
+      <tr>
+        <td><div className="yellowCircle"/></td><td>Current Node</td>
+      </tr>
+      <tr>
+        <td><div className="blueCircle"/></td><td>Visited Node</td>
+      </tr>
+      <tr>
+        <td><div className="aquaCircle"/></td><td>Current Neighbor</td>
+      </tr>
+      <tr>
+        <td><div className="blueEdge"/></td><td>Visited Edge</td>
+      </tr>
+      <tr>
+        <td><div className="aquaEdge"/></td><td>Current Edge</td>
+      </tr>
+    </table></div>; 
+  }
+  
   return (
     <div className="Graphs-pageContainer">
       {redirect}
@@ -349,6 +391,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
               recolorEdge={recolorEdge}
               linksState={linksState}
               nodesState={nodesState}
+              displayLegend={displayLegend}
             />
             <Dijkstra recolorNode={recolorNode} linksState={linksState} nodesState={nodesState} />
           </div>
@@ -365,9 +408,14 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           />
         </div>
       </div>
-      <div id="main" className="Graphs-svgContainer" ref={main} /* width="500px" height="500px" */>
-        {""}
-      </div>
+        
+        <div id="main" className="Graphs-svgContainer" ref={main} /* width="500px" height="500px" */>
+          {""}
+          
+          {legend}
+        
+        </div>
+        
     </div>
   );
 };

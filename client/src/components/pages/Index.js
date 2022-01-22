@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import GoogleLogin, { GoogleLogout } from "react-google-login";
-import Typewriter from "typewriter-effect";
+//import Typewriter from "typewriter-effect";
 import "../../utilities.css";
 import "./Index.css";
 
@@ -34,13 +34,13 @@ const Index = ({ userId, handleLogin, handleLogout }) => {
       )} */}
       <div className="landing-page-container u-textCenter">
         <div className="landing-page-title">
-          <Typewriter
+          {/* <Typewriter
             options={{
               strings: ["Algorama", "Algorithm Visualizer", "Data Visualizer", "MIT 6.006 Helper"],
               autoStart: true,
               loop: true,
             }}
-          />
+          /> */}
         </div>
         <div className="landing-page-content">
           {" "}
