@@ -233,6 +233,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   };
 
   const recolorEdge = (i, j, color) => {
+    if (i === "all" || j === "all") {
+      d3.select(main.current).select("svg").selectAll("line").attr("stroke", color);
+    }
     let edgeId = "#e" + i.toString() + "-" + j.toString();
     d3.select(main.current).select("svg").select(edgeId).attr("stroke", color);
   };
@@ -282,7 +285,12 @@ const Graphs = ({ userId, handleLogout, userName }) => {
               directed={isDirected}
               changeDirected={changeDirected}
             />
-            <BFS recolorNode={recolorNode} linksState={linksState} nodesState={nodesState} />
+            <BFS
+              recolorNode={recolorNode}
+              recolorEdge={recolorEdge}
+              linksState={linksState}
+              nodesState={nodesState}
+            />
             <Dijkstra recolorNode={recolorNode} linksState={linksState} nodesState={nodesState} />
           </div>
         </div>

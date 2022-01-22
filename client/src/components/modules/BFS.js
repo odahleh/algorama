@@ -2,25 +2,29 @@ import React, { Component, useEffect, useState } from "react";
 import "../../utilities.css";
 import "../pages/Graphs.css";
 
-const BFS = ({ recolorNode, linksState, nodesState }) => {
+const BFS = ({ recolorNode, recolorEdge, linksState, nodesState }) => {
   let [showBFSProgress, setShowBFSProgress] = useState(false);
   let [BFS_STEP_State, setBFS_STEP] = useState([]);
-  let [BFS_INDEX, setBFS_INDEX] = useState(0);
+  let [BFS_INDEX, setBFS_INDEX] = useState(-1);
   let [startNodeBFS, setStartNodeBFS] = useState("");
 
   function findNeighbors(start, links) {
-    let neighbors = new Set();
+    let neighbors = [];
+    let neighborsEdges = [];
+    // console.log("links", links);
     for (let edge of links) {
       if (edge.source.name === start.name) {
-        neighbors.add(edge.target.name);
+        neighbors.push(edge.target.name);
+        neighborsEdges.push(edge);
       } else if (edge.target.name === start.name) {
-        neighbors.add(edge.source.name);
+        neighbors.push(edge.source.name);
+        neighborsEdges.push(edge);
       }
     }
-    return neighbors;
+    // console.log(neighbors);
+    return [neighbors, neighborsEdges];
   }
   function BFS() {
-    setBFS_INDEX(0);
     recolorNode("all", "black");
     // BFS_stepper(0);
     // setBFS_INDEX(0);
@@ -32,59 +36,56 @@ const BFS = ({ recolorNode, linksState, nodesState }) => {
       setShowBFSProgress(true);
       let links = linksState;
       let nodes = nodesState;
-      console.log(links);
-      console.log(nodes);
       let visited = new Set();
-      visited.add(start.name);
       let distanceArray = [];
       let BFS_STEP = [];
       for (let node in nodes) {
         distanceArray.push(0);
       }
-      let queue = [];
-      let neighbors = findNeighbors(start, links);
-      queue = Array.from(neighbors);
-      let level = 1;
+      let queue = [parseInt(startNodeBFS)];
+      let level = 0;
       while (queue.length > 0) {
-        BFS_STEP.push([...distanceArray]);
-        console.log(distanceArray);
-        neighbors = [];
+        let neighbors = [];
 
         for (let next of queue) {
           if (!visited.has(next)) {
             visited.add(next);
-            console.log(next, "node");
             distanceArray[next] = level;
           }
         }
         level += 1;
         for (let next of queue) {
-          let currNeighbors = findNeighbors({ name: next }, links);
-          for (let neigh of currNeighbors) {
-            if (!visited.has(neigh)) {
-              neighbors.push(neigh);
+          // console.log("NEXT", next);
+          let [currNeighbors, currNeighborsEdges] = findNeighbors({ name: parseInt(next) }, links);
+          // console.log(currNeighbors);
+          for (let neigh in currNeighbors) {
+            // console.log("NEIGH");
+            if (visited.has(currNeighbors[neigh])) {
+              BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], false]);
+            } else {
+              neighbors.push(currNeighbors[neigh]);
+              BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], true]);
             }
           }
         }
         queue = neighbors;
+        // console.log("queue", queue);
       }
-      BFS_STEP.push([...distanceArray]);
       console.log(distanceArray);
+      console.log(BFS_STEP);
       setBFS_STEP(BFS_STEP);
     }
   }
 
   function BFS_stepper(index) {
-    recolorNode("all", "black");
-    recolorNode(startNodeBFS, "red");
-    console.log(BFS_STEP_State);
+    //BFS_STEP saves every edge and target node that BFS looks at, both visited and unvisited.
     console.log(index);
-    for (let node in BFS_STEP_State[index]) {
-      // if value of node has changed
-      if (BFS_STEP_State[index - 1][node] !== BFS_STEP_State[index][node]) {
-        recolorNode(node, "green");
-        console.log(node);
-      }
+    recolorNode("all", "black");
+    recolorEdge("all", "all", "grey");
+    recolorNode(parseInt(startNodeBFS), "red");
+    recolorEdge(BFS_STEP_State[index][0].source.name, BFS_STEP_State[index][0].target.name, "aqua");
+    if (BFS_STEP_State[index][2]) {
+      recolorNode(BFS_STEP_State[index][1], "blue");
     }
   }
 
@@ -93,14 +94,13 @@ const BFS = ({ recolorNode, linksState, nodesState }) => {
   };
 
   const nextStep = () => {
-    BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, 0)));
-    setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, 0)));
+    BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
+    setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
   };
   const prevStep = () => {
     BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
     setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
   };
-
   return (
     <div>
       <input

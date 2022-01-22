@@ -1,5 +1,4 @@
 import React, { Component, useEffect, useState } from "react";
-import Switch from "react-switch";
 import "../../utilities.css";
 import "../pages/Graphs.css";
 
