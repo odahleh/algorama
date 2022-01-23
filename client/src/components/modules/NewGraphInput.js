@@ -39,9 +39,8 @@ const NewGraphInput = (props) => {
         let start = parseInt(ends[0]);
         //let end = parseInt(ends[1]);
         let end = parseInt(ends[1].split("/")[0]);
-        if (ends[1].split("/").length > 0) {
+        if (ends[1].split("/").length > 1) {
           let weight = ends[1].split("/")[1];
-          console.log(weight);
           links.push({ source: start, target: end, weight: parseInt(weight) });
         } else {
           links.push({ source: start, target: end, weight: 1 });

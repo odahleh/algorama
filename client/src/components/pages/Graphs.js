@@ -70,6 +70,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     setNodes(nodes);
     setLinks(links);
     setCurrentDirected(isDirected);
+    console.log(isWeighted, "ishwf");
     setCurrentWeighted(isWeighted);
     if (displaySimulation === true) {
       d3.selectAll("svg").remove();
@@ -309,7 +310,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         .selectAll("text")
         .style("opacity", 0);
     }
-    setWeighted(1 - isWeighted);
+    setWeighted(1-isWeighted);
   };
 
   const displayLegend = () => {
@@ -405,6 +406,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       </div>; 
   }
   
+  console.log(linksState, "stats");
   return (
     <div className="Graphs-pageContainer">
       {redirect}

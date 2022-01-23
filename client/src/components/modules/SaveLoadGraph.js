@@ -26,7 +26,11 @@ const SaveLoadGraph = (props) => {
       nodeNames.push({ name: node.name });
     }
     for (let edge of props.linksState) {
-      edgeNames.push({ source: edge.source.name, target: edge.target.name });
+      if (props.isCurrentWeighted){
+        edgeNames.push({ source: edge.source.name, target: edge.target.name, weight:edge.weight});
+      }else{
+        edgeNames.push({ source: edge.source.name, target: edge.target.name});
+      }
     }
     console.log(nodeNames, edgeNames);
     if (nodeNames.length > 0 && valueGraphName.length > 0) {

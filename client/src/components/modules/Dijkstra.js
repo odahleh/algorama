@@ -43,7 +43,7 @@ const Dijkstra = ({ recolorNode, linksState, nodesState }) => {
     for (let edge of links) {
       if (
         (edge.source.name === u && edge.target.name === v) ||
-        (edge.source.name === v && edge.target.name === v)
+        (edge.source.name === v && edge.target.name === u)
       ) {
         return edge.weight;
       }
