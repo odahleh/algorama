@@ -66,11 +66,14 @@ const BFS = ({ recolorNode, recolorEdge, linksState, nodesState, displayLegend, 
             if (visited.has(currNeighbors[neigh])) {
               BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], false]);
             } else {
-              neighbors.push(currNeighbors[neigh]);
+              if (!neighbors.includes(currNeighbors[neigh])){
+                neighbors.push(currNeighbors[neigh]);
+              }
               BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], true]);
             }
           }
         }
+        console.log(neighbors, "neighbors");
         queue = neighbors;
         // console.log("queue", queue);
       }
