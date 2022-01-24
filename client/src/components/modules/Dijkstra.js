@@ -3,6 +3,11 @@ import "../../utilities.css";
 import "../pages/Graphs.css";
 
 const Dijkstra = ({ recolorNode, linksState, nodesState }) => {
+  let [showDijkstraProgress, setShowDijkstraProgress] = useState(false);
+  let [dijkstraStepState, setDijkstraStepState] = useState([]);
+  let [dijkstraIndex, setDijkstraIndex] = useState(-1);
+  let [startNodeDistra, setStartNodeDijkstra] = useState("");
+
   function dijkstra() {
     let startNode = 0;
     let links = linksState;
