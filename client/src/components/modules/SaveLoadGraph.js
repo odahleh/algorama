@@ -9,6 +9,7 @@ const SaveLoadGraph = (props) => {
   let [valueGraphName, setValueNames] = useState("");
   let [loadedGraphs, setLoadedGraphs] = useState([]);
 
+ 
   useEffect(() => {
     if (loadedGraphs.length === 0 && props.userId) {
       loadGraph();
@@ -26,7 +27,8 @@ const SaveLoadGraph = (props) => {
       nodeNames.push({ name: node.name });
     }
     for (let edge of props.linksState) {
-      edgeNames.push({ source: edge.source.name, target: edge.target.name });
+        edgeNames.push({ source: edge.source.name, target: edge.target.name, weight:edge.weight});
+      
     }
     console.log(nodeNames, edgeNames);
     if (nodeNames.length > 0 && valueGraphName.length > 0) {
@@ -36,7 +38,6 @@ const SaveLoadGraph = (props) => {
         edges: edgeNames,
         name: valueGraphName,
         directed: props.isCurrentDirected,
-        weighted: props.isCurrentWeighted,
       };
 
       post("/api/savegraph", graphDoc).then((graph) => {
@@ -65,6 +66,7 @@ const SaveLoadGraph = (props) => {
     let i = parseInt(id.charAt(id.length - 1));
     console.log(i);
     console.log(loadedGraphs[i].edges);
+    props.hideLegend(); 
     props.GraphSimulation(loadedGraphs[i].nodes, loadedGraphs[i].edges);
     // console.log("Will be available soon!");
   };

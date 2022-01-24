@@ -2,53 +2,57 @@ import React, { Component, useEffect, useState } from "react";
 import "../../utilities.css";
 import "../pages/Graphs.css";
 
-const Dijkstra = ({ recolorNode, linksState, nodesState }) => {
-  let [showDijkstraProgress, setShowDijkstraProgress] = useState(false);
-  let [dijkstraStepState, setDijkstraStepState] = useState([]);
-  let [dijkstraIndex, setDijkstraIndex] = useState(-1);
-  let [startNodeDijkstra, setStartNodeDijkstra] = useState("");
-
+const Dijkstra = ({ recolorNode, linksState, nodesState, startNode, hideLegend }) => {
   function dijkstra() {
-    let startNode = 0;
-    let links = linksState;
-    let nodes = nodesState;
-    let distanceArray = [0]; //MODIFY FOR DIFFERENT STARTING NODE
-    let parentArray = [];
-    let pqueue = [];
-    for (let node of nodes) {
-      if (node.name !== startNode) {
-        distanceArray.push(Infinity);
-      }
-      pqueue.push(node.name);
+    recolorNode("all", "black");
+    // BFS_stepper(0);
+    // setBFS_INDEX(0);
+    hideLegend();
+    if (startNode === "") {
+      alert("Please set a start node for Dijkstra.");
     }
-    let counter = 0;
-    while (pqueue.length > 0 && counter <= 200) {
-      let u = null;
-      let curMin = Infinity;
-      for (let node in distanceArray) {
-        if (pqueue.includes(parseInt(node)) && distanceArray[node] <= curMin) {
-          u = parseInt(node);
-          curMin = distanceArray[node];
+    else{
+      recolorNode(startNode, "red");
+      let links = linksState;
+      let nodes = nodesState;
+      let distanceArray = [parseInt(startNode)]; //MODIFY FOR DIFFERENT STARTING NODE
+      let parentArray = [];
+      let pqueue = [];
+      for (let node of nodes) {
+        if (node.name !== parseInt(startNode)) {
+          distanceArray.push(Infinity);
+        }
+        pqueue.push(node.name);
+      }
+      let counter = 0;
+      while (pqueue.length > 0 && counter <= 200) {
+        let u = null;
+        let curMin = Infinity;
+        for (let node in distanceArray) {
+          if (pqueue.includes(parseInt(node)) && distanceArray[node] <= curMin) {
+            u = parseInt(node);
+            curMin = distanceArray[node];
+          }
+        }
+        let uIndex = pqueue.indexOf(u);
+        pqueue.splice(uIndex, 1);
+        let neighbors = findNeighbors({ name: u }, links);
+        for (let v of neighbors) {
+          let alt = distanceArray[u] + returnEdgeWeights(u, v, links);
+          if (alt < distanceArray[v]) {
+            distanceArray[v] = alt;
+            parentArray[v] = u;
+          }
         }
       }
-      let uIndex = pqueue.indexOf(u);
-      pqueue.splice(uIndex, 1);
-      let neighbors = findNeighbors({ name: u }, links);
-      for (let v of neighbors) {
-        let alt = distanceArray[u] + returnEdgeWeights(u, v, links);
-        if (alt < distanceArray[v]) {
-          distanceArray[v] = alt;
-          parentArray[v] = u;
-        }
-      }
+      console.log(distanceArray);
     }
-    console.log(distanceArray);
   }
   function returnEdgeWeights(u, v, links) {
     for (let edge of links) {
       if (
         (edge.source.name === u && edge.target.name === v) ||
-        (edge.source.name === v && edge.target.name === v)
+        (edge.source.name === v && edge.target.name === u)
       ) {
         return edge.weight;
       }

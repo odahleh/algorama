@@ -15,6 +15,9 @@ import Dijkstra from "../modules/Dijkstra.js";
 
 const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
 let userIDList = [];
+let currentNodeBFS = undefined; 
+let visitedNodesBFS = new Set(); 
+let currentEdgeBFS = '';
 
 const Graphs = ({ userId, handleLogout, userName }) => {
   const [main, setRef1] = useState(React.createRef());
@@ -29,6 +32,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   const [isCurrentDirected, setCurrentDirected] = useState(0);
   const [isCurrentWeighted, setCurrentWeighted] = useState(0);
   let [showLegend, setShowedLegend] = useState(false);
+  let [BFS_STEP_State, setBFS_STEP] = useState([]);
+  let [BFS_INDEX, setBFS_INDEX] = useState(-1);
+  let [startNodeBFS, setStartNodeBFS] = useState("");
 
   useEffect(() => {
     let navbox = document.querySelector(".top-bar-container");
@@ -306,12 +312,68 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         .selectAll("text")
         .style("opacity", 0);
     }
-    setWeighted(1 - isWeighted);
+    setWeighted(1-isWeighted);
   };
 
   const displayLegend = () => {
     setShowedLegend(true); 
   }
+
+  const hideLegend = () => {
+    setShowedLegend(false); 
+  }
+
+  const emptyCounter = () => {
+    visitedNodesBFS.clear();
+    currentNodeBFS = undefined; 
+    currentEdgeBFS = '';
+  }
+
+
+  function BFS_stepper(index) {
+    //BFS_STEP saves every edge and target node that BFS looks at, both visited and unvisited.
+    visitedNodesBFS = new Set();
+    console.log(index);
+    recolorNode("all", "black");
+    recolorEdge("all", "all", "grey");
+    const source = BFS_STEP_State[index][0].source.name; 
+    const target = BFS_STEP_State[index][0].target.name; 
+    for (let i = 0; i <= index -1; i++){
+      const currStart = BFS_STEP_State[i][0].source.name;
+      const currEnd = BFS_STEP_State[i][0].target.name; 
+      recolorNode(currStart, "blue");
+      recolorEdge(currStart, currEnd, "blue");
+      recolorNode(currEnd, "blue");  
+      visitedNodesBFS.add(currStart);
+      visitedNodesBFS.add(currEnd);
+    }
+    recolorNode(parseInt(startNodeBFS), "red");
+    if(source === BFS_STEP_State[index][1]){
+      recolorNode(target, "yellow");
+      currentNodeBFS = target;
+      visitedNodesBFS.add(target);
+      currentEdgeBFS = "From " + target.toString() + " to " + source.toString();
+    }
+    else if(target === BFS_STEP_State[index][1]){
+      currentNodeBFS = source;
+      visitedNodesBFS.add(source);
+      recolorNode(source, "yellow"); 
+      currentEdgeBFS = "From " + source.toString() + " to " + target.toString();
+    }
+    recolorEdge(BFS_STEP_State[index][0].source.name, BFS_STEP_State[index][0].target.name, "aqua");
+    if (BFS_STEP_State[index][2]) {
+      recolorNode(BFS_STEP_State[index][1], "aqua");
+    }
+  }
+
+  const nextStep = () => {
+    BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
+    setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
+  };
+  const prevStep = () => {
+    BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
+    setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
+  };
 
   let redirect = <div></div>;
   if (userId === undefined) {
@@ -326,15 +388,16 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   }
 
   let legend = <div></div>; 
-  console.log(showLegend, "legend");
+
   if (showLegend === true){
-    legend = <div className="Algorithm-legend"> <table className="legend-table">
+    legend =  <div className="container">
+      <div className="Algorithm-legend"> <table className="legend-table">
       <tr>
         <th>BFS Legend</th>
       </tr>
       <tr>
        <td width="34%"/>
-    </tr>
+     </tr>
       <tr>
         <td><div className="redCircle"/></td> <td>Start Node</td>
       </tr>
@@ -353,8 +416,27 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       <tr>
         <td><div className="aquaEdge"/></td><td>Current Edge</td>
       </tr>
-    </table></div>; 
+      <tr>
+      </tr>
+    </table>
+    <div>
+          <button onClick={prevStep} className="button u-marginButton">
+            Previous Step
+          </button>
+          <button onClick={nextStep} className="button u-marginButton">
+            Next Step
+          </button>
+      </div>
+    </div>
+    <div className="infoLegend u-flex u-flexColumn">
+            <div>Start Node = {startNodeBFS}</div>
+            <div>Current Node = {currentNodeBFS} </div>
+            <div>Current Edge = {currentEdgeBFS}</div>
+            <div>Visited Nodes= {Array.from(visitedNodesBFS).join(', ')} </div>
+    </div>
+    </div>; 
   }
+  
   
   return (
     <div className="Graphs-pageContainer">
@@ -385,6 +467,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
               changeDirected={changeDirected}
               weighted={isWeighted}
               changeWeighted={changeWeighted}
+              hideLegend={hideLegend}
             />
             <BFS
               recolorNode={recolorNode}
@@ -392,8 +475,18 @@ const Graphs = ({ userId, handleLogout, userName }) => {
               linksState={linksState}
               nodesState={nodesState}
               displayLegend={displayLegend}
+              setBFS_STEP={setBFS_STEP}
+              setBFS_INDEX={setBFS_INDEX}
+              startNodeBFS={startNodeBFS}
+              setStartNodeBFS={setStartNodeBFS}
+              emptyCounter={emptyCounter}
             />
-            <Dijkstra recolorNode={recolorNode} linksState={linksState} nodesState={nodesState} />
+            <Dijkstra recolorNode={recolorNode} 
+              linksState={linksState} 
+              nodesState={nodesState} 
+              startNode={startNodeBFS}
+              hideLegend={hideLegend}
+              />
           </div>
         </div>
         <div className="Graphs-text">Save and load your graphs</div>
@@ -404,7 +497,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             linksState={linksState}
             GraphSimulation={GraphSimulation}
             isCurrentDirected={isCurrentDirected}
-            isCurrentWeighted={isCurrentWeighted}
+            hideLegend={hideLegend}
           />
         </div>
       </div>
