@@ -323,6 +323,12 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     setShowedLegend(false); 
   }
 
+  const emptyCounter = () => {
+    visitedNodesBFS.clear();
+    currentNodeBFS = undefined; 
+    currentEdgeBFS = '';
+  }
+
 
   function BFS_stepper(index) {
     //BFS_STEP saves every edge and target node that BFS looks at, both visited and unvisited.
@@ -473,6 +479,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
               setBFS_INDEX={setBFS_INDEX}
               startNodeBFS={startNodeBFS}
               setStartNodeBFS={setStartNodeBFS}
+              emptyCounter={emptyCounter}
             />
             <Dijkstra recolorNode={recolorNode} 
               linksState={linksState} 

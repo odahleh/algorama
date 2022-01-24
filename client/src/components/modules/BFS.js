@@ -3,7 +3,7 @@ import "../../utilities.css";
 import "../pages/Graphs.css";
 
 
-const BFS = ({ recolorNode, recolorEdge, linksState, nodesState, displayLegend, setBFS_STEP, setBFS_INDEX, startNodeBFS, setStartNodeBFS}) => {
+const BFS = ({ recolorNode, recolorEdge, linksState, nodesState, displayLegend, setBFS_STEP, setBFS_INDEX, startNodeBFS, setStartNodeBFS, emptyCounter}) => {
   let [showBFSProgress, setShowBFSProgress] = useState(false);
 
   
@@ -25,8 +25,9 @@ const BFS = ({ recolorNode, recolorEdge, linksState, nodesState, displayLegend, 
     return [neighbors, neighborsEdges];
   }
   function BFS() {
-
+    emptyCounter();
     recolorNode("all", "black");
+    recolorEdge("all", "all", "grey");
     // BFS_stepper(0);
     // setBFS_INDEX(0);
     if (startNodeBFS === "") {
@@ -43,7 +44,7 @@ const BFS = ({ recolorNode, recolorEdge, linksState, nodesState, displayLegend, 
       let distanceArray = [];
       let BFS_STEP = [];
       for (let node in nodes) {
-        distanceArray.push(0);
+        distanceArray.push(Infinity);
       }
       let queue = [parseInt(startNodeBFS)];
       let level = 0;
