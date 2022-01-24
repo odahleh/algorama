@@ -24,6 +24,7 @@ const NewGraphInput = (props) => {
     setDirected(1 - directed);
   };
 
+
   const startGraph = (valueNodes, valueEdges) => {
     let nodes = [];
     let links = [];
@@ -48,6 +49,7 @@ const NewGraphInput = (props) => {
       }
       console.log(links);
     }
+    props.hideLegend(); 
     props.GraphSimulation(nodes, links, directed);
   };
 

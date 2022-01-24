@@ -188,8 +188,11 @@ input[type="range"]::-webkit-slider-thumb {
   box-shadow: -85px 0 0 80px var(--primary);
 }
 
-.Algorithm-legend{
+.container{
   position: absolute;
+}
+.Algorithm-legend{
+
   margin: 24px;
   border: 1px solid black;
   border-collapse: collapse;
@@ -197,6 +200,12 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 16px;
 }
 
+.infoLegend{
+  border: 1px solid black;
+  border-radius: 16px;
+  padding: 8px;
+  margin: 24px;
+}
 .redCircle{
   border-radius: 32px;
   height: 16px;

@@ -97,7 +97,7 @@ const BFS = ({ recolorNode, recolorEdge, linksState, nodesState, displayLegend, 
         type="text"
         value={startNodeBFS}
         onChange={handleStartNodeBFS}
-        placeholder={"BFS start node"}
+        placeholder={"Starting node"}
         className="InputBox"
       />
       <button onClick={BFS} className="button u-marginButton">
