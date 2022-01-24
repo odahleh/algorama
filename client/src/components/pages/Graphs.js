@@ -423,10 +423,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       </div>
     </div>
     <div className="infoLegend u-flex u-flexColumn">
-            <div>Start Node ={startNodeBFS}</div>
-            <div>Current Node ={currentNodeBFS} </div>
+            <div>Start Node = {startNodeBFS}</div>
+            <div>Current Node = {currentNodeBFS} </div>
             <div>Current Edge = {currentEdgeBFS}</div>
-            <div>Visited Nodes={Array.from(visitedNodesBFS).join(' ')} </div>
+            <div>Visited Nodes= {Array.from(visitedNodesBFS).join(', ')} </div>
     </div>
     </div>; 
   }
