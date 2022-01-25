@@ -29,7 +29,7 @@ const NewGraphInput = (props) => {
     let links = [];
     for (let i = 0; i < parseInt(valueNodes); i++) {
       //console.log(i);
-      nodes.push({ name: i /* , x: i * 100, y: 100 */ });
+      nodes.push({ name: i, id: i /* , x: i * 100, y: 100 */ });
     }
     console.log(nodes);
     if (valueEdges.length > 0) {
@@ -68,7 +68,6 @@ const NewGraphInput = (props) => {
         placeholder={"edges 0-1,2-0, ..."}
         className="InputBox"
       />
-
       <div className="Graph-names u-flex u-flex-alignCenter">
         <input
           type="range"

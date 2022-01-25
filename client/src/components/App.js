@@ -9,7 +9,7 @@ import "../utilities.css";
 import { socket } from "../client-socket.js";
 
 import { get, post } from "../utilities";
-// import NewGraphs from "./pages/NewGraphs.js";
+import NewGraphs from "./pages/NewGraphs.js";
 
 /**
  * Define the "App" component
@@ -48,6 +48,13 @@ const App = () => {
         <Index path="/" handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
         <Graphs
           path="/graphs"
+          userId={userId}
+          userName={userName}
+          handleLogout={handleLogout}
+          userId={userId}
+        />
+        <NewGraphs
+          path="/newgraphs"
           userId={userId}
           userName={userName}
           handleLogout={handleLogout}

@@ -3,6 +3,7 @@ import "../../utilities.css";
 import "../pages/Graphs.css";
 
 const BFS = ({ recolorNode, recolorEdge, linksState, nodesState }) => {
+  //console.log(linksState, nodesState);
   let [showBFSProgress, setShowBFSProgress] = useState(false);
   let [BFS_STEP_State, setBFS_STEP] = useState([]);
   let [BFS_INDEX, setBFS_INDEX] = useState(-1);
@@ -36,6 +37,7 @@ const BFS = ({ recolorNode, recolorEdge, linksState, nodesState }) => {
       setShowBFSProgress(true);
       let links = linksState;
       let nodes = nodesState;
+      console.log(links, nodes);
       let visited = new Set();
       let distanceArray = [];
       let BFS_STEP = [];
