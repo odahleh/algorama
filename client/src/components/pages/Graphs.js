@@ -611,14 +611,14 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   }
   function Dijkstra_stepper(index) {
     console.log("DIJKSTRA STATE", Dijkstra_STEP_State);
-    for (let i = 0; i < index; i++) {
+    for (let i = 0; i < Dijkstra_STEP_State.length; i++) {
       if (Dijkstra_STEP_State[i][2] === false) {
         recolorNode(Dijkstra_STEP_State[i][0], "black");
-        recolorEdge(
-          Dijkstra_STEP_State[i][1].source.name,
-          Dijkstra_STEP_State[i][1].target.name,
-          "grey"
-        );
+        // recolorEdge(
+        //   Dijkstra_STEP_State[i][1].source.name,
+        //   Dijkstra_STEP_State[i][1].target.name,
+        //   "grey"
+        // );
       }
     }
     console.log("INDEX", index);
