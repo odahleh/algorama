@@ -34,7 +34,6 @@ const BFS = ({ recolorNode, recolorEdge, linksState, nodesState, displayLegend, 
       alert("Please set a start node for BFS.");
     } else {
       displayLegend(); 
-      recolorNode(startNodeBFS, "red");
       setBFS_INDEX(-1);
       let start = { name: parseInt(startNodeBFS) };
       setShowBFSProgress(true);
@@ -64,16 +63,16 @@ const BFS = ({ recolorNode, recolorEdge, linksState, nodesState, displayLegend, 
           // console.log(currNeighbors);
           for (let neigh in currNeighbors) {
             // console.log("NEIGH");
-            if (visited.has(currNeighbors[neigh])) {
-              BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], false]);
-            } else {
+            if (!visited.has(currNeighbors[neigh])){
               if (!neighbors.includes(currNeighbors[neigh])){
                 neighbors.push(currNeighbors[neigh]);
               }
-              BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], true]);
+              //BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], next]);
+            }
+            BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], next]);
             }
           }
-        }
+        
         console.log(neighbors, "neighbors");
         queue = neighbors;
         // console.log("queue", queue);

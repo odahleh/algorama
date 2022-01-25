@@ -1,3 +1,4 @@
+import { navigate } from "@reach/router";
 import React, { Component } from "react";
 import GoogleLogin, { GoogleLogout } from "react-google-login";
 import Typewriter from "typewriter-effect";
@@ -8,30 +9,18 @@ import "./Index.css";
 const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
 
 const Index = ({ userId, handleLogin, handleLogout }) => {
+  console.log(userId);
+  console.log(handleLogin, handleLogout);
   if (userId) {
+    navigate("/graphs");
     return (
       <>
-        <meta http-equiv="refresh" content="0; url = '/graphs'" />
+        {/* <meta http-equiv="refresh" content="0; url = '/graphs'" /> */}
       </>
     );
   }
   return (
     <>
-      {/* {userId ? (
-        <GoogleLogout
-          clientId={GOOGLE_CLIENT_ID}
-          buttonText="Logout"
-          onLogoutSuccess={handleLogout}
-          onFailure={(err) => console.log(err)}
-        />
-      ) : (
-        <GoogleLogin
-          clientId={GOOGLE_CLIENT_ID}
-          buttonText="Login"
-          onSuccess={handleLogin}
-          onFailure={(err) => console.log(err)}
-        />
-      )} */}
       <div className="landing-page-container u-textCenter">
         <div className="landing-page-title">
           <Typewriter

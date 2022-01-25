@@ -42,8 +42,9 @@ const App = () => {
     post("/api/logout");
   };
 
-
+  console.log(userName, "userName");
   if (userId){
+    console.log("helooo");
     return (
       <>
         <Router>
@@ -62,10 +63,12 @@ const App = () => {
     );
   }
   else{
+    console.log("something else");
     return (
       <>
         <Router>
-          <Index default handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
+          <Index path='/' handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
+          <NotFound default />
         </Router>
       </>
     );
