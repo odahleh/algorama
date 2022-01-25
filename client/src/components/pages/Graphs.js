@@ -15,13 +15,16 @@ import Dijkstra from "../modules/Dijkstra.js";
 import FloydWarshall from "../modules/FloydWarshall.js";
 
 const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
+//Initialization for BFS Display 
 let currentNodeBFS = undefined;
 let visitedNodesBFS = new Set();
-let minNodesDijkstra = new Set();
 let currentEdgeBFS = "";
 let previousExploredBFS = new Set();
 let queue = [];
 let levelSets = [];
+
+//Initialization for Dijkstra Display
+let minNodesDijkstra = new Set();
 
 let simulation;
 let svg;
@@ -52,13 +55,13 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   const [isWeighted, setWeighted] = useState(0);
   const [isCurrentDirected, setCurrentDirected] = useState(0);
   const [isCurrentWeighted, setCurrentWeighted] = useState(0);
-  let [showBFSLegend, setShowedLegend] = useState(false);
+  let [showBFSLegend, setShowedBFS] = useState(false);
   let [BFS_STEP_State, setBFS_STEP] = useState([]);
   let [BFS_INDEX, setBFS_INDEX] = useState(-1);
   let [startNodeBFS, setStartNodeBFS] = useState("");
   let [Dijkstra_STEP_State, setDijkstra_State] = useState([]);
   let [Dijkstra_INDEX, setDijkstra_INDEX] = useState(-1);
-  let [showDijkstra, setShowedDijkstra] = useState(false);
+  let [showDijkstraLegend, setShowedDijkstra] = useState(false);
   let [currentMode, setCurrentMode] = useState("cre");
 
   useLayoutEffect(() => {
@@ -631,18 +634,23 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     setWeighted(1 - isWeighted);
   };
 
-  const displayLegend = () => {
-    setShowedLegend(true);
+  const displayBFSLegend = () => {
+    setShowedBFS(true);
   };
 
-  const hideLegend = () => {
-    setShowedLegend(false);
+  const hideBFSLegend = () => {
+    setShowedBFS(false);
   };
 
-  const displayDijkstra = () => {
+  const displayDijkstraLegend = () => {
     setShowedDijkstra(true);
   };
-  const emptyCounter = () => {
+
+  const hideDijkstraLegend = () => {
+    setShowedDijkstra(false); 
+  }
+
+  const emptyBFSCounter = () => {
     visitedNodesBFS.clear();
     currentNodeBFS = undefined;
     currentEdgeBFS = "";
@@ -650,6 +658,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     queue = "";
     levelSets = []; 
   };
+
+  const emptyDijkstraCounter = () => {
+    minNodesDijkstra.clear();
+  }
 
   function BFS_stepper(index) {
     //BFS_STEP saves every edge and target node that BFS looks at, both visited and unvisited.
@@ -760,7 +772,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   };
 
   let legend = <div></div>;
-  if (showBFSLegend === true || showDijkstra === true) {
+  if (showBFSLegend === true || showDijkstraLegend === true) {
     legend = (
       <div className="container">
         <div className="Algorithm-legend">
@@ -876,7 +888,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                     changeDirected={changeDirected}
                     weighted={isWeighted}
                     changeWeighted={changeWeighted}
-                    hideLegend={hideLegend}
+                    hideBFSLegend={hideBFSLegend}
+                    hideDijkstraLegend={hideDijkstraLegend}
                     update={update}
                     nodes={nodesGlobal}
                     links={linksGlobal}
@@ -894,12 +907,13 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   recolorEdge={recolorEdge}
                   linksState={linksGlobal}
                   nodesState={nodesGlobal}
-                  displayLegend={displayLegend}
+                  displayBFSLegend={displayBFSLegend}
                   setBFS_STEP={setBFS_STEP}
                   setBFS_INDEX={setBFS_INDEX}
                   startNodeBFS={startNodeBFS}
                   setStartNodeBFS={setStartNodeBFS}
-                  emptyCounter={emptyCounter}
+                  emptyBFSCounter={emptyBFSCounter}
+                  hideDijkstraLegend={hideDijkstraLegend}
                 />
                 <Dijkstra
                   recolorNode={recolorNode}
@@ -907,10 +921,11 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   linksState={linksGlobal}
                   nodesState={nodesGlobal}
                   startNode={startNodeBFS}
-                  hideLegend={hideLegend}
+                  hideBFSLegend={hideBFSLegend}
                   setDijkstra_State={setDijkstra_State}
                   setDijkstra_INDEX={setDijkstra_INDEX}
-                  displayDijkstra={displayDijkstra}
+                  displayDijkstraLegend={displayDijkstraLegend}
+                  emptyDijkstraCounter={emptyDijkstraCounter}
                 />
 
                 <FloydWarshall
@@ -918,7 +933,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   linksState={linksGlobal}
                   nodesState={nodesGlobal}
                   startNode={startNodeBFS}
-                  hideLegend={hideLegend}
+                  hideBFSLegend={hideBFSLegend}
+                  hideDijkstraLegend={hideDijkstraLegend}
                 />
               </div>
             </>
@@ -932,7 +948,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             linksState={linksGlobal}
             GraphSimulation={GraphSimulation}
             isCurrentDirected={isCurrentDirected}
-            hideLegend={hideLegend}
+            hideBFSLegend={hideBFSLegend}
+            hideDijkstraLegend={hideDijkstraLegend}
           />
         </div>
       </div>

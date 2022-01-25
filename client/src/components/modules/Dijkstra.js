@@ -8,22 +8,24 @@ const Dijkstra = ({
   linksState,
   nodesState,
   startNode,
-  hideLegend,
+  hideBFSLegend,
   setDijkstra_State,
   setDijkstra_INDEX,
-  displayDijkstra,
+  displayDijkstraLegend,
+  emptyDijkstraCounter
 }) => {
   function dijkstra() {
     recolorNode("all", "black");
     recolorEdge("all", "all", "grey");
     // BFS_stepper(0);
     // setBFS_INDEX(0);
-    hideLegend();
+    hideBFSLegend();
+    emptyDijkstraCounter();
     if (startNode === "") {
       alert("Please set a start node for Dijkstra.");
     } else {
       recolorNode(startNode, "red");
-      displayDijkstra();
+      displayDijkstraLegend();
       setDijkstra_INDEX(-1);
       let links = linksState;
       let nodes = nodesState;
