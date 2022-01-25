@@ -15,7 +15,7 @@ const Dijkstra = ({ recolorNode, linksState, nodesState, startNode, hideLegend }
       recolorNode(startNode, "red");
       let links = linksState;
       let nodes = nodesState;
-      let distanceArray = [parseInt(startNode)]; //MODIFY FOR DIFFERENT STARTING NODE
+      let distanceArray = [0]; //MODIFY FOR DIFFERENT STARTING NODE
       let parentArray = [];
       let pqueue = [];
       for (let node of nodes) {
@@ -24,8 +24,7 @@ const Dijkstra = ({ recolorNode, linksState, nodesState, startNode, hideLegend }
         }
         pqueue.push(node.name);
       }
-      let counter = 0;
-      while (pqueue.length > 0 && counter <= 200) {
+      while (pqueue.length > 0) {
         let u = null;
         let curMin = Infinity;
         for (let node in distanceArray) {

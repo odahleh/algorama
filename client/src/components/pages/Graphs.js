@@ -12,12 +12,13 @@ import NewGraphInput from "../modules/NewGraphInput.js";
 import SaveLoadGraph from "../modules/SaveLoadGraph.js";
 import BFS from "../modules/BFS.js";
 import Dijkstra from "../modules/Dijkstra.js";
+import FloydWarshall from "../modules/FloydWarshall.js";
 
 const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
 let userIDList = [];
-let currentNodeBFS = undefined; 
-let visitedNodesBFS = new Set(); 
-let currentEdgeBFS = '';
+let currentNodeBFS = undefined;
+let visitedNodesBFS = new Set();
+let currentEdgeBFS = "";
 
 const Graphs = ({ userId, handleLogout, userName }) => {
   const [main, setRef1] = useState(React.createRef());
@@ -142,11 +143,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .attr("stroke-width", 5)
       .attr("stroke", "grey")
       .attr("id", function (d) {
-        console.log(d.source, d.target)
-        if (typeof d.source === "number"){
+        console.log(d.source, d.target);
+        if (typeof d.source === "number") {
           return "e" + d.source.toString() + "-" + d.target.toString();
-        }
-        else {
+        } else {
           return "e" + d.source.name.toString() + "-" + d.target.name.toString();
         }
       });
@@ -312,23 +312,22 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         .selectAll("text")
         .style("opacity", 0);
     }
-    setWeighted(1-isWeighted);
+    setWeighted(1 - isWeighted);
   };
 
   const displayLegend = () => {
-    setShowedLegend(true); 
-  }
+    setShowedLegend(true);
+  };
 
   const hideLegend = () => {
-    setShowedLegend(false); 
-  }
+    setShowedLegend(false);
+  };
 
   const emptyCounter = () => {
     visitedNodesBFS.clear();
-    currentNodeBFS = undefined; 
-    currentEdgeBFS = '';
-  }
-
+    currentNodeBFS = undefined;
+    currentEdgeBFS = "";
+  };
 
   function BFS_stepper(index) {
     //BFS_STEP saves every edge and target node that BFS looks at, both visited and unvisited.
@@ -336,28 +335,27 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     console.log(index);
     recolorNode("all", "black");
     recolorEdge("all", "all", "grey");
-    const source = BFS_STEP_State[index][0].source.name; 
-    const target = BFS_STEP_State[index][0].target.name; 
-    for (let i = 0; i <= index -1; i++){
+    const source = BFS_STEP_State[index][0].source.name;
+    const target = BFS_STEP_State[index][0].target.name;
+    for (let i = 0; i <= index - 1; i++) {
       const currStart = BFS_STEP_State[i][0].source.name;
-      const currEnd = BFS_STEP_State[i][0].target.name; 
+      const currEnd = BFS_STEP_State[i][0].target.name;
       recolorNode(currStart, "blue");
       recolorEdge(currStart, currEnd, "blue");
-      recolorNode(currEnd, "blue");  
+      recolorNode(currEnd, "blue");
       visitedNodesBFS.add(currStart);
       visitedNodesBFS.add(currEnd);
     }
     recolorNode(parseInt(startNodeBFS), "red");
-    if(source === BFS_STEP_State[index][1]){
+    if (source === BFS_STEP_State[index][1]) {
       recolorNode(target, "yellow");
       currentNodeBFS = target;
       visitedNodesBFS.add(target);
       currentEdgeBFS = "From " + target.toString() + " to " + source.toString();
-    }
-    else if(target === BFS_STEP_State[index][1]){
+    } else if (target === BFS_STEP_State[index][1]) {
       currentNodeBFS = source;
       visitedNodesBFS.add(source);
-      recolorNode(source, "yellow"); 
+      recolorNode(source, "yellow");
       currentEdgeBFS = "From " + source.toString() + " to " + target.toString();
     }
     recolorEdge(BFS_STEP_State[index][0].source.name, BFS_STEP_State[index][0].target.name, "aqua");
@@ -387,57 +385,77 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     }
   }
 
-  let legend = <div></div>; 
+  let legend = <div></div>;
 
-  if (showLegend === true){
-    legend =  <div className="container">
-      <div className="Algorithm-legend"> <table className="legend-table">
-      <tr>
-        <th>BFS Legend</th>
-      </tr>
-      <tr>
-       <td width="34%"/>
-     </tr>
-      <tr>
-        <td><div className="redCircle"/></td> <td>Start Node</td>
-      </tr>
-      <tr>
-        <td><div className="yellowCircle"/></td><td>Current Node</td>
-      </tr>
-      <tr>
-        <td><div className="blueCircle"/></td><td>Visited Node</td>
-      </tr>
-      <tr>
-        <td><div className="aquaCircle"/></td><td>Current Neighbor</td>
-      </tr>
-      <tr>
-        <td><div className="blueEdge"/></td><td>Visited Edge</td>
-      </tr>
-      <tr>
-        <td><div className="aquaEdge"/></td><td>Current Edge</td>
-      </tr>
-      <tr>
-      </tr>
-    </table>
-    <div>
-          <button onClick={prevStep} className="button u-marginButton">
-            Previous Step
-          </button>
-          <button onClick={nextStep} className="button u-marginButton">
-            Next Step
-          </button>
+  if (showLegend === true) {
+    legend = (
+      <div className="container">
+        <div className="Algorithm-legend">
+          {" "}
+          <table className="legend-table">
+            <tr>
+              <th>BFS Legend</th>
+            </tr>
+            <tr>
+              <td width="34%" />
+            </tr>
+            <tr>
+              <td>
+                <div className="redCircle" />
+              </td>{" "}
+              <td>Start Node</td>
+            </tr>
+            <tr>
+              <td>
+                <div className="yellowCircle" />
+              </td>
+              <td>Current Node</td>
+            </tr>
+            <tr>
+              <td>
+                <div className="blueCircle" />
+              </td>
+              <td>Visited Node</td>
+            </tr>
+            <tr>
+              <td>
+                <div className="aquaCircle" />
+              </td>
+              <td>Current Neighbor</td>
+            </tr>
+            <tr>
+              <td>
+                <div className="blueEdge" />
+              </td>
+              <td>Visited Edge</td>
+            </tr>
+            <tr>
+              <td>
+                <div className="aquaEdge" />
+              </td>
+              <td>Current Edge</td>
+            </tr>
+            <tr></tr>
+          </table>
+          <div>
+            <button onClick={prevStep} className="button u-marginButton">
+              Previous Step
+            </button>
+            <button onClick={nextStep} className="button u-marginButton">
+              Next Step
+            </button>
+          </div>
+        </div>
+        <div className="infoLegend u-flex u-flexColumn">
+          <div>Start Node = {startNodeBFS}</div>
+          <div>Current Node = {currentNodeBFS} </div>
+          <div>Current Edge = {currentEdgeBFS}</div>
+          <div>Visited Nodes= {Array.from(visitedNodesBFS).join(", ")} </div>
+        </div>
       </div>
-    </div>
-    <div className="infoLegend u-flex u-flexColumn">
-            <div>Start Node = {startNodeBFS}</div>
-            <div>Current Node = {currentNodeBFS} </div>
-            <div>Current Edge = {currentEdgeBFS}</div>
-            <div>Visited Nodes= {Array.from(visitedNodesBFS).join(', ')} </div>
-    </div>
-    </div>; 
+    );
   }
-  
-  
+
   return (
     <div className="Graphs-pageContainer">
       {redirect}
@@ -481,12 +499,20 @@ const Graphs = ({ userId, handleLogout, userName }) => {
               setStartNodeBFS={setStartNodeBFS}
               emptyCounter={emptyCounter}
             />
-            <Dijkstra recolorNode={recolorNode} 
-              linksState={linksState} 
-              nodesState={nodesState} 
+            <Dijkstra
+              recolorNode={recolorNode}
+              linksState={linksState}
+              nodesState={nodesState}
               startNode={startNodeBFS}
               hideLegend={hideLegend}
-              />
+            />
+            <FloydWarshall
+              recolorNode={recolorNode}
+              linksState={linksState}
+              nodesState={nodesState}
+              startNode={startNodeBFS}
+              hideLegend={hideLegend}
+            />
           </div>
         </div>
         <div className="Graphs-text">Save and load your graphs</div>
@@ -501,14 +527,12 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           />
         </div>
       </div>
-        
-        <div id="main" className="Graphs-svgContainer" ref={main} /* width="500px" height="500px" */>
-          {""}
-          
-          {legend}
-        
-        </div>
-        
+
+      <div id="main" className="Graphs-svgContainer" ref={main} /* width="500px" height="500px" */>
+        {""}
+
+        {legend}
+      </div>
     </div>
   );
 };
