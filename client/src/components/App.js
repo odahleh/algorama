@@ -59,13 +59,7 @@ const App = () => {
         </Router>
       </>
     );
-<<<<<<< HEAD
-  }
-  else{
-    console.log("something else");
-=======
   } else {
->>>>>>> 886b962e5210fc8334a82482e7ead7702eb02a9f
     return (
       <>
         <Router>

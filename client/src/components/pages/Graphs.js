@@ -70,9 +70,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       }, 500);
     } */
     );
-  }
-  ,[userId, userName]
-  );
+  }, [userId, userName]);
 
   const handleResize = () => {
     d3.select(main.current)
@@ -476,7 +474,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       });
     nodeText
       .attr("x", function (d) {
-        console.log(d);
+        // console.log(d);
         //console.log(d.x);
         let correctionCoeff = 0.5;
         let name = d.name;
@@ -592,7 +590,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       visitedNodesBFS.add(currEnd);
       previousExploredBFS.add(previous);
     }
-    for (let prev of previousExploredBFS){
+    for (let prev of previousExploredBFS) {
       recolorNode(prev, "yellow");
     }
     if (source === BFS_STEP_State[index][1]) {
@@ -611,9 +609,34 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     recolorEdge(BFS_STEP_State[index][0].source.name, BFS_STEP_State[index][0].target.name, "aqua");
   }
   function Dijkstra_stepper(index) {
-    recolorNodeBorder("all", "black");
-    recolorEdge("all", "all", "grey");
-  };
+    console.log("DIJKSTRA STATE", Dijkstra_STEP_State);
+    for (let i = 0; i < index; i++) {
+      if (Dijkstra_STEP_State[i][2] === false) {
+        recolorNode(Dijkstra_STEP_State[i][0], "black");
+        recolorEdge(
+          Dijkstra_STEP_State[i][1].source.name,
+          Dijkstra_STEP_State[i][1].target.name,
+          "grey"
+        );
+      }
+    }
+    console.log("INDEX", index);
+    if (Dijkstra_STEP_State[index][2] && Dijkstra_STEP_State[index][0] !== parseInt(startNodeBFS)) {
+      recolorNode(Dijkstra_STEP_State[index][0], "red");
+      recolorEdge(
+        Dijkstra_STEP_State[index][1].source.name,
+        Dijkstra_STEP_State[index][1].target.name,
+        "red"
+      );
+    } else if (!Dijkstra_STEP_State[index][2]) {
+      recolorNode(Dijkstra_STEP_State[index][0], "blue");
+      recolorEdge(
+        Dijkstra_STEP_State[index][1].source.name,
+        Dijkstra_STEP_State[index][1].target.name,
+        "blue"
+      );
+    }
+  }
   const nextStep = () => {
     if (showLegend) {
       BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));

@@ -47,7 +47,7 @@ const Dijkstra = ({
             curMin = distanceArray[node];
           }
         }
-        Dijkstra_STEP.push([u, parentArray[u], true]);
+        Dijkstra_STEP.push([u, returnEdge(u, parentArray[u], links), true]);
         let uIndex = pqueue.indexOf(u);
         pqueue.splice(uIndex, 1);
         let [neighbors, currNeighborEdges] = findNeighbors({ name: u }, links);
@@ -61,7 +61,7 @@ const Dijkstra = ({
         }
       }
       // console.log(distanceArray);
-      console.log(Dijkstra_STEP);
+      // console.log(Dijkstra_STEP);
       setDijkstra_State(Dijkstra_STEP);
     }
   }
@@ -75,7 +75,16 @@ const Dijkstra = ({
       }
     }
   }
-
+  function returnEdge(u, v, links) {
+    for (let edge of links) {
+      if (
+        (edge.source.name === u && edge.target.name === v) ||
+        (edge.source.name === v && edge.target.name === u)
+      ) {
+        return edge;
+      }
+    }
+  }
   function findNeighbors(start, links) {
     let neighbors = [];
     let currNeighborEdges = [];
