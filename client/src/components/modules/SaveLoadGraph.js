@@ -62,8 +62,8 @@ const SaveLoadGraph = (props) => {
     //setDisplaySimulation(false);
     let id = event.target.id;
     let i = parseInt(id.charAt(id.length - 1));
-    console.log(i);
-    console.log(loadedGraphs[i].edges);
+    //console.log(i);
+    //console.log(loadedGraphs[i].edges);
     props.hideLegend();
     props.GraphSimulation(loadedGraphs[i].nodes, loadedGraphs[i].edges);
     // console.log("Will be available soon!");
