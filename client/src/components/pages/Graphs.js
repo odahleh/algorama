@@ -17,6 +17,7 @@ import FloydWarshall from "../modules/FloydWarshall.js";
 const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
 let currentNodeBFS = undefined;
 let visitedNodesBFS = new Set();
+let minNodesDijkstra = new Set();
 let currentEdgeBFS = "";
 let previousExploredBFS = new Set();
 let queue = "";
@@ -619,32 +620,31 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     );
   }
   function Dijkstra_stepper(index) {
+    minNodesDijkstra.add(parseInt(startNodeBFS));
+    console.log("START NODE", startNodeBFS);
     console.log("DIJKSTRA STATE", Dijkstra_STEP_State);
-    for (let i = 0; i < Dijkstra_STEP_State.length; i++) {
-      if (Dijkstra_STEP_State[i][2] === false) {
-        recolorNode(Dijkstra_STEP_State[i][0], "black");
-        // recolorEdge(
-        //   Dijkstra_STEP_State[i][1].source.name,
-        //   Dijkstra_STEP_State[i][1].target.name,
-        //   "grey"
-        // );
+    console.log("VISITED", minNodesDijkstra);
+    for (let i = 0; i < index; i++) {
+      let [target, edge, is_min] = Dijkstra_STEP_State[i];
+      if (!is_min && !minNodesDijkstra.has(target)) {
+        recolorNode(target, "black");
+        recolorEdge(edge.source.name, edge.target.name, "grey");
+      }
+      if (minNodesDijkstra.has(target)) {
+        console.log("in");
+        recolorNode(target, "red");
+        recolorEdge(edge.source.name, edge.target.name, "red");
       }
     }
     console.log("INDEX", index);
-    if (Dijkstra_STEP_State[index][2] && Dijkstra_STEP_State[index][0] !== parseInt(startNodeBFS)) {
-      recolorNode(Dijkstra_STEP_State[index][0], "red");
-      recolorEdge(
-        Dijkstra_STEP_State[index][1].source.name,
-        Dijkstra_STEP_State[index][1].target.name,
-        "red"
-      );
-    } else if (!Dijkstra_STEP_State[index][2]) {
-      recolorNode(Dijkstra_STEP_State[index][0], "blue");
-      recolorEdge(
-        Dijkstra_STEP_State[index][1].source.name,
-        Dijkstra_STEP_State[index][1].target.name,
-        "blue"
-      );
+    let [target, edge, is_min] = Dijkstra_STEP_State[index];
+    if (is_min) {
+      minNodesDijkstra.add(target);
+      recolorNode(target, "red");
+      recolorEdge(edge.source.name, edge.target.name, "red");
+    } else {
+      recolorNode(target, "blue");
+      recolorEdge(edge.source.name, edge.target.name, "blue");
     }
   }
   const nextStep = () => {
@@ -652,14 +652,14 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
       setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
     } else {
-      Dijkstra_stepper(Math.min(Dijkstra_STEP_State.length - 1, Math.max(1 + Dijkstra_INDEX, -1)));
-      setDijkstra_INDEX(Math.min(Dijkstra_STEP_State.length - 1, Math.max(1 + Dijkstra_INDEX, -1)));
+      Dijkstra_stepper(Math.min(Dijkstra_STEP_State.length - 1, Math.max(1 + Dijkstra_INDEX, 0)));
+      setDijkstra_INDEX(Math.min(Dijkstra_STEP_State.length - 1, Math.max(1 + Dijkstra_INDEX, 0)));
     }
   };
   const prevStep = () => {
     if (showLegend) {
-      BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
-      setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
+      BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, -1)));
+      setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, -1)));
     } else {
       Dijkstra_stepper(Math.min(Dijkstra_STEP_State.length - 1, Math.max(Dijkstra_INDEX - 1, 0)));
       setDijkstra_INDEX(Math.min(Dijkstra_STEP_State.length - 1, Math.max(Dijkstra_INDEX - 1, 0)));
