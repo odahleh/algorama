@@ -52,13 +52,18 @@ const BFS = ({
       let distanceArray = [];
       let BFS_STEP = [];
       for (let node in nodes) {
-        distanceArray.push(Infinity);
+        if (node !== start.name){
+          distanceArray.push(Infinity);
+        }else{
+          distanceArray.push(0);
+        }
       }
       let queue = [parseInt(startNodeBFS)];
       let level = 0;
+      let visibleDistance = Array.from(distanceArray);
+      let visibleQueue = [parseInt(startNodeBFS)]; 
       while (queue.length > 0) {
         let neighbors = [];
-        console.log(queue, "queue");
         for (let next of queue) {
           if (!visited.has(next)) {
             visited.add(next);
@@ -67,27 +72,29 @@ const BFS = ({
         }
         level += 1;
         for (let next of queue) {
+          let current = visibleQueue.shift();
           // console.log("NEXT", next);
+          visibleDistance[current] = distanceArray[current];
           let [currNeighbors, currNeighborsEdges] = findNeighbors({ name: parseInt(next) }, links);
           // console.log(currNeighbors);
           for (let neigh in currNeighbors) {
             // console.log("NEIGH");
             if (!visited.has(currNeighbors[neigh])){
               if (!neighbors.includes(currNeighbors[neigh])){
+                visibleQueue.push(currNeighbors[neigh]);
                 neighbors.push(currNeighbors[neigh]);
               }
               //BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], next]);
             }
-            BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], next]);
+            BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], next, Array.from(visibleQueue), Array.from(visibleDistance)]);
             }
           }
         
-        console.log(neighbors, "neighbors");
         queue = neighbors;
         // console.log("queue", queue);
       }
       console.log(distanceArray);
-      console.log(BFS_STEP);
+      // console.log(BFS_STEP);
       setBFS_STEP(BFS_STEP);
     }
   }

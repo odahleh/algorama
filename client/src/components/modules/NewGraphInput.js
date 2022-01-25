@@ -32,7 +32,7 @@ const NewGraphInput = (props) => {
       //console.log(i);
       nodes.push({ name: i, id: i /* , x: i * 100, y: 100 */ });
     }
-    console.log(nodes);
+    //console.log(nodes);
     if (valueEdges.length > 0) {
       let linksArray = valueEdges.split(",");
       for (let ele of linksArray) {
@@ -47,7 +47,7 @@ const NewGraphInput = (props) => {
           links.push({ source: start, target: end, weight: 1 });
         }
       }
-      console.log(links);
+      //console.log(links);
     }
     props.hideLegend(); 
     props.GraphSimulation(nodes, links, directed);

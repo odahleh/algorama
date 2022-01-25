@@ -228,33 +228,16 @@ input[type="range"]::-webkit-slider-thumb {
   background-color: red;
 }
 
-.yellowCircle{
+
+.pinkCircle{
   border-radius: 32px;
   height: 16px;
   width: 16px;
-  background-color: yellow;
+  background-color: pink;
 }
 
-.blueCircle{
-  border-radius: 32px;
-  height: 16px;
-  width: 16px;
-  background-color: blue;
-}
-
-.aquaCircle{
-  border-radius: 32px;
-  height: 16px;
-  width: 16px;
-  background-color: aqua;
-}
-
-.blueEdge{
-  border-bottom:8px solid blue;
-  width: 40px;
-}
 
 .aquaEdge{
-  border-bottom:8px solid aqua;
+  border-bottom:8px solid #00c2a5;
   width: 40px;
 }
