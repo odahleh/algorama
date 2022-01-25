@@ -6,7 +6,7 @@ import * as d3 from "d3";
 import "../../utilities.css";
 import "./Graphs.css";
 import GoogleLogin, { GoogleLogout } from "react-google-login";
-import { least, stratify } from "d3";
+import { least, selectAll, stratify } from "d3";
 
 import NewGraphInput from "../modules/NewGraphInput.js";
 import SaveLoadGraph from "../modules/SaveLoadGraph.js";
@@ -25,6 +25,7 @@ let svg;
 let vertex;
 let edge;
 let linkText;
+let nodeText;
 let mousedownNode;
 let dragLine;
 let nodesGlobal = [];
@@ -342,6 +343,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     //console.log(vertex);
     vertex = vertex
       .enter()
+      .append("g")
+      .attr("class", "gSingleNode")
       .append("circle")
       .attr("fill", "black")
       .attr("r", 10)
@@ -377,7 +380,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     if (isDirected === 0) {
       d3.select(main.current).select("path").attr("opacity", 0);
     }
-
+    d3.selectAll(".gSingleLine").selectAll("text").remove();
+    d3.selectAll(".gSingleNode").selectAll("text").remove();
     // edgelabels
     linkText = svg
       .selectAll(".gSingleLine")
@@ -392,6 +396,17 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       })
       .style("font-size", 16)
       .attr("stroke-width", 0);
+
+    nodeText = svg
+      .selectAll(".gSingleNode")
+      .data(nodes)
+      .append("text")
+      .text(function (d) {
+        return d.name.toString();
+      })
+      .style("font-size", 12)
+      .attr("stroke-width", 0)
+      .style("fill", "white");
 
     if (isWeighted === 0) {
       linkText.attr("opacity", 0);
@@ -456,6 +471,34 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         } else {
           return d.target.y + (d.source.y - d.target.y) / 2;
         }
+      });
+    nodeText
+      .attr("x", function (d) {
+        console.log(d);
+        //console.log(d.x);
+        let correctionCoeff = 0.5;
+        let name = d.name;
+        for (let char of name.toString()) {
+          correctionCoeff = correctionCoeff + 3.5;
+          if (char === "1") {
+            correctionCoeff = correctionCoeff - 2;
+          }
+        }
+        return Math.max(radius, Math.min(WIDTH - radius, d.x)) - correctionCoeff;
+        /*  if (d.name === 21) {
+          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 7;
+        } else if (d.name > 19) {
+          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 7;
+        } else if (d.name > 9) {
+          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 5;
+        } else if (d.name > 9) {
+          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 5;
+        } else {
+          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 4;
+        } */
+      })
+      .attr("y", function (d) {
+        return Math.max(radius, Math.min(HEIGHT - radius, d.y)) + 4;
       });
   }
 
