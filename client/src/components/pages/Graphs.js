@@ -71,9 +71,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       }, 500);
     } */
     );
-  }
-  ,[userId, userName]
-  );
+  }, [userId, userName]);
 
   const handleResize = () => {
     d3.select(main.current)
@@ -477,7 +475,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       });
     nodeText
       .attr("x", function (d) {
-        console.log(d);
+        //console.log(d);
         //console.log(d.x);
         let correctionCoeff = 0.5;
         let name = d.name;
@@ -593,7 +591,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       visitedNodesBFS.add(currEnd);
       previousExploredBFS.add(previous);
     }
-    for (let prev of previousExploredBFS){
+    for (let prev of previousExploredBFS) {
       recolorNode(prev, "yellow");
     }
     if (source === BFS_STEP_State[index][1]) {
@@ -614,7 +612,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   function Dijkstra_stepper(index) {
     recolorNodeBorder("all", "black");
     recolorEdge("all", "all", "grey");
-  };
+  }
   const nextStep = () => {
     if (showLegend) {
       BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
@@ -732,7 +730,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             />
           </div>
         </div>
-        <div className="u-flex u-flex-alignCenter">
+        <div className="u-flex u-flex-alignCenter u-flex-wrap">
           <div className="Graphs-ModeSelector" onClick={changeMode}>
             <div
               className={
@@ -767,7 +765,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           </div>
           {currentMode === "cre" ? (
             <>
-              <div className="Graphs-text">Create and edit the graph: </div>
               <div className="Graphs-topbar">
                 <div className=" u-flex u-flex-wrap">
                   <NewGraphInput
@@ -777,6 +774,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                     weighted={isWeighted}
                     changeWeighted={changeWeighted}
                     hideLegend={hideLegend}
+                    update={update}
+                    nodes={nodesGlobal}
+                    links={linksGlobal}
                   />
                 </div>
               </div>
@@ -822,7 +822,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           )}
         </div>
       </div>
-      <div className="Graphs-text">Save and load your graphs</div>
+
       <div className="second-bar">
         <SaveLoadGraph
           userId={userId}
