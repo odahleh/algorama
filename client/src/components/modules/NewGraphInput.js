@@ -1,10 +1,13 @@
+import { range } from "d3";
 import React, { Component, useEffect, useState } from "react";
 import "../../utilities.css";
 import "../pages/Graphs.css";
 
 const NewGraphInput = (props) => {
-  let [valueNodes, setValueNodes] = useState("");
+  let [valueNodes, setValueNodes] = useState("1");
   let [valueEdges, setValueEdges] = useState("");
+  let [valueEdges2, setValueEdges2] = useState("");
+  let [valueWeight, setValueWeight] = useState("1");
 
   const [directed, setDirected] = useState(0);
 
@@ -16,6 +19,14 @@ const NewGraphInput = (props) => {
     setValueEdges(event.target.value);
   };
 
+  const handleChangeEdges2 = (event) => {
+    setValueEdges2(event.target.value);
+  };
+
+  const handleChangeWeight = (event) => {
+    setValueWeight(event.target.value);
+  };
+
   const onSubmit = () => {
     startGraph(valueNodes, valueEdges);
   };
@@ -24,6 +35,52 @@ const NewGraphInput = (props) => {
     setDirected(1 - directed);
   };
 
+  const addNode = () => {
+    if (valueNodes === "") {
+      console.log("zero");
+      if (props.nodes.length === 0) {
+        props.GraphSimulation([{ name: props.nodes.length }], props.links);
+      } else {
+        props.update([...props.nodes, { name: props.nodes.length }], props.links);
+      }
+    } else if (isNaN(valueNodes)) {
+      alert("Invalid input. Please put a number.");
+    } else if (parseInt(valueNodes) > 100) {
+      alert("Invalid input. You can't add more than 100 nodes at a time.");
+    } else {
+      let currentNodes = [...props.nodes];
+      let newNodes = [];
+      for (let i in range(parseInt(valueNodes))) {
+        console.log(i);
+        currentNodes.push({ name: props.nodes.length + parseInt(i) });
+      }
+      if (props.nodes.length === 0) {
+        props.GraphSimulation(currentNodes, props.links);
+      } else {
+        props.update(currentNodes, props.links);
+      }
+    }
+  };
+
+  const addEdge = () => {
+    if (isNaN(valueEdges) || isNaN(valueEdges2) || isNaN(valueWeight)) {
+      alert("Invalid input. Please put the node's numbers.");
+    } else if (
+      parseInt(valueEdges) >= props.nodes.length ||
+      parseInt(valueEdges2) >= props.nodes.length
+    ) {
+      alert("Invalid input. One or both of those nodes don't exist.");
+    } else {
+      props.update(props.nodes, [
+        ...props.links,
+        {
+          source: parseInt(valueEdges),
+          target: parseInt(valueEdges2),
+          weight: parseInt(valueWeight),
+        },
+      ]);
+    }
+  };
 
   const startGraph = (valueNodes, valueEdges) => {
     let nodes = [];
@@ -32,7 +89,7 @@ const NewGraphInput = (props) => {
       //console.log(i);
       nodes.push({ name: i, id: i /* , x: i * 100, y: 100 */ });
     }
-    console.log(nodes);
+    //console.log(nodes);
     if (valueEdges.length > 0) {
       let linksArray = valueEdges.split(",");
       for (let ele of linksArray) {
@@ -47,28 +104,55 @@ const NewGraphInput = (props) => {
           links.push({ source: start, target: end, weight: 1 });
         }
       }
-      console.log(links);
+      //console.log(links);
     }
-    props.hideLegend(); 
+    props.hideLegend();
     props.GraphSimulation(nodes, links, directed);
   };
 
   return (
-    <div className="u-flex">
-      <input
-        type="text"
-        value={valueNodes}
-        onChange={handleChangeNodes}
-        placeholder={"number of nodes"}
-        className="InputBox"
-      />
-      <input
-        type="text"
-        value={valueEdges}
-        onChange={handleChangeEdges}
-        placeholder={"edges 0-1,2-0, ..."}
-        className="InputBox"
-      />
+    <div className="u-flex u-flex-wrap">
+      <div className="u-flex u-flex-alignCenter Graph-names">
+        <button className="button" onClick={addNode}>
+          Add nodes
+        </button>
+        <input
+          type="text"
+          value={valueNodes}
+          onChange={handleChangeNodes}
+          placeholder={"#"}
+          className="InputBox InputBoxSmall"
+        />
+      </div>
+      <div className="u-flex u-flex-alignCenter Graph-names">
+        <button className="button " onClick={addEdge}>
+          Add Edge
+        </button>
+        <p>from</p>
+        <input
+          type="text"
+          value={valueEdges}
+          onChange={handleChangeEdges}
+          placeholder={"# node"}
+          className="InputBox InputBoxSmall"
+        />
+        <p>to</p>
+        <input
+          type="text"
+          value={valueEdges2}
+          onChange={handleChangeEdges2}
+          placeholder={"# node"}
+          className="InputBox InputBoxSmall"
+        />
+        <p>, weight</p>
+        <input
+          type="text"
+          value={valueWeight}
+          onChange={handleChangeWeight}
+          placeholder={"#"}
+          className="InputBox InputBoxSmall"
+        />
+      </div>
       <div className="Graph-names u-flex u-flex-alignCenter">
         <input
           type="range"
@@ -93,9 +177,9 @@ const NewGraphInput = (props) => {
         />
         <div className="Graphs-textInside">directed</div>
       </div>
-      <button onClick={onSubmit} className="button u-marginButton">
+      {/* <button onClick={onSubmit} className="button u-marginButton">
         Display
-      </button>
+      </button> */}
     </div>
   );
 };

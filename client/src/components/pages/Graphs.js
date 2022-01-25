@@ -19,6 +19,8 @@ let currentNodeBFS = undefined;
 let visitedNodesBFS = new Set();
 let currentEdgeBFS = "";
 let previousExploredBFS = new Set();
+let queue = "";
+let currentDistance = "";
 
 let simulation;
 let svg;
@@ -55,7 +57,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   let [Dijkstra_INDEX, setDijkstra_INDEX] = useState(-1);
   let [showDijkstra, setShowedDijkstra] = useState(false);
   let [currentMode, setCurrentMode] = useState("cre");
-  console.log(showLegend);
 
   useEffect(() => {
     let navbox = document.querySelector(".top-bar-container");
@@ -312,7 +313,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       target: parseInt(dragEndNodeId.substring(1)),
       weight: 1,
     };
-    console.log("EDL");
+    //console.log("EDL");
     update([...nodesGlobal], [...linksGlobal, newLink]);
 
     /*  for (var i = 0; i < links.length; i++) {
@@ -333,15 +334,15 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     linksGlobal = links;
     setNodes(nodes);
     setLinks(links);
-    //console.log(nodesGlobal, linksGlobal);
-    console.log(nodes, links);
+    ////console.log(nodesGlobal, linksGlobal);
+    //console.log(nodes, links);
 
     // Apply the general update pattern to the nodes.#
-    //console.log(vertex);
+    ////console.log(vertex);
     vertex = vertex.data(nodes);
-    //console.log(vertex);
+    ////console.log(vertex);
     vertex.exit().remove();
-    //console.log(vertex);
+    ////console.log(vertex);
     vertex = vertex
       .enter()
       .append("g")
@@ -358,7 +359,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .on("mouseup", endDragLine)
       .merge(vertex);
 
-    //console.log(vertex)
+    ////console.log(vertex)
 
     d3.selectAll("circle"); //.call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended))
     d3.selectAll(".gLinks").on("mousedown", function (event) {
@@ -572,6 +573,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     currentNodeBFS = undefined;
     currentEdgeBFS = "";
     previousExploredBFS = [];
+    queue = "";
+    currentDistance = "";
   };
 
   function BFS_stepper(index) {
@@ -583,19 +586,21 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     recolorEdge("all", "all", "grey");
     const source = BFS_STEP_State[index][0].source.name;
     const target = BFS_STEP_State[index][0].target.name;
+    currentDistance = BFS_STEP_State[index][4].join(", ");
+    queue = BFS_STEP_State[index][3].join(", ");
+
     for (let i = 0; i <= index - 1; i++) {
       const currStart = BFS_STEP_State[i][0].source.name;
       const currEnd = BFS_STEP_State[i][0].target.name;
       const previous = BFS_STEP_State[i][2];
-      visitedNodesBFS.add(currStart);
-      visitedNodesBFS.add(currEnd);
+      visitedNodesBFS.add(previous);
       previousExploredBFS.add(previous);
     }
     for (let prev of previousExploredBFS) {
-      recolorNode(prev, "yellow");
+      recolorNode(prev, "pink");
     }
     if (source === BFS_STEP_State[index][1]) {
-      recolorNode(target, "yellow");
+      recolorNode(target, "pink");
       currentNodeBFS = target;
       visitedNodesBFS.add(target);
       previousExploredBFS.add(target);
@@ -603,11 +608,15 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     } else if (target === BFS_STEP_State[index][1]) {
       currentNodeBFS = source;
       visitedNodesBFS.add(source);
-      recolorNode(source, "yellow");
+      recolorNode(source, "pink");
       previousExploredBFS.add(source);
       currentEdgeBFS = "From " + source.toString() + " to " + target.toString();
     }
-    recolorEdge(BFS_STEP_State[index][0].source.name, BFS_STEP_State[index][0].target.name, "aqua");
+    recolorEdge(
+      BFS_STEP_State[index][0].source.name,
+      BFS_STEP_State[index][0].target.name,
+      "#00c2a5"
+    );
   }
   function Dijkstra_stepper(index) {
     console.log("DIJKSTRA STATE", Dijkstra_STEP_State);
@@ -673,41 +682,16 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             </tr>
             <tr>
               <td>
-                <div className="redCircle" />
-              </td>{" "}
-              <td>Start Node</td>
-            </tr>
-            <tr>
-              <td>
-                <div className="yellowCircle" />
-              </td>
-              <td>Current Node</td>
-            </tr>
-            <tr>
-              <td>
-                <div className="blueCircle" />
-              </td>
-              <td>Visited Node</td>
-            </tr>
-            <tr>
-              <td>
-                <div className="aquaCircle" />
-              </td>
-              <td>Current Neighbor</td>
-            </tr>
-            <tr>
-              <td>
-                <div className="blueEdge" />
-              </td>
-              <td>Visited Edge</td>
-            </tr>
-            <tr>
-              <td>
                 <div className="aquaEdge" />
               </td>
-              <td>Current Edge</td>
+              <td>Current Path</td>
             </tr>
-            <tr></tr>
+            <tr>
+              <td>
+                <div className="pinkCircle" />
+              </td>
+              <td>Visited Nodes</td>
+            </tr>
           </table>
           <div>
             <button onClick={prevStep} className="button u-marginButton">
@@ -722,7 +706,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           <div>Start Node = {startNodeBFS}</div>
           <div>Current Node = {currentNodeBFS} </div>
           <div>Current Edge = {currentEdgeBFS}</div>
-          <div>Visited Nodes= {Array.from(visitedNodesBFS).join(", ")} </div>
+          <div>Visited Nodes = {Array.from(visitedNodesBFS).join(", ")} </div>
+          <div>Queue = {queue}</div>
+          <div>Current Distances = {currentDistance}</div>
         </div>
       </div>
     );
@@ -755,7 +741,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             />
           </div>
         </div>
-        <div className="u-flex u-flex-alignCenter">
+        <div className="u-flex u-flex-alignCenter u-flex-wrap">
           <div className="Graphs-ModeSelector" onClick={changeMode}>
             <div
               className={
@@ -790,7 +776,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           </div>
           {currentMode === "cre" ? (
             <>
-              <div className="Graphs-text">Create and edit the graph: </div>
               <div className="Graphs-topbar">
                 <div className=" u-flex u-flex-wrap">
                   <NewGraphInput
@@ -800,6 +785,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                     weighted={isWeighted}
                     changeWeighted={changeWeighted}
                     hideLegend={hideLegend}
+                    update={update}
+                    nodes={nodesGlobal}
+                    links={linksGlobal}
                   />
                 </div>
               </div>
@@ -845,7 +833,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           )}
         </div>
       </div>
-      <div className="Graphs-text">Save and load your graphs</div>
+
       <div className="second-bar">
         <SaveLoadGraph
           userId={userId}

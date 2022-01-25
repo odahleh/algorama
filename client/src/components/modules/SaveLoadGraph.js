@@ -9,7 +9,6 @@ const SaveLoadGraph = (props) => {
   let [valueGraphName, setValueNames] = useState("");
   let [loadedGraphs, setLoadedGraphs] = useState([]);
 
- 
   useEffect(() => {
     if (loadedGraphs.length === 0 && props.userId) {
       loadGraph();
@@ -27,8 +26,7 @@ const SaveLoadGraph = (props) => {
       nodeNames.push({ name: node.name });
     }
     for (let edge of props.linksState) {
-        edgeNames.push({ source: edge.source.name, target: edge.target.name, weight:edge.weight});
-      
+      edgeNames.push({ source: edge.source.name, target: edge.target.name, weight: edge.weight });
     }
     console.log(nodeNames, edgeNames);
     if (nodeNames.length > 0 && valueGraphName.length > 0) {
@@ -64,9 +62,9 @@ const SaveLoadGraph = (props) => {
     //setDisplaySimulation(false);
     let id = event.target.id;
     let i = parseInt(id.charAt(id.length - 1));
-    console.log(i);
-    console.log(loadedGraphs[i].edges);
-    props.hideLegend(); 
+    //console.log(i);
+    //console.log(loadedGraphs[i].edges);
+    props.hideLegend();
     props.GraphSimulation(loadedGraphs[i].nodes, loadedGraphs[i].edges);
     // console.log("Will be available soon!");
   };
@@ -110,6 +108,7 @@ const SaveLoadGraph = (props) => {
 
   return (
     <div className="Graphs-topbar u-flex u-flex-wrap " id="Graphs-loadingMenu">
+      <div className="Graphs-text">Save and load your graphs</div>
       <span className="Graph-names u-flex u-flex-alignCenter">
         <input
           type="text"
