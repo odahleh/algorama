@@ -34,7 +34,8 @@ let dragLine;
 let nodesGlobal = [];
 let linksGlobal = [];
 let dragStartX, dragStartY, dragStartNodeId;
-let isDrag = false;
+let isDragLine = false;
+let timeOutFunctionId;
 
 let legend = <div></div>;
 
@@ -67,10 +68,11 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       console.log([window.innerWidth, window.innerHeight - offsetTop]);
       d3.select(main.current)
         .selectAll("svg")
-        .attr("height", window.innerHeight - navbox.clientHeight - 8)
+        .attr("height", window.innerHeight - navbox.clientHeight)
         .attr("width", window.innerWidth);
       clearTimeout(timeOutFunctionId);
-      let timeOutFunctionId = setTimeout(function () {
+      timeOutFunctionId = setTimeout(function () {
+        console.log("run");
         if (simulation) {
           simulation.force(
             "center",
@@ -97,15 +99,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     let offsetTop = navbox.clientHeight;
     setHeight(window.innerHeight - navbox.clientHeight);
     setWidth(window.innerWidth);
-    /*window.addEventListener(
-      "resize",
-      handleResize /* function () {
-      clearTimeout(adaptSizeTimer);
-      adaptSizeTimer = setTimeout(function () {
-        console.log("resize");
-      }, 500);
-    } 
-    );*/
   }, [HEIGHT, WIDTH]);
 
   const handleResize = () => {
@@ -228,7 +221,19 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       GraphSimulation([...nodesGlobal, { name: 0 }], linksGlobal);
       //setNodes([...nodesGlobal, { name: 0 }]);
     } else {
-      //console.log("mama2");
+      if (!isDragLine) {
+        let svgHere = document.querySelector("#svg");
+        let rect = svgHere.getBoundingClientRect();
+        let currentX = event.clientX - rect.left;
+        let currentY = event.clientY - rect.top;
+        //nodesGlobal.push({ name: nodesGlobal.length, x: currentX, y: currentY });
+        //GraphSimulation(nodesGlobal, linksGlobal)
+
+        update(
+          [...nodesGlobal, { name: nodesGlobal.length, x: currentX, y: currentY }],
+          linksGlobal
+        );
+      }
     }
   };
 
@@ -251,19 +256,11 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   }
 
   function beginDragLine(d) {
-    isDrag = true;
+    isDragLine = true;
     //console.log(nodesGlobal, linksGlobal);
     console.log("Start");
-    //d3.preventDefault();
-    // if (d3.ctrlKey || d3.button != 0) return;
     dragStartNodeId = d.path[0].id;
-    //console.log(dragStartNodeId)
-    //console.log(parseInt(dragStartNodeId.substring(1)))
-    /* console.log(nodeId)
-    console.log(d3.select("#"+nodeId))
-    console.log(d.path[0]) */
     mousedownNode = d.path[0];
-    //console.log(mousedownNode.cx.baseVal.value);
     dragStartX = mousedownNode.cx.baseVal.value;
     dragStartY = mousedownNode.cy.baseVal.value;
 
@@ -295,26 +292,19 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   }
 
   function hideDragLine() {
-    console.log("hide");
-    if (!isDrag) {
+    if (false) {
       let bodyHere = document.querySelector("body");
       let rect = bodyHere.getBoundingClientRect();
       let currentX = event.clientX - rect.left;
       let currentY = event.clientY - rect.top;
       let navbox = document.querySelector(".top-bar-container");
       let offsetTop = navbox.clientHeight;
-      //console.log(nodesGlobal);
-      //console.log(nodesGlobal);
       if (nodesGlobal.length === 0) {
-        //console.log("new");
-        //nodesGlobal, { name: 0, x: currentX, y: currentY - offsetTop });
         GraphSimulation(
           [...nodesGlobal, { name: 0, x: currentX, y: currentY - offsetTop }],
           linksGlobal
         );
       } else {
-        //console.log("update");
-        //console.log(nodesGlobal, linksGlobal)
         let svgHere = document.querySelector("#svg");
         let rect = svgHere.getBoundingClientRect();
         let currentX = event.clientX - rect.left;
@@ -322,45 +312,47 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         //nodesGlobal.push({ name: nodesGlobal.length, x: currentX, y: currentY });
         //GraphSimulation(nodesGlobal, linksGlobal)
 
-        update(
+        /* update(
           [...nodesGlobal, { name: nodesGlobal.length, x: currentX, y: currentY }],
           linksGlobal
-        );
+        ); */
       }
+    } else {
+      let svgHere = document.querySelector("#svg");
+      let rect = svgHere.getBoundingClientRect();
+      let currentX = event.clientX - rect.left;
+      let currentY = event.clientY - rect.top;
+      console.log("hide");
+      let onNode = false;
+      for (let i in nodesGlobal) {
+        let singleNode = nodesGlobal[i];
+        if (
+          Math.pow(
+            Math.pow(singleNode.x - currentX, 2) + Math.pow(singleNode.y - currentY, 2),
+            0.5
+          ) < 10
+        ) {
+          onNode = true;
+          console.log("from", parseInt(dragStartNodeId.substring(1)), "to", i);
+          let dragEndNodeId = "v" + i.toString();
+          var newLink = {
+            source: parseInt(dragStartNodeId.substring(1)),
+            target: parseInt(i), //parseInt(dragEndNodeId.substring(1)),
+            weight: 1,
+          };
+          update([...nodesGlobal], [...linksGlobal, newLink]);
+        }
+      }
+      dragLine.classed("hidden", true);
+      setTimeout(function () {
+        isDragLine = false;
+      }, 100);
     }
-    dragLine.classed("hidden", true);
-    isDrag = false;
   }
 
   function hideDragLine2() {
     dragLine.classed("hidden", true);
-    isDrag = false;
-  }
-
-  function endDragLine(d) {
-    console.log("end");
-    //  if (!mousedownNode || mousedownNode === d) return;
-    //return if link already exists
-    let dragEndNodeId = d.path[0].id;
-    var newLink = {
-      source: parseInt(dragStartNodeId.substring(1)),
-      target: parseInt(dragEndNodeId.substring(1)),
-      weight: 1,
-    };
-    //console.log("EDL");
-    update([...nodesGlobal], [...linksGlobal, newLink]);
-
-    /*  for (var i = 0; i < links.length; i++) {
-      var l = links[i];
-      if (
-        (l.source === mousedownNode && l.target === d) ||
-        (l.source === d && l.target === mousedownNode)
-      ) {
-        return;
-      }
-  } */
-    // mousedownNode.degree++;
-    //.degree++;
+    isDragLine = false;
   }
 
   function update(nodes, links) {
@@ -370,7 +362,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     console.log([window.innerWidth, window.innerHeight - offsetTop]);
     d3.select(main.current)
       .selectAll("svg")
-      .attr("height", window.innerHeight - navbox.clientHeight - 8)
+      .attr("height", window.innerHeight - navbox.clientHeight)
       .attr("width", window.innerWidth);
 
     nodesGlobal = nodes;
@@ -399,7 +391,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .on("mousedown", function (d) {
         beginDragLine(d);
       })
-      .on("mouseup", endDragLine)
       .merge(vertex);
 
     ////console.log(vertex)
