@@ -72,7 +72,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         .attr("width", window.innerWidth);
       clearTimeout(timeOutFunctionId);
       timeOutFunctionId = setTimeout(function () {
-        console.log("run");
         if (simulation) {
           simulation.force(
             "center",
@@ -221,7 +220,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       GraphSimulation([...nodesGlobal, { name: 0 }], linksGlobal);
       //setNodes([...nodesGlobal, { name: 0 }]);
     } else {
-      if (!isDragLine) {
+      /* if (!isDragLine) {
         let svgHere = document.querySelector("#svg");
         let rect = svgHere.getBoundingClientRect();
         let currentX = event.clientX - rect.left;
@@ -231,9 +230,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
 
         update(
           [...nodesGlobal, { name: nodesGlobal.length, x: currentX, y: currentY }],
-          linksGlobal
+          linksGlobal 
         );
-      }
+      }*/
     }
   };
 
@@ -257,14 +256,11 @@ const Graphs = ({ userId, handleLogout, userName }) => {
 
   function beginDragLine(d) {
     isDragLine = true;
-    //console.log(nodesGlobal, linksGlobal);
     console.log("Start");
     dragStartNodeId = d.path[0].id;
     mousedownNode = d.path[0];
     dragStartX = mousedownNode.cx.baseVal.value;
     dragStartY = mousedownNode.cy.baseVal.value;
-
-    //console.log(mousedownNode, "ja");
     dragLine
       .classed("hidden", false)
       .attr("d", "M" + dragStartX + "," + dragStartY + "L" + dragStartX + "," + dragStartY);
@@ -275,7 +271,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     let rect = svgHere.getBoundingClientRect();
     let dragCurrentX = event.clientX - rect.left;
     let dragCurrentY = event.clientY - rect.top;
-    //console.log(x, y)
 
     if (!mousedownNode) return;
 
@@ -283,16 +278,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       "d",
       "M" + dragStartX + "," + dragStartY + "L" + dragCurrentX + "," + dragCurrentY
     );
-
-    /* let coords = event.currentTarget.value
-    
-    console.log(svgHere, "svg")
-    console.log(event.clientX)
-    console.log(event.clientY) */
   }
 
   function hideDragLine() {
-    if (false) {
+    if (!isDragLine) {
       let bodyHere = document.querySelector("body");
       let rect = bodyHere.getBoundingClientRect();
       let currentX = event.clientX - rect.left;
@@ -312,17 +301,17 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         //nodesGlobal.push({ name: nodesGlobal.length, x: currentX, y: currentY });
         //GraphSimulation(nodesGlobal, linksGlobal)
 
-        /* update(
+        update(
           [...nodesGlobal, { name: nodesGlobal.length, x: currentX, y: currentY }],
           linksGlobal
-        ); */
+        );
       }
     } else {
       let svgHere = document.querySelector("#svg");
       let rect = svgHere.getBoundingClientRect();
       let currentX = event.clientX - rect.left;
       let currentY = event.clientY - rect.top;
-      console.log("hide");
+
       let onNode = false;
       for (let i in nodesGlobal) {
         let singleNode = nodesGlobal[i];
@@ -333,7 +322,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           ) < 10
         ) {
           onNode = true;
-          console.log("from", parseInt(dragStartNodeId.substring(1)), "to", i);
           let dragEndNodeId = "v" + i.toString();
           var newLink = {
             source: parseInt(dragStartNodeId.substring(1)),
@@ -359,7 +347,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     let navbox = document.querySelector(".top-bar-container");
     let offsetTop; //= 220;
     offsetTop = navbox.clientHeight;
-    console.log([window.innerWidth, window.innerHeight - offsetTop]);
     d3.select(main.current)
       .selectAll("svg")
       .attr("height", window.innerHeight - navbox.clientHeight)
@@ -782,10 +769,46 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     );
   }
 
+  const hala = () => {
+    console.log("barca");
+  };
+
   const changeMode = () => {
     if (currentMode === "alg") {
+      console.log("cre");
+      //cre functions
+      d3.select("#svg")
+        .on("mousemove", updateDragLine)
+        .on("mouseup", hideDragLine)
+        .on("mouseleave", hideDragLine2);
+      /* .on("click", mama); */
+
+      d3.selectAll(".gLinks").on("mousedown", function (event) {
+        event.stopPropagation();
+      });
+
+      d3.selectAll("circle").on("mousedown", function (d) {
+        beginDragLine(d);
+      });
+
+      //alg functions
+      d3.selectAll("circle").on("mousedown.drag", null);
+
       setCurrentMode("cre");
     } else {
+      console.log("alg");
+      d3.select("#svg").on("mousemove", null).on("mouseup", null).on("mouseleave", null);
+      /* .on("click", hala); */
+
+      d3.selectAll(".gLinks").on("mousedown", null);
+
+      d3.selectAll("circle").on("mousedown", null);
+
+      //alg functions
+      d3.selectAll("circle").call(
+        d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended)
+      );
+
       setCurrentMode("alg");
     }
   };
@@ -859,6 +882,16 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   />
                 </div>
               </div>
+              <div className="second-bar">
+                <SaveLoadGraph
+                  userId={userId}
+                  nodesState={nodesGlobal}
+                  linksState={linksGlobal}
+                  GraphSimulation={GraphSimulation}
+                  isCurrentDirected={isCurrentDirected}
+                  hideLegend={hideLegend}
+                />
+              </div>
             </>
           ) : (
             <>
@@ -899,17 +932,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
               </div>
             </>
           )}
-        </div>
-
-        <div className="second-bar">
-          <SaveLoadGraph
-            userId={userId}
-            nodesState={nodesGlobal}
-            linksState={linksGlobal}
-            GraphSimulation={GraphSimulation}
-            isCurrentDirected={isCurrentDirected}
-            hideLegend={hideLegend}
-          />
         </div>
       </div>
       <div id="main" className="Graphs-svgContainer" ref={main} /* width="500px" height="500px" */>
