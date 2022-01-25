@@ -12,9 +12,13 @@ import NewGraphInput from "../modules/NewGraphInput.js";
 import SaveLoadGraph from "../modules/SaveLoadGraph.js";
 import BFS from "../modules/BFS.js";
 import Dijkstra from "../modules/Dijkstra.js";
+import FloydWarshall from "../modules/FloydWarshall.js";
 
 const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
 let userIDList = [];
+let currentNodeBFS = undefined;
+let visitedNodesBFS = new Set();
+let currentEdgeBFS = "";
 
 let simulation;
 let svg;
@@ -28,6 +32,8 @@ let linksGlobal = [];
 let dragStartX, dragStartY, dragStartNodeId;
 let isDrag = false;
 
+let legend = <div></div>;
+
 const Graphs = ({ userId, handleLogout, userName }) => {
   const [main, setRef1] = useState(React.createRef());
   let [currentSimulation, setCurrentSimulation] = useState(null);
@@ -40,6 +46,14 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   const [isWeighted, setWeighted] = useState(0);
   const [isCurrentDirected, setCurrentDirected] = useState(0);
   const [isCurrentWeighted, setCurrentWeighted] = useState(0);
+  let [showLegend, setShowedLegend] = useState(false);
+  let [BFS_STEP_State, setBFS_STEP] = useState([]);
+  let [BFS_INDEX, setBFS_INDEX] = useState(-1);
+  let [startNodeBFS, setStartNodeBFS] = useState("");
+  let [Dijkstra_STEP_State, setDijkstra_State] = useState([]);
+  let [Dijkstra_INDEX, setDijkstra_INDEX] = useState(-1);
+  let [showDijkstra, setShowedDijkstra] = useState(false);
+  console.log(showLegend);
 
   useEffect(() => {
     let navbox = document.querySelector(".top-bar-container");
@@ -454,6 +468,16 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     }
   };
 
+  const recolorNodeBorder = (i, color) => {
+    if (i === "all") {
+      d3.select(main.current).select("svg").selectAll("circle").attr("stroke-width", "0px");
+      d3.select(main.current).select("svg").selectAll("circle").attr("stroke", color);
+    } else {
+      let nodeId = "#v" + i.toString();
+      d3.select(main.current).select("svg").select(nodeId).attr("stroke-width", "6px");
+      d3.select(main.current).select("svg").select(nodeId).attr("stroke", "black");
+    }
+  };
   const recolorEdge = (i, j, color) => {
     if (i === "all" || j === "all") {
       d3.select(main.current).select("svg").selectAll("line").attr("stroke", color);
@@ -488,21 +512,149 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     setWeighted(1 - isWeighted);
   };
 
-  let redirect = <div></div>;
-  if (userId === undefined) {
-    console.log(userIDList);
-    userIDList.push(userId);
-    //console.log(userIDList);
-    if (userIDList.length > 2 && userIDList[-1] === undefined) {
-      redirect = <meta http-equiv="refresh" content="0; url = '/'" />;
-      console.log("redirect");
-      //userIDList = [];
+  const displayLegend = () => {
+    setShowedLegend(true);
+  };
+
+  const hideLegend = () => {
+    setShowedLegend(false);
+  };
+
+  const displayDijkstra = () => {
+    setShowedDijkstra(true);
+  };
+  const emptyCounter = () => {
+    visitedNodesBFS.clear();
+    currentNodeBFS = undefined;
+    currentEdgeBFS = "";
+  };
+
+  function BFS_stepper(index) {
+    //BFS_STEP saves every edge and target node that BFS looks at, both visited and unvisited.
+    visitedNodesBFS = new Set();
+    console.log(index);
+    recolorNodeBorder("all", "black");
+    recolorEdge("all", "all", "grey");
+    const source = BFS_STEP_State[index][0].source.name;
+    const target = BFS_STEP_State[index][0].target.name;
+    for (let i = 0; i <= index - 1; i++) {
+      const currStart = BFS_STEP_State[i][0].source.name;
+      const currEnd = BFS_STEP_State[i][0].target.name;
+      recolorNodeBorder(currStart, "blue");
+      recolorEdge(currStart, currEnd, "blue");
+      recolorNodeBorder(currEnd, "blue");
+      visitedNodesBFS.add(currStart);
+      visitedNodesBFS.add(currEnd);
     }
+    recolorNodeBorder(parseInt(startNodeBFS), "red");
+    if (source === BFS_STEP_State[index][1]) {
+      recolorNodeBorder(target, "yellow");
+      currentNodeBFS = target;
+      visitedNodesBFS.add(target);
+      currentEdgeBFS = "From " + target.toString() + " to " + source.toString();
+    } else if (target === BFS_STEP_State[index][1]) {
+      currentNodeBFS = source;
+      visitedNodesBFS.add(source);
+      recolorNodeBorder(source, "yellow");
+      currentEdgeBFS = "From " + source.toString() + " to " + target.toString();
+    }
+    recolorEdge(BFS_STEP_State[index][0].source.name, BFS_STEP_State[index][0].target.name, "aqua");
+    if (BFS_STEP_State[index][2]) {
+      recolorNodeBorder(BFS_STEP_State[index][1], "aqua");
+    }
+  }
+
+  const nextStep = () => {
+    if (showLegend) {
+      BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
+      setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
+    } else {
+      Dijkstra_stepper(Math.min(Dijkstra_STEP_State.length - 1, Math.max(1 + Dijkstra_INDEX, -1)));
+      setDijkstra_INDEX(Math.min(Dijkstra_STEP_State.length - 1, Math.max(1 + Dijkstra_INDEX, -1)));
+    }
+  };
+  const prevStep = () => {
+    if (showLegend) {
+      BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
+      setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
+    } else {
+      Dijkstra_stepper(Math.min(Dijkstra_STEP_State.length - 1, Math.max(Dijkstra_INDEX - 1, 0)));
+      setDijkstra_INDEX(Math.min(Dijkstra_STEP_State.length - 1, Math.max(Dijkstra_INDEX - 1, 0)));
+    }
+  };
+
+  if (showLegend === true || showDijkstra === true) {
+    console.log("a");
+    legend = (
+      <div className="container">
+        <div className="Algorithm-legend">
+          {" "}
+          <table className="legend-table">
+            <tr>
+              <th>BFS Legend</th>
+            </tr>
+            <tr>
+              <td width="34%" />
+            </tr>
+            <tr>
+              <td>
+                <div className="redCircle" />
+              </td>{" "}
+              <td>Start Node</td>
+            </tr>
+            <tr>
+              <td>
+                <div className="yellowCircle" />
+              </td>
+              <td>Current Node</td>
+            </tr>
+            <tr>
+              <td>
+                <div className="blueCircle" />
+              </td>
+              <td>Visited Node</td>
+            </tr>
+            <tr>
+              <td>
+                <div className="aquaCircle" />
+              </td>
+              <td>Current Neighbor</td>
+            </tr>
+            <tr>
+              <td>
+                <div className="blueEdge" />
+              </td>
+              <td>Visited Edge</td>
+            </tr>
+            <tr>
+              <td>
+                <div className="aquaEdge" />
+              </td>
+              <td>Current Edge</td>
+            </tr>
+            <tr></tr>
+          </table>
+          <div>
+            <button onClick={prevStep} className="button u-marginButton">
+              Previous Step
+            </button>
+            <button onClick={nextStep} className="button u-marginButton">
+              Next Step
+            </button>
+          </div>
+        </div>
+        <div className="infoLegend u-flex u-flexColumn">
+          <div>Start Node = {startNodeBFS}</div>
+          <div>Current Node = {currentNodeBFS} </div>
+          <div>Current Edge = {currentEdgeBFS}</div>
+          <div>Visited Nodes= {Array.from(visitedNodesBFS).join(", ")} </div>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="Graphs-pageContainer">
-      {/*redirect*/}
       <div className="top-bar-container">
         <div className="u-flex">
           <div className="Graphs-title left-side ">
@@ -534,6 +686,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
               changeDirected={changeDirected}
               weighted={isWeighted}
               changeWeighted={changeWeighted}
+              hideLegend={hideLegend}
             />
             <button className="button" onClick={addNode}>
               Add Node
@@ -543,8 +696,32 @@ const Graphs = ({ userId, handleLogout, userName }) => {
               recolorEdge={recolorEdge}
               linksState={linksGlobal}
               nodesState={nodesGlobal}
+              displayLegend={displayLegend}
+              setBFS_STEP={setBFS_STEP}
+              setBFS_INDEX={setBFS_INDEX}
+              startNodeBFS={startNodeBFS}
+              setStartNodeBFS={setStartNodeBFS}
+              emptyCounter={emptyCounter}
             />
-            <Dijkstra recolorNode={recolorNode} linksState={linksGlobal} nodesState={nodesGlobal} />
+            <Dijkstra
+              recolorNode={recolorNode}
+              recolorEdge={recolorEdge}
+              linksState={linksGlobal}
+              nodesState={nodesGlobal}
+              startNode={startNodeBFS}
+              hideLegend={hideLegend}
+              setDijkstra_State={setDijkstra_State}
+              setDijkstra_INDEX={setDijkstra_INDEX}
+              displayDijkstra={displayDijkstra}
+            />
+
+            <FloydWarshall
+              recolorNode={recolorNode}
+              linksState={linksGlobal}
+              nodesState={nodesGlobal}
+              startNode={startNodeBFS}
+              hideLegend={hideLegend}
+            />
           </div>
         </div>
         <div className="Graphs-text">Save and load your graphs</div>
@@ -555,12 +732,15 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             linksState={linksGlobal}
             GraphSimulation={GraphSimulation}
             isCurrentDirected={isCurrentDirected}
-            isCurrentWeighted={isCurrentWeighted}
+            hideLegend={hideLegend}
           />
         </div>
       </div>
+
       <div id="main" className="Graphs-svgContainer" ref={main} /* width="500px" height="500px" */>
+        {legend}
         <svg width={window.innerWidth} height={window.innerHeight} onClick={mama} />
+        {""}
       </div>
     </div>
   );

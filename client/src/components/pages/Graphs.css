@@ -203,3 +203,58 @@ input[type="range"]::-webkit-slider-thumb {
   border-color: #aaa;
   border-radius: 32px;
 }
+.container{
+  position: absolute;
+}
+.Algorithm-legend{
+
+  margin: 24px;
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 8px;
+  border-radius: 16px;
+}
+
+.infoLegend{
+  border: 1px solid black;
+  border-radius: 16px;
+  padding: 8px;
+  margin: 24px;
+}
+.redCircle{
+  border-radius: 32px;
+  height: 16px;
+  width: 16px;
+  background-color: red;
+}
+
+.yellowCircle{
+  border-radius: 32px;
+  height: 16px;
+  width: 16px;
+  background-color: yellow;
+}
+
+.blueCircle{
+  border-radius: 32px;
+  height: 16px;
+  width: 16px;
+  background-color: blue;
+}
+
+.aquaCircle{
+  border-radius: 32px;
+  height: 16px;
+  width: 16px;
+  background-color: aqua;
+}
+
+.blueEdge{
+  border-bottom:8px solid blue;
+  width: 40px;
+}
+
+.aquaEdge{
+  border-bottom:8px solid aqua;
+  width: 40px;
+}

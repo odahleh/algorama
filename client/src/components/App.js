@@ -42,29 +42,32 @@ const App = () => {
     post("/api/logout");
   };
 
-  return (
-    <>
-      <Router>
-        <Index path="/" handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
-        <Graphs
-          path="/graphs"
-          userId={userId}
-          userName={userName}
-          handleLogout={handleLogout}
-          userId={userId}
-        />
-        <NewGraphs
-          path="/newgraphs"
-          userId={userId}
-          userName={userName}
-          handleLogout={handleLogout}
-          userId={userId}
-        />
-        {/* <NewGraphs path="/newgraphs" userId={userId} /> */}
-        <NotFound default />
-      </Router>
-    </>
-  );
+  if (userId) {
+    return (
+      <>
+        <Router>
+          <Index path="/" handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
+          <Graphs
+            path="/graphs"
+            userId={userId}
+            userName={userName}
+            handleLogout={handleLogout}
+            userId={userId}
+          />
+          {/* <NewGraphs path="/newgraphs" userId={userId} /> */}
+          <NotFound default />
+        </Router>
+      </>
+    );
+  } else {
+    return (
+      <>
+        <Router>
+          <Index default handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
+        </Router>
+      </>
+    );
+  }
 };
 
 export default App;
