@@ -124,7 +124,7 @@
 }
 
 .Graphs-text {
-  margin: 8px 8px 8px;
+  margin: 8px 25px 8px;
 }
 .Graphs-textInside {
   margin: 0px 8px 0px 0px;
@@ -132,6 +132,7 @@
 }
 
 .InputBox {
+  /* font-size: 16px; */
   text-align: center;
   margin: 8px;
   border: 0px;
@@ -313,4 +314,11 @@ input[type="range"]::-webkit-slider-thumb {
 .aquaEdge{
   border-bottom:8px solid #00c2a5;
   width: 40px;
+}
+
+.gLinkText{
+  border-radius: 32px;
+  height: 16px;
+  width: 16px;
+  background-color: pink;
 }

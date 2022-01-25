@@ -9,15 +9,11 @@ import "./Index.css";
 const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
 
 const Index = ({ userId, handleLogin, handleLogout }) => {
-  console.log(userId);
-  console.log(handleLogin, handleLogout);
+  /* console.log(userId);
+  console.log(handleLogin, handleLogout); */
   if (userId) {
     navigate("/graphs");
-    return (
-      <>
-        {/* <meta http-equiv="refresh" content="0; url = '/graphs'" /> */}
-      </>
-    );
+    return <>{/* <meta http-equiv="refresh" content="0; url = '/graphs'" /> */}</>;
   }
   return (
     <>

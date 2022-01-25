@@ -28,7 +28,8 @@ const NewGraphInput = (props) => {
   };
 
   const onSubmit = () => {
-    startGraph(valueNodes, valueEdges);
+    props.GraphSimulation([], []);
+    //startGraph(valueNodes, valueEdges);
   };
 
   const handleSliderChange = () => {
@@ -80,6 +81,10 @@ const NewGraphInput = (props) => {
         },
       ]);
     }
+  };
+
+  const senseless = () => {
+    let sense = "less";
   };
 
   const startGraph = (valueNodes, valueEdges) => {
@@ -159,7 +164,7 @@ const NewGraphInput = (props) => {
           min="0"
           max="1"
           value={props.weighted}
-          //onChange={props.changeWeighted}
+          onChange={senseless}
           onClick={props.changeWeighted}
           className="Graphs-switch"
         />
@@ -171,15 +176,15 @@ const NewGraphInput = (props) => {
           min="0"
           max="1"
           value={props.directed}
-          //onChange={props.changeDirected}
+          onChange={senseless}
           onClick={props.changeDirected}
           className="Graphs-switch"
         />
         <div className="Graphs-textInside">directed</div>
       </div>
-      {/* <button onClick={onSubmit} className="button u-marginButton">
-        Display
-      </button> */}
+      <button onClick={onSubmit} className="button u-marginButton">
+        Clear Graph
+      </button>
     </div>
   );
 };
