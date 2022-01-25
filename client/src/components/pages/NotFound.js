@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { navigate } from "@reach/router";
 
 const NotFound = () => {
+  useEffect( () => {
+    navigate("/");
+  }); 
+  
   return (
     <>
-    404
+      {/* <meta http-equiv="refresh" content="0; url = '/'" /> */}
     </>
   );
 };

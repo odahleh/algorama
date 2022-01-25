@@ -2,11 +2,19 @@ import React, { Component, useEffect, useState } from "react";
 import "../../utilities.css";
 import "../pages/Graphs.css";
 
-
-const BFS = ({ recolorNode, recolorEdge, linksState, nodesState, displayLegend, setBFS_STEP, setBFS_INDEX, startNodeBFS, setStartNodeBFS, emptyCounter}) => {
+const BFS = ({
+  recolorNode,
+  recolorEdge,
+  linksState,
+  nodesState,
+  displayLegend,
+  setBFS_STEP,
+  setBFS_INDEX,
+  startNodeBFS,
+  setStartNodeBFS,
+  emptyCounter,
+}) => {
   let [showBFSProgress, setShowBFSProgress] = useState(false);
-
-  
 
   function findNeighbors(start, links) {
     let neighbors = [];
@@ -34,12 +42,12 @@ const BFS = ({ recolorNode, recolorEdge, linksState, nodesState, displayLegend, 
       alert("Please set a start node for BFS.");
     } else {
       displayLegend(); 
-      recolorNode(startNodeBFS, "red");
       setBFS_INDEX(-1);
       let start = { name: parseInt(startNodeBFS) };
       setShowBFSProgress(true);
       let links = linksState;
       let nodes = nodesState;
+      console.log(links, nodes);
       let visited = new Set();
       let distanceArray = [];
       let BFS_STEP = [];
@@ -64,16 +72,16 @@ const BFS = ({ recolorNode, recolorEdge, linksState, nodesState, displayLegend, 
           // console.log(currNeighbors);
           for (let neigh in currNeighbors) {
             // console.log("NEIGH");
-            if (visited.has(currNeighbors[neigh])) {
-              BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], false]);
-            } else {
+            if (!visited.has(currNeighbors[neigh])){
               if (!neighbors.includes(currNeighbors[neigh])){
                 neighbors.push(currNeighbors[neigh]);
               }
-              BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], true]);
+              //BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], next]);
+            }
+            BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], next]);
             }
           }
-        }
+        
         console.log(neighbors, "neighbors");
         queue = neighbors;
         // console.log("queue", queue);
@@ -84,13 +92,9 @@ const BFS = ({ recolorNode, recolorEdge, linksState, nodesState, displayLegend, 
     }
   }
 
-
-
-
   const handleStartNodeBFS = (event) => {
     setStartNodeBFS(event.target.value);
   };
-
 
   return (
     <div>

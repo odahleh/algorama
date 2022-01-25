@@ -6,7 +6,7 @@ import * as d3 from "d3";
 import "../../utilities.css";
 import "./Graphs.css";
 import GoogleLogin, { GoogleLogout } from "react-google-login";
-import { least, stratify } from "d3";
+import { least, selectAll, stratify } from "d3";
 
 import NewGraphInput from "../modules/NewGraphInput.js";
 import SaveLoadGraph from "../modules/SaveLoadGraph.js";
@@ -15,10 +15,25 @@ import Dijkstra from "../modules/Dijkstra.js";
 import FloydWarshall from "../modules/FloydWarshall.js";
 
 const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
-let userIDList = [];
 let currentNodeBFS = undefined;
 let visitedNodesBFS = new Set();
 let currentEdgeBFS = "";
+let previousExploredBFS = new Set();
+
+let simulation;
+let svg;
+let vertex;
+let edge;
+let linkText;
+let nodeText;
+let mousedownNode;
+let dragLine;
+let nodesGlobal = [];
+let linksGlobal = [];
+let dragStartX, dragStartY, dragStartNodeId;
+let isDrag = false;
+
+let legend = <div></div>;
 
 const Graphs = ({ userId, handleLogout, userName }) => {
   const [main, setRef1] = useState(React.createRef());
@@ -39,6 +54,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   let [Dijkstra_STEP_State, setDijkstra_State] = useState([]);
   let [Dijkstra_INDEX, setDijkstra_INDEX] = useState(-1);
   let [showDijkstra, setShowedDijkstra] = useState(false);
+  console.log(showLegend);
 
   useEffect(() => {
     let navbox = document.querySelector(".top-bar-container");
@@ -54,7 +70,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       }, 500);
     } */
     );
-  });
+  }
+  ,[userId, userName]
+  );
 
   const handleResize = () => {
     d3.select(main.current)
@@ -74,26 +92,31 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   };
 
   const GraphSimulation = (nodes, links) => {
-    setNodes(nodes);
-    setLinks(links);
+    console.log("generating graph for", nodes, links);
     setCurrentDirected(isDirected);
     setCurrentWeighted(isWeighted);
-    if (displaySimulation === true) {
-      d3.selectAll("svg").remove();
-      setDisplaySimulation(false);
+    if (displaySimulation === false) {
+      const svg = d3
+        .select(main.current)
+        .select("svg")
+        .attr("width", window.innerWidth)
+        .attr(
+          "height",
+          window.innerHeight - document.querySelector(".top-bar-container").clientHeight
+        )
+        .style("background-color", "white")
+        .attr("id", "svg");
     }
 
+    setDisplaySimulation(true);
+    setCurrentSimulation(simulation);
+
     //dcreating main svg
-    const svg = d3
-      .select(main.current)
-      .append("svg")
-      .attr("width", window.innerWidth)
-      .attr(
-        "height",
-        window.innerHeight - document.querySelector(".top-bar-container").clientHeight
-      )
-      //.attr("viewbox", "0 0 100 100")
-      .style("background-color", "white");
+    svg = d3.select(main.current).select("svg");
+
+    svg.selectAll("g").remove();
+
+    const g = svg.append("g");
 
     //defining arrowheads
     let arrowheads = d3
@@ -112,8 +135,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .attr("fill", "grey")
       .attr("d", "M0,-5L10,0L0,5");
 
+    dragLine = svg.append("path").attr("class", "dragLine hidden").attr("d", "M0,0L0,0");
+
     //creating forcesimulation
-    let simulation = d3
+    simulation = d3
       .forceSimulation()
       .force(
         "link",
@@ -124,7 +149,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           })
           .distance(100)
       )
-      .force("charge", d3.forceManyBody().strength(-70))
+      .force("charge", d3.forceManyBody().strength(-100).distanceMax(200))
       .force(
         "center",
         d3.forceCenter(
@@ -134,47 +159,16 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       )
       .on("tick", ticked);
 
-    //creating edges
-    let edge = svg
-      .selectAll(".gLine")
-      .data(links)
-      .enter()
+    edge = g
       .append("g")
-      .attr("class", "gLine")
-      .append("line")
-      .attr("marker-end", "url(#arrow)")
+      .attr("class", "gLinks")
       .attr("stroke-width", 5)
       .attr("stroke", "grey")
-      .attr("id", function (d) {
-        console.log(d.source, d.target);
-        if (typeof d.source === "number") {
-          return "e" + d.source.toString() + "-" + d.target.toString();
-        } else {
-          return "e" + d.source.name.toString() + "-" + d.target.name.toString();
-        }
-      });
-    if (isDirected === 0) {
-      d3.select(main.current).select("path").attr("opacity", 0);
-    }
+      .selectAll(".link");
 
-    //svg.selectAll("g").append("text").text("lol").attr("x", 6).attr("y", 3);
+    vertex = g.append("g").attr("class", "gNode").attr("fill", "black").selectAll(".node");
 
-    //creating vertices
-    let vertex = svg
-      .selectAll(".gNode")
-      .data(nodes)
-      .enter()
-      .append("g")
-      .attr("class", "gNode")
-      .append("circle")
-      .attr("r", 10)
-      .attr("fill", "black")
-      .attr("id", function (d) {
-        return "v" + d.name.toString();
-      })
-      .call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended));
-
-    vertex.append("title").text(function (d) {
+    /*  vertex.append("title").text(function (d) {
       return d.name;
     });
 
@@ -188,92 +182,327 @@ const Graphs = ({ userId, handleLogout, userName }) => {
 
     edge.append("title").text(function (d) {
       return d.weight;
-    });
+    }); */
 
     // TODO: Finish adding labels, see https://stackoverflow.com/questions/13364566/labels-text-on-the-nodes-of-a-d3-force-directed-graph
 
-    simulation.nodes(nodes).on("tick", ticked);
-    simulation.force("link").links(links);
+    update(nodes, links);
+  };
 
+  const mama = () => {
+    if (nodesGlobal.length === 0) {
+      GraphSimulation([...nodesGlobal, { name: 0 }], linksGlobal);
+      //setNodes([...nodesGlobal, { name: 0 }]);
+    } else {
+      console.log("mama2");
+    }
+  };
+
+  //forces for dragging nodes
+  function dragstarted(event, d) {
+    if (!event.active) simulation.alphaTarget(0.3).restart();
+    d.fx = d.x;
+    d.fy = d.y;
+  }
+
+  function dragged(event, d) {
+    d.fx = event.x;
+    d.fy = event.y;
+  }
+
+  function dragended(event, d) {
+    if (!event.active) simulation.alphaTarget(0);
+    d.fx = null;
+    d.fy = null;
+  }
+
+  function beginDragLine(d) {
+    isDrag = true;
+    console.log(nodesGlobal, linksGlobal);
+    console.log("Start");
+    //d3.preventDefault();
+    // if (d3.ctrlKey || d3.button != 0) return;
+    dragStartNodeId = d.path[0].id;
+    //console.log(dragStartNodeId)
+    //console.log(parseInt(dragStartNodeId.substring(1)))
+    /* console.log(nodeId)
+    console.log(d3.select("#"+nodeId))
+    console.log(d.path[0]) */
+    mousedownNode = d.path[0];
+    console.log(mousedownNode.cx.baseVal.value);
+    dragStartX = mousedownNode.cx.baseVal.value;
+    dragStartY = mousedownNode.cy.baseVal.value;
+
+    console.log(mousedownNode, "ja");
+    dragLine
+      .classed("hidden", false)
+      .attr("d", "M" + dragStartX + "," + dragStartY + "L" + dragStartX + "," + dragStartY);
+  }
+
+  function updateDragLine(event) {
+    let svgHere = document.querySelector("#svg");
+    let rect = svgHere.getBoundingClientRect();
+    let dragCurrentX = event.clientX - rect.left;
+    let dragCurrentY = event.clientY - rect.top;
+    //console.log(x, y)
+
+    if (!mousedownNode) return;
+
+    dragLine.attr(
+      "d",
+      "M" + dragStartX + "," + dragStartY + "L" + dragCurrentX + "," + dragCurrentY
+    );
+
+    /* let coords = event.currentTarget.value
+    
+    console.log(svgHere, "svg")
+    console.log(event.clientX)
+    console.log(event.clientY) */
+  }
+
+  function hideDragLine() {
+    console.log("hide");
+    if (!isDrag) {
+      let bodyHere = document.querySelector("body");
+      let rect = bodyHere.getBoundingClientRect();
+      let currentX = event.clientX - rect.left;
+      let currentY = event.clientY - rect.top;
+      let navbox = document.querySelector(".top-bar-container");
+      let offsetTop = navbox.clientHeight;
+      console.log(nodesGlobal);
+      console.log(nodesGlobal);
+      if (nodesGlobal.length === 0) {
+        console.log("new");
+        //nodesGlobal, { name: 0, x: currentX, y: currentY - offsetTop });
+        GraphSimulation(
+          [...nodesGlobal, { name: 0, x: currentX, y: currentY - offsetTop }],
+          linksGlobal
+        );
+      } else {
+        console.log("update");
+        //console.log(nodesGlobal, linksGlobal)
+        let svgHere = document.querySelector("#svg");
+        let rect = svgHere.getBoundingClientRect();
+        let currentX = event.clientX - rect.left;
+        let currentY = event.clientY - rect.top;
+        //nodesGlobal.push({ name: nodesGlobal.length, x: currentX, y: currentY });
+        //GraphSimulation(nodesGlobal, linksGlobal)
+
+        update(
+          [...nodesGlobal, { name: nodesGlobal.length, x: currentX, y: currentY }],
+          linksGlobal
+        );
+      }
+    }
+    dragLine.classed("hidden", true);
+    isDrag = false;
+  }
+
+  function hideDragLine2() {
+    dragLine.classed("hidden", true);
+    isDrag = false;
+  }
+
+  function endDragLine(d) {
+    console.log("end");
+    //  if (!mousedownNode || mousedownNode === d) return;
+    //return if link already exists
+    let dragEndNodeId = d.path[0].id;
+    var newLink = {
+      source: parseInt(dragStartNodeId.substring(1)),
+      target: parseInt(dragEndNodeId.substring(1)),
+      weight: 1,
+    };
+    console.log("EDL");
+    update([...nodesGlobal], [...linksGlobal, newLink]);
+
+    /*  for (var i = 0; i < links.length; i++) {
+      var l = links[i];
+      if (
+        (l.source === mousedownNode && l.target === d) ||
+        (l.source === d && l.target === mousedownNode)
+      ) {
+        return;
+      }
+  } */
+    // mousedownNode.degree++;
+    //.degree++;
+  }
+
+  function update(nodes, links) {
+    nodesGlobal = nodes;
+    linksGlobal = links;
+    setNodes(nodes);
+    setLinks(links);
+    //console.log(nodesGlobal, linksGlobal);
+    console.log(nodes, links);
+
+    // Apply the general update pattern to the nodes.#
+    //console.log(vertex);
+    vertex = vertex.data(nodes);
+    //console.log(vertex);
+    vertex.exit().remove();
+    //console.log(vertex);
+    vertex = vertex
+      .enter()
+      .append("g")
+      .attr("class", "gSingleNode")
+      .append("circle")
+      .attr("fill", "black")
+      .attr("r", 10)
+      .attr("id", function (d) {
+        return "v" + d.name.toString();
+      })
+      .on("mousedown", function (d) {
+        beginDragLine(d);
+      })
+      .on("mouseup", endDragLine)
+      .merge(vertex);
+
+    //console.log(vertex)
+
+    d3.selectAll("circle"); //.call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended))
+    d3.selectAll(".gLinks").on("mousedown", function (event) {
+      event.stopPropagation();
+    });
+    // Apply the general update pattern to the links.
+    edge = edge.data(links);
+    edge.exit().remove();
+    edge = edge
+      .enter()
+      .append("g")
+      .attr("class", "gSingleLine")
+      .append("line")
+      .attr("marker-end", "url(#arrow)")
+      .attr("id", function (d) {
+        return "e" + d.source.toString() + "-" + d.target.toString();
+      })
+      .merge(edge);
+
+    if (isDirected === 0) {
+      d3.select(main.current).select("path").attr("opacity", 0);
+    }
+    d3.selectAll(".gSingleLine").selectAll("text").remove();
+    d3.selectAll(".gSingleNode").selectAll("text").remove();
     // edgelabels
-    let linkText = svg
-      .selectAll(".gLine")
+    linkText = svg
+      .selectAll(".gSingleLine")
       .data(links)
       .append("text")
       .text(function (d) {
-        if (d.weight) {
+        if (false) {
           return d.weight.toString();
         } else {
           return "1";
         }
       })
-      .style("font-size", 16);
+      .style("font-size", 16)
+      .attr("stroke-width", 0);
+
+    nodeText = svg
+      .selectAll(".gSingleNode")
+      .data(nodes)
+      .append("text")
+      .text(function (d) {
+        return d.name.toString();
+      })
+      .style("font-size", 12)
+      .attr("stroke-width", 0)
+      .style("fill", "white");
+
     if (isWeighted === 0) {
       linkText.attr("opacity", 0);
     }
 
-    //force upon creation
-    function ticked() {
-      let radius = 10;
-      vertex
-        .attr("cx", function (d) {
-          //console.log(d.x);
-          return Math.max(radius, Math.min(WIDTH - radius, d.x));
-        })
-        .attr("cy", function (d) {
-          return Math.max(radius, Math.min(HEIGHT - radius, d.y));
-        });
-      edge
-        .attr("x1", function (d) {
-          //console.log(d.source.x);
-          return d.source.x;
-        })
-        .attr("y1", function (d) {
-          return d.source.y;
-        })
-        .attr("x2", function (d) {
-          return d.target.x;
-        })
-        .attr("y2", function (d) {
-          return d.target.y;
-        });
-      linkText
-        .attr("x", function (d) {
-          if (d.target.x > d.source.x) {
-            return d.source.x + (d.target.x - d.source.x) / 2;
-          } else {
-            return d.target.x + (d.source.x - d.target.x) / 2;
-          }
-        })
-        .attr("y", function (d) {
-          if (d.target.y > d.source.y) {
-            return d.source.y + (d.target.y - d.source.y) / 2;
-          } else {
-            return d.target.y + (d.source.y - d.target.y) / 2;
-          }
-        });
-    }
+    d3.select(main.current)
+      .select("svg")
+      .on("mousemove", updateDragLine)
+      .on("mouseup", hideDragLine)
+      .on("mouseleave", hideDragLine2);
+    // Update and restart the simulation.
+    simulation.nodes(nodes);
+    simulation.force("link").links(links);
+    simulation.alpha(1).restart();
+  }
 
-    //forces for dragging nodes
-    function dragstarted(event, d) {
-      if (!event.active) simulation.alphaTarget(0.3).restart();
-      d.fx = d.x;
-      d.fy = d.y;
+  const addNode = () => {
+    if (nodesGlobal.length === 0) {
+      //nodesGlobal.push({ name: 0 });
+      GraphSimulation([nodesGlobal, { name: 0 }], linksGlobal);
+    } else {
+      update([...nodesGlobal, { name: nodesGlobal.length }], linksGlobal);
     }
-
-    function dragged(event, d) {
-      d.fx = event.x;
-      d.fy = event.y;
-    }
-
-    function dragended(event, d) {
-      if (!event.active) simulation.alphaTarget(0);
-      d.fx = null;
-      d.fy = null;
-    }
-    setDisplaySimulation(true);
-    setCurrentSimulation(simulation);
   };
+
+  //force upon creation
+  function ticked() {
+    let radius = 10;
+    vertex
+      .attr("cx", function (d) {
+        //console.log(d.x);
+        return Math.max(radius, Math.min(WIDTH - radius, d.x));
+      })
+      .attr("cy", function (d) {
+        return Math.max(radius, Math.min(HEIGHT - radius, d.y));
+      });
+    edge
+      .attr("x1", function (d) {
+        //console.log(d.source.x);
+        return d.source.x;
+      })
+      .attr("y1", function (d) {
+        return d.source.y;
+      })
+      .attr("x2", function (d) {
+        return d.target.x;
+      })
+      .attr("y2", function (d) {
+        return d.target.y;
+      });
+    linkText
+      .attr("x", function (d) {
+        if (d.target.x > d.source.x) {
+          return d.source.x + (d.target.x - d.source.x) / 2;
+        } else {
+          return d.target.x + (d.source.x - d.target.x) / 2;
+        }
+      })
+      .attr("y", function (d) {
+        if (d.target.y > d.source.y) {
+          return d.source.y + (d.target.y - d.source.y) / 2;
+        } else {
+          return d.target.y + (d.source.y - d.target.y) / 2;
+        }
+      });
+    nodeText
+      .attr("x", function (d) {
+        console.log(d);
+        //console.log(d.x);
+        let correctionCoeff = 0.5;
+        let name = d.name;
+        for (let char of name.toString()) {
+          correctionCoeff = correctionCoeff + 3.5;
+          if (char === "1") {
+            correctionCoeff = correctionCoeff - 2;
+          }
+        }
+        return Math.max(radius, Math.min(WIDTH - radius, d.x)) - correctionCoeff;
+        /*  if (d.name === 21) {
+          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 7;
+        } else if (d.name > 19) {
+          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 7;
+        } else if (d.name > 9) {
+          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 5;
+        } else if (d.name > 9) {
+          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 5;
+        } else {
+          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 4;
+        } */
+      })
+      .attr("y", function (d) {
+        return Math.max(radius, Math.min(HEIGHT - radius, d.y)) + 4;
+      });
+  }
 
   const recolorNode = (i, color) => {
     if (i === "all") {
@@ -315,13 +544,13 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     if (isWeighted === 0) {
       d3.select(main.current)
         .selectAll("svg")
-        .selectAll(".gLine")
+        .selectAll(".gSingleLine")
         .selectAll("text")
         .style("opacity", 1);
     } else {
       d3.select(main.current)
         .selectAll("svg")
-        .selectAll(".gLine")
+        .selectAll(".gSingleLine")
         .selectAll("text")
         .style("opacity", 0);
     }
@@ -343,41 +572,43 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     visitedNodesBFS.clear();
     currentNodeBFS = undefined;
     currentEdgeBFS = "";
+    previousExploredBFS = [];
   };
 
   function BFS_stepper(index) {
     //BFS_STEP saves every edge and target node that BFS looks at, both visited and unvisited.
     visitedNodesBFS = new Set();
+    previousExploredBFS = new Set();
     console.log(index);
-    recolorNodeBorder("all", "black");
+    recolorNode("all", "black");
     recolorEdge("all", "all", "grey");
     const source = BFS_STEP_State[index][0].source.name;
     const target = BFS_STEP_State[index][0].target.name;
     for (let i = 0; i <= index - 1; i++) {
       const currStart = BFS_STEP_State[i][0].source.name;
       const currEnd = BFS_STEP_State[i][0].target.name;
-      recolorNodeBorder(currStart, "blue");
-      recolorEdge(currStart, currEnd, "blue");
-      recolorNodeBorder(currEnd, "blue");
+      const previous = BFS_STEP_State[i][2];
       visitedNodesBFS.add(currStart);
       visitedNodesBFS.add(currEnd);
+      previousExploredBFS.add(previous);
     }
-    recolorNodeBorder(parseInt(startNodeBFS), "red");
+    for (let prev of previousExploredBFS){
+      recolorNode(prev, "yellow");
+    }
     if (source === BFS_STEP_State[index][1]) {
-      recolorNodeBorder(target, "yellow");
+      recolorNode(target, "yellow");
       currentNodeBFS = target;
       visitedNodesBFS.add(target);
+      previousExploredBFS.add(target);
       currentEdgeBFS = "From " + target.toString() + " to " + source.toString();
     } else if (target === BFS_STEP_State[index][1]) {
       currentNodeBFS = source;
       visitedNodesBFS.add(source);
-      recolorNodeBorder(source, "yellow");
+      recolorNode(source, "yellow");
+      previousExploredBFS.add(source);
       currentEdgeBFS = "From " + source.toString() + " to " + target.toString();
     }
     recolorEdge(BFS_STEP_State[index][0].source.name, BFS_STEP_State[index][0].target.name, "aqua");
-    if (BFS_STEP_State[index][2]) {
-      recolorNodeBorder(BFS_STEP_State[index][1], "aqua");
-    }
   }
   function Dijkstra_stepper(index) {
     recolorNodeBorder("all", "black");
@@ -492,6 +723,11 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             />
           </div>
         </div>
+        <div className="Graphs-ModeSelector">
+          <div>Edit</div>
+          <div>Load and Save</div>
+          <div>Algorithms</div>
+        </div>
         <div className="Graphs-text">Create a new graph or run an algorithm</div>
         <div className="Graphs-topbar">
           <div className=" u-flex u-flex-wrap">
@@ -503,11 +739,14 @@ const Graphs = ({ userId, handleLogout, userName }) => {
               changeWeighted={changeWeighted}
               hideLegend={hideLegend}
             />
+            <button className="button" onClick={addNode}>
+              Add Node
+            </button>
             <BFS
               recolorNode={recolorNode}
               recolorEdge={recolorEdge}
-              linksState={linksState}
-              nodesState={nodesState}
+              linksState={linksGlobal}
+              nodesState={nodesGlobal}
               displayLegend={displayLegend}
               setBFS_STEP={setBFS_STEP}
               setBFS_INDEX={setBFS_INDEX}
@@ -518,8 +757,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             <Dijkstra
               recolorNode={recolorNode}
               recolorEdge={recolorEdge}
-              linksState={linksState}
-              nodesState={nodesState}
+              linksState={linksGlobal}
+              nodesState={nodesGlobal}
               startNode={startNodeBFS}
               hideLegend={hideLegend}
               setDijkstra_State={setDijkstra_State}
@@ -529,8 +768,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
 
             <FloydWarshall
               recolorNode={recolorNode}
-              linksState={linksState}
-              nodesState={nodesState}
+              linksState={linksGlobal}
+              nodesState={nodesGlobal}
               startNode={startNodeBFS}
               hideLegend={hideLegend}
             />
@@ -540,8 +779,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         <div className="second-bar">
           <SaveLoadGraph
             userId={userId}
-            nodesState={nodesState}
-            linksState={linksState}
+            nodesState={nodesGlobal}
+            linksState={linksGlobal}
             GraphSimulation={GraphSimulation}
             isCurrentDirected={isCurrentDirected}
             hideLegend={hideLegend}
@@ -550,9 +789,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       </div>
 
       <div id="main" className="Graphs-svgContainer" ref={main} /* width="500px" height="500px" */>
-        {""}
-
         {legend}
+        <svg width={window.innerWidth} height={window.innerHeight} onClick={mama} />
+        {""}
       </div>
     </div>
   );

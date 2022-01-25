@@ -9,7 +9,7 @@ import "../utilities.css";
 import { socket } from "../client-socket.js";
 
 import { get, post } from "../utilities";
-// import NewGraphs from "./pages/NewGraphs.js";
+import NewGraphs from "./pages/NewGraphs.js";
 
 /**
  * Define the "App" component
@@ -42,8 +42,7 @@ const App = () => {
     post("/api/logout");
   };
 
-
-  if (userId){
+  if (userId) {
     return (
       <>
         <Router>
@@ -60,18 +59,22 @@ const App = () => {
         </Router>
       </>
     );
+<<<<<<< HEAD
   }
   else{
+    console.log("something else");
+=======
+  } else {
+>>>>>>> 886b962e5210fc8334a82482e7ead7702eb02a9f
     return (
       <>
         <Router>
-          <Index default handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
+          <Index path='/' handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
+          <NotFound default />
         </Router>
       </>
     );
   }
-
-  
 };
 
 export default App;
