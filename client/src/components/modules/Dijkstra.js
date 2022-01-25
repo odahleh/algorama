@@ -2,7 +2,17 @@ import React, { Component, useEffect, useState } from "react";
 import "../../utilities.css";
 import "../pages/Graphs.css";
 
-const Dijkstra = ({ recolorNode, recolorEdge, linksState, nodesState, startNode, hideLegend, setDijkstra_State, setDijkstra_INDEX, displayDijkstra}) => {
+const Dijkstra = ({
+  recolorNode,
+  recolorEdge,
+  linksState,
+  nodesState,
+  startNode,
+  hideLegend,
+  setDijkstra_State,
+  setDijkstra_INDEX,
+  displayDijkstra,
+}) => {
   function dijkstra() {
     recolorNode("all", "black");
     recolorEdge("all", "all", "grey");
@@ -11,14 +21,13 @@ const Dijkstra = ({ recolorNode, recolorEdge, linksState, nodesState, startNode,
     hideLegend();
     if (startNode === "") {
       alert("Please set a start node for Dijkstra.");
-    }
-    else{
+    } else {
       recolorNode(startNode, "red");
-      displayDijkstra(); 
+      displayDijkstra();
       setDijkstra_INDEX(-1);
       let links = linksState;
       let nodes = nodesState;
-      let Dijkstra_STEP =[]; 
+      let Dijkstra_STEP = [];
       //MODIFY FOR DIFFERENT STARTING NODE
       let distanceArray = [0]; //MODIFY FOR DIFFERENT STARTING NODE
       let parentArray = [];
@@ -38,12 +47,12 @@ const Dijkstra = ({ recolorNode, recolorEdge, linksState, nodesState, startNode,
             curMin = distanceArray[node];
           }
         }
-        Dijkstra_STEP.push([u, true]);
+        Dijkstra_STEP.push([u, parentArray[u], true]);
         let uIndex = pqueue.indexOf(u);
         pqueue.splice(uIndex, 1);
-        let neighbors = findNeighbors({ name: u }, links);
+        let [neighbors, currNeighborEdges] = findNeighbors({ name: u }, links);
         for (let v of neighbors) {
-          Dijkstra_STEP.push([v, false]);
+          Dijkstra_STEP.push([v, currNeighborEdges[neighbors.indexOf(v)], false]);
           let alt = distanceArray[u] + returnEdgeWeights(u, v, links);
           if (alt < distanceArray[v]) {
             distanceArray[v] = alt;
@@ -51,10 +60,10 @@ const Dijkstra = ({ recolorNode, recolorEdge, linksState, nodesState, startNode,
           }
         }
       }
-      console.log(distanceArray);
+      // console.log(distanceArray);
       console.log(Dijkstra_STEP);
       setDijkstra_State(Dijkstra_STEP);
-    } 
+    }
   }
   function returnEdgeWeights(u, v, links) {
     for (let edge of links) {
@@ -68,15 +77,18 @@ const Dijkstra = ({ recolorNode, recolorEdge, linksState, nodesState, startNode,
   }
 
   function findNeighbors(start, links) {
-    let neighbors = new Set();
+    let neighbors = [];
+    let currNeighborEdges = [];
     for (let edge of links) {
       if (edge.source.name === start.name) {
-        neighbors.add(edge.target.name);
+        neighbors.push(edge.target.name);
+        currNeighborEdges.push(edge);
       } else if (edge.target.name === start.name) {
-        neighbors.add(edge.source.name);
+        neighbors.push(edge.source.name);
+        currNeighborEdges.push(edge);
       }
     }
-    return neighbors;
+    return [neighbors, currNeighborEdges];
   }
 
   return (

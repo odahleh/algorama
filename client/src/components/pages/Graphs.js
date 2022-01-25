@@ -336,9 +336,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     setShowedLegend(false);
   };
 
-  const displayDijkstra = () => { 
+  const displayDijkstra = () => {
     setShowedDijkstra(true);
-  }
+  };
   const emptyCounter = () => {
     visitedNodesBFS.clear();
     currentNodeBFS = undefined;
@@ -379,13 +379,15 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       recolorNodeBorder(BFS_STEP_State[index][1], "aqua");
     }
   }
-
+  function Dijkstra_stepper(index) {
+    recolorNodeBorder("all", "black");
+    recolorEdge("all", "all", "grey");
+  };
   const nextStep = () => {
-    if (showLegend){
+    if (showLegend) {
       BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
       setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
-    }
-    else{
+    } else {
       Dijkstra_stepper(Math.min(Dijkstra_STEP_State.length - 1, Math.max(1 + Dijkstra_INDEX, -1)));
       setDijkstra_INDEX(Math.min(Dijkstra_STEP_State.length - 1, Math.max(1 + Dijkstra_INDEX, -1)));
     }
@@ -394,56 +396,71 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     if (showLegend) {
       BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
       setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
-    }else{
+    } else {
       Dijkstra_stepper(Math.min(Dijkstra_STEP_State.length - 1, Math.max(Dijkstra_INDEX - 1, 0)));
       setDijkstra_INDEX(Math.min(Dijkstra_STEP_State.length - 1, Math.max(Dijkstra_INDEX - 1, 0)));
     }
   };
 
+  let legend = <div></div>;
 
-
-
-
-  let legend = <div></div>; 
-
-  if (showLegend === true || showDijkstra === true){
-    legend =  <div className="container">
-      <div className="Algorithm-legend"> <table className="legend-table">
-      <tr>
-        <th>BFS Legend</th>
-      </tr>
-      <tr>
-       <td width="34%"/>
-     </tr>
-      <tr>
-        <td><div className="redCircle"/></td> <td>Start Node</td>
-      </tr>
-      <tr>
-        <td><div className="yellowCircle"/></td><td>Current Node</td>
-      </tr>
-      <tr>
-        <td><div className="blueCircle"/></td><td>Visited Node</td>
-      </tr>
-      <tr>
-        <td><div className="aquaCircle"/></td><td>Current Neighbor</td>
-      </tr>
-      <tr>
-        <td><div className="blueEdge"/></td><td>Visited Edge</td>
-      </tr>
-      <tr>
-        <td><div className="aquaEdge"/></td><td>Current Edge</td>
-      </tr>
-      <tr>
-      </tr>
-    </table>
-    <div>
-          <button onClick={prevStep} className="button u-marginButton">
-            Previous Step
-          </button>
-          <button onClick={nextStep} className="button u-marginButton">
-            Next Step
-          </button>
-
+  if (showLegend === true || showDijkstra === true) {
+    legend = (
+      <div className="container">
+        <div className="Algorithm-legend">
+          {" "}
+          <table className="legend-table">
+            <tr>
+              <th>BFS Legend</th>
+            </tr>
+            <tr>
+              <td width="34%" />
+            </tr>
+            <tr>
+              <td>
+                <div className="redCircle" />
+              </td>{" "}
+              <td>Start Node</td>
+            </tr>
+            <tr>
+              <td>
+                <div className="yellowCircle" />
+              </td>
+              <td>Current Node</td>
+            </tr>
+            <tr>
+              <td>
+                <div className="blueCircle" />
+              </td>
+              <td>Visited Node</td>
+            </tr>
+            <tr>
+              <td>
+                <div className="aquaCircle" />
+              </td>
+              <td>Current Neighbor</td>
+            </tr>
+            <tr>
+              <td>
+                <div className="blueEdge" />
+              </td>
+              <td>Visited Edge</td>
+            </tr>
+            <tr>
+              <td>
+                <div className="aquaEdge" />
+              </td>
+              <td>Current Edge</td>
+            </tr>
+            <tr></tr>
+          </table>
+          <div>
+            <button onClick={prevStep} className="button u-marginButton">
+              Previous Step
+            </button>
+            <button onClick={nextStep} className="button u-marginButton">
+              Next Step
+            </button>
           </div>
         </div>
         <div className="infoLegend u-flex u-flexColumn">
@@ -453,7 +470,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           <div>Visited Nodes= {Array.from(visitedNodesBFS).join(", ")} </div>
         </div>
       </div>
-  };
+    );
+  }
 
   return (
     <div className="Graphs-pageContainer">
@@ -497,16 +515,17 @@ const Graphs = ({ userId, handleLogout, userName }) => {
               setStartNodeBFS={setStartNodeBFS}
               emptyCounter={emptyCounter}
             />
-            <Dijkstra recolorNode={recolorNode} 
+            <Dijkstra
+              recolorNode={recolorNode}
               recolorEdge={recolorEdge}
-              linksState={linksState} 
-              nodesState={nodesState} 
+              linksState={linksState}
+              nodesState={nodesState}
               startNode={startNodeBFS}
               hideLegend={hideLegend}
               setDijkstra_State={setDijkstra_State}
               setDijkstra_INDEX={setDijkstra_INDEX}
               displayDijkstra={displayDijkstra}
-              />
+            />
 
             <FloydWarshall
               recolorNode={recolorNode}
