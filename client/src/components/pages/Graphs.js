@@ -284,6 +284,16 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     }
   };
 
+  const recolorNodeBorder = (i, color) => {
+    if (i === "all") {
+      d3.select(main.current).select("svg").selectAll("circle").attr("stroke-width", "0px");
+      d3.select(main.current).select("svg").selectAll("circle").attr("stroke", color);
+    } else {
+      let nodeId = "#v" + i.toString();
+      d3.select(main.current).select("svg").select(nodeId).attr("stroke-width", "6px");
+      d3.select(main.current).select("svg").select(nodeId).attr("stroke", "black");
+    }
+  };
   const recolorEdge = (i, j, color) => {
     if (i === "all" || j === "all") {
       d3.select(main.current).select("svg").selectAll("line").attr("stroke", color);
@@ -339,34 +349,34 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     //BFS_STEP saves every edge and target node that BFS looks at, both visited and unvisited.
     visitedNodesBFS = new Set();
     console.log(index);
-    recolorNode("all", "black");
+    recolorNodeBorder("all", "black");
     recolorEdge("all", "all", "grey");
     const source = BFS_STEP_State[index][0].source.name;
     const target = BFS_STEP_State[index][0].target.name;
     for (let i = 0; i <= index - 1; i++) {
       const currStart = BFS_STEP_State[i][0].source.name;
       const currEnd = BFS_STEP_State[i][0].target.name;
-      recolorNode(currStart, "blue");
+      recolorNodeBorder(currStart, "blue");
       recolorEdge(currStart, currEnd, "blue");
-      recolorNode(currEnd, "blue");
+      recolorNodeBorder(currEnd, "blue");
       visitedNodesBFS.add(currStart);
       visitedNodesBFS.add(currEnd);
     }
-    recolorNode(parseInt(startNodeBFS), "red");
+    recolorNodeBorder(parseInt(startNodeBFS), "red");
     if (source === BFS_STEP_State[index][1]) {
-      recolorNode(target, "yellow");
+      recolorNodeBorder(target, "yellow");
       currentNodeBFS = target;
       visitedNodesBFS.add(target);
       currentEdgeBFS = "From " + target.toString() + " to " + source.toString();
     } else if (target === BFS_STEP_State[index][1]) {
       currentNodeBFS = source;
       visitedNodesBFS.add(source);
-      recolorNode(source, "yellow");
+      recolorNodeBorder(source, "yellow");
       currentEdgeBFS = "From " + source.toString() + " to " + target.toString();
     }
     recolorEdge(BFS_STEP_State[index][0].source.name, BFS_STEP_State[index][0].target.name, "aqua");
     if (BFS_STEP_State[index][2]) {
-      recolorNode(BFS_STEP_State[index][1], "aqua");
+      recolorNodeBorder(BFS_STEP_State[index][1], "aqua");
     }
   }
 
