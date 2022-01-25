@@ -12,6 +12,7 @@ import NewGraphInput from "../modules/NewGraphInput.js";
 import SaveLoadGraph from "../modules/SaveLoadGraph.js";
 import BFS from "../modules/BFS.js";
 import Dijkstra from "../modules/Dijkstra.js";
+import { navigate } from "@reach/router";
 
 const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
 let userIDList = [];
@@ -35,6 +36,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   let [BFS_STEP_State, setBFS_STEP] = useState([]);
   let [BFS_INDEX, setBFS_INDEX] = useState(-1);
   let [startNodeBFS, setStartNodeBFS] = useState("");
+  let [Dijkstra_STEP_State, setDijkstra_State] = useState([]);
+  let [Dijkstra_INDEX, setDijkstra_INDEX] = useState(-1);
+  let [showDijkstra, setShowedDijkstra] = useState(false);
 
   useEffect(() => {
     let navbox = document.querySelector(".top-bar-container");
@@ -323,6 +327,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     setShowedLegend(false); 
   }
 
+  const displayDijkstra = () => { 
+    setShowedDijkstra(true);
+  }
   const emptyCounter = () => {
     visitedNodesBFS.clear();
     currentNodeBFS = undefined; 
@@ -367,29 +374,32 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   }
 
   const nextStep = () => {
-    BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
-    setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
+    if (showLegend){
+      BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
+      setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
+    }
+    else{
+      Dijkstra_stepper(Math.min(Dijkstra_STEP_State.length - 1, Math.max(1 + Dijkstra_INDEX, -1)));
+      setDijkstra_INDEX(Math.min(Dijkstra_STEP_State.length - 1, Math.max(1 + Dijkstra_INDEX, -1)));
+    }
   };
   const prevStep = () => {
-    BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
-    setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
+    if (showLegend) {
+      BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
+      setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
+    }else{
+      Dijkstra_stepper(Math.min(Dijkstra_STEP_State.length - 1, Math.max(Dijkstra_INDEX - 1, 0)));
+      setDijkstra_INDEX(Math.min(Dijkstra_STEP_State.length - 1, Math.max(Dijkstra_INDEX - 1, 0)));
+    }
   };
 
-  let redirect = <div></div>;
-  if (userId === undefined) {
-    console.log(userIDList);
-    userIDList.push(userId);
-    //console.log(userIDList);
-    if (userIDList.length > 2 && userIDList[-1] === undefined) {
-      redirect = <meta http-equiv="refresh" content="0; url = '/'" />;
-      console.log("redirect");
-      //userIDList = [];
-    }
-  }
+
+
+
 
   let legend = <div></div>; 
 
-  if (showLegend === true){
+  if (showLegend === true || showDijkstra === true){
     legend =  <div className="container">
       <div className="Algorithm-legend"> <table className="legend-table">
       <tr>
@@ -440,7 +450,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   
   return (
     <div className="Graphs-pageContainer">
-      {redirect}
       <div className="top-bar-container">
         <div className="u-flex">
           <div className="Graphs-title left-side ">
@@ -482,10 +491,14 @@ const Graphs = ({ userId, handleLogout, userName }) => {
               emptyCounter={emptyCounter}
             />
             <Dijkstra recolorNode={recolorNode} 
+              recolorEdge={recolorEdge}
               linksState={linksState} 
               nodesState={nodesState} 
               startNode={startNodeBFS}
               hideLegend={hideLegend}
+              setDijkstra_State={setDijkstra_State}
+              setDijkstra_INDEX={setDijkstra_INDEX}
+              displayDijkstra={displayDijkstra}
               />
           </div>
         </div>

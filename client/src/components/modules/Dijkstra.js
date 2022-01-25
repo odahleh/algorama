@@ -2,9 +2,10 @@ import React, { Component, useEffect, useState } from "react";
 import "../../utilities.css";
 import "../pages/Graphs.css";
 
-const Dijkstra = ({ recolorNode, linksState, nodesState, startNode, hideLegend }) => {
+const Dijkstra = ({ recolorNode, recolorEdge, linksState, nodesState, startNode, hideLegend, setDijkstra_State, setDijkstra_INDEX, displayDijkstra}) => {
   function dijkstra() {
     recolorNode("all", "black");
+    recolorEdge("all", "all", "grey");
     // BFS_stepper(0);
     // setBFS_INDEX(0);
     hideLegend();
@@ -13,8 +14,11 @@ const Dijkstra = ({ recolorNode, linksState, nodesState, startNode, hideLegend }
     }
     else{
       recolorNode(startNode, "red");
+      displayDijkstra(); 
+      setDijkstra_INDEX(-1);
       let links = linksState;
       let nodes = nodesState;
+      let Dijkstra_STEP =[]; 
       let distanceArray = [parseInt(startNode)]; //MODIFY FOR DIFFERENT STARTING NODE
       let parentArray = [];
       let pqueue = [];
@@ -24,8 +28,7 @@ const Dijkstra = ({ recolorNode, linksState, nodesState, startNode, hideLegend }
         }
         pqueue.push(node.name);
       }
-      let counter = 0;
-      while (pqueue.length > 0 && counter <= 200) {
+      while (pqueue.length > 0) {
         let u = null;
         let curMin = Infinity;
         for (let node in distanceArray) {
@@ -34,10 +37,12 @@ const Dijkstra = ({ recolorNode, linksState, nodesState, startNode, hideLegend }
             curMin = distanceArray[node];
           }
         }
+        Dijkstra_STEP.push([u, true]);
         let uIndex = pqueue.indexOf(u);
         pqueue.splice(uIndex, 1);
         let neighbors = findNeighbors({ name: u }, links);
         for (let v of neighbors) {
+          Dijkstra_STEP.push([v, false]);
           let alt = distanceArray[u] + returnEdgeWeights(u, v, links);
           if (alt < distanceArray[v]) {
             distanceArray[v] = alt;
@@ -46,7 +51,9 @@ const Dijkstra = ({ recolorNode, linksState, nodesState, startNode, hideLegend }
         }
       }
       console.log(distanceArray);
-    }
+      console.log(Dijkstra_STEP);
+      setDijkstra_State(Dijkstra_STEP);
+    } 
   }
   function returnEdgeWeights(u, v, links) {
     for (let edge of links) {
