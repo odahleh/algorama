@@ -13,7 +13,7 @@ const SaveLoadGraph = (props) => {
     if (loadedGraphs.length === 0 && props.userId) {
       loadGraph();
     }
-  }, props.userId);
+  }, [props.userId]);
 
   const handleChangeName = (event) => {
     setValueNames(event.target.value);
@@ -107,28 +107,30 @@ const SaveLoadGraph = (props) => {
   }
 
   return (
-    <div className="Graphs-topbar u-flex u-flex-wrap " id="Graphs-loadingMenu">
+    <>
       <div className="Graphs-text">Save and load your graphs</div>
-      <span className="Graph-names u-flex u-flex-alignCenter">
-        <input
-          type="text"
-          value={valueGraphName}
-          onChange={handleChangeName}
-          placeholder={"Graph Name"}
-          className="InputBoxInside"
-        />
-        <button onClick={saveGraph} className="button u-marginButtonLeft">
-          Save
-        </button>
-      </span>
+      <div className="Graphs-topbar u-flex u-flex-wrap " id="Graphs-loadingMenu">
+        <span className="Graph-names u-flex u-flex-alignCenter">
+          <input
+            type="text"
+            value={valueGraphName}
+            onChange={handleChangeName}
+            placeholder={"Graph Name"}
+            className="InputBoxInside"
+          />
+          <button onClick={saveGraph} className="button u-marginButtonLeft">
+            Save
+          </button>
+        </span>
 
-      {/* <button onClick={loadGraph} className="button u-marginButton">
+        {/* <button onClick={loadGraph} className="button u-marginButton">
         {" "}
         Load{" "}
       </button> */}
 
-      {graphList}
-    </div>
+        {graphList}
+      </div>
+    </>
   );
 };
 

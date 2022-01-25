@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from "react";
+import React, { Component, useEffect, useState, useLayoutEffect } from "react";
 
 import * as d3 from "d3";
 //import { forceSimulation } from "https://cdn.skypack.dev/d3-force@3";
@@ -20,21 +20,23 @@ let visitedNodesBFS = new Set();
 let minNodesDijkstra = new Set();
 let currentEdgeBFS = "";
 let previousExploredBFS = new Set();
-let queue = "";
-let currentDistance = "";
+let queue = [];
+let levelSets = [];
 
 let simulation;
 let svg;
 let vertex;
 let edge;
 let linkText;
+let linkText2;
 let nodeText;
 let mousedownNode;
 let dragLine;
 let nodesGlobal = [];
 let linksGlobal = [];
 let dragStartX, dragStartY, dragStartNodeId;
-let isDrag = false;
+let isDragLine = false;
+let timeOutFunctionId;
 
 let legend = <div></div>;
 
@@ -50,7 +52,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   const [isWeighted, setWeighted] = useState(0);
   const [isCurrentDirected, setCurrentDirected] = useState(0);
   const [isCurrentWeighted, setCurrentWeighted] = useState(0);
-  let [showLegend, setShowedLegend] = useState(false);
+  let [showBFSLegend, setShowedLegend] = useState(false);
   let [BFS_STEP_State, setBFS_STEP] = useState([]);
   let [BFS_INDEX, setBFS_INDEX] = useState(-1);
   let [startNodeBFS, setStartNodeBFS] = useState("");
@@ -59,21 +61,46 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   let [showDijkstra, setShowedDijkstra] = useState(false);
   let [currentMode, setCurrentMode] = useState("cre");
 
+  useLayoutEffect(() => {
+    function updateSize() {
+      let navbox = document.querySelector(".top-bar-container");
+      let offsetTop; //= 220;
+      offsetTop = navbox.clientHeight;
+      console.log([window.innerWidth, window.innerHeight - offsetTop]);
+      d3.select(main.current)
+        .selectAll("svg")
+        .attr("height", window.innerHeight - navbox.clientHeight)
+        .attr("width", window.innerWidth);
+      clearTimeout(timeOutFunctionId);
+      timeOutFunctionId = setTimeout(function () {
+        console.log("run");
+        if (simulation) {
+          simulation.force(
+            "center",
+            d3.forceCenter(window.innerWidth / 2, (window.innerHeight - offsetTop) / 2)
+          );
+        }
+      }, 500);
+
+      /*  if (displaySimulation) {
+        currentSimulation.force(
+          "center",
+          d3.forceCenter(window.innerWidth / 2, (window.innerHeight - navbox.clientHeight) / 2)
+        );
+      } */
+      //setSize([window.innerWidth, window.innerHeight]);
+    }
+    window.addEventListener("resize", updateSize);
+    updateSize();
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
   useEffect(() => {
     let navbox = document.querySelector(".top-bar-container");
     let offsetTop = navbox.clientHeight;
     setHeight(window.innerHeight - navbox.clientHeight);
     setWidth(window.innerWidth);
-    window.addEventListener(
-      "resize",
-      handleResize /* function () {
-      clearTimeout(adaptSizeTimer);
-      adaptSizeTimer = setTimeout(function () {
-        console.log("resize");
-      }, 500);
-    } */
-    );
-  }, [userId, userName]);
+  }, [HEIGHT, WIDTH]);
 
   const handleResize = () => {
     d3.select(main.current)
@@ -195,7 +222,19 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       GraphSimulation([...nodesGlobal, { name: 0 }], linksGlobal);
       //setNodes([...nodesGlobal, { name: 0 }]);
     } else {
-      console.log("mama2");
+      if (!isDragLine) {
+        let svgHere = document.querySelector("#svg");
+        let rect = svgHere.getBoundingClientRect();
+        let currentX = event.clientX - rect.left;
+        let currentY = event.clientY - rect.top;
+        //nodesGlobal.push({ name: nodesGlobal.length, x: currentX, y: currentY });
+        //GraphSimulation(nodesGlobal, linksGlobal)
+
+        update(
+          [...nodesGlobal, { name: nodesGlobal.length, x: currentX, y: currentY }],
+          linksGlobal
+        );
+      }
     }
   };
 
@@ -218,23 +257,15 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   }
 
   function beginDragLine(d) {
-    isDrag = true;
-    console.log(nodesGlobal, linksGlobal);
+    isDragLine = true;
+    //console.log(nodesGlobal, linksGlobal);
     console.log("Start");
-    //d3.preventDefault();
-    // if (d3.ctrlKey || d3.button != 0) return;
     dragStartNodeId = d.path[0].id;
-    //console.log(dragStartNodeId)
-    //console.log(parseInt(dragStartNodeId.substring(1)))
-    /* console.log(nodeId)
-    console.log(d3.select("#"+nodeId))
-    console.log(d.path[0]) */
     mousedownNode = d.path[0];
-    console.log(mousedownNode.cx.baseVal.value);
     dragStartX = mousedownNode.cx.baseVal.value;
     dragStartY = mousedownNode.cy.baseVal.value;
 
-    console.log(mousedownNode, "ja");
+    //console.log(mousedownNode, "ja");
     dragLine
       .classed("hidden", false)
       .attr("d", "M" + dragStartX + "," + dragStartY + "L" + dragStartX + "," + dragStartY);
@@ -262,26 +293,19 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   }
 
   function hideDragLine() {
-    console.log("hide");
-    if (!isDrag) {
+    if (false) {
       let bodyHere = document.querySelector("body");
       let rect = bodyHere.getBoundingClientRect();
       let currentX = event.clientX - rect.left;
       let currentY = event.clientY - rect.top;
       let navbox = document.querySelector(".top-bar-container");
       let offsetTop = navbox.clientHeight;
-      console.log(nodesGlobal);
-      console.log(nodesGlobal);
       if (nodesGlobal.length === 0) {
-        console.log("new");
-        //nodesGlobal, { name: 0, x: currentX, y: currentY - offsetTop });
         GraphSimulation(
           [...nodesGlobal, { name: 0, x: currentX, y: currentY - offsetTop }],
           linksGlobal
         );
       } else {
-        console.log("update");
-        //console.log(nodesGlobal, linksGlobal)
         let svgHere = document.querySelector("#svg");
         let rect = svgHere.getBoundingClientRect();
         let currentX = event.clientX - rect.left;
@@ -289,48 +313,59 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         //nodesGlobal.push({ name: nodesGlobal.length, x: currentX, y: currentY });
         //GraphSimulation(nodesGlobal, linksGlobal)
 
-        update(
+        /* update(
           [...nodesGlobal, { name: nodesGlobal.length, x: currentX, y: currentY }],
           linksGlobal
-        );
+        ); */
       }
+    } else {
+      let svgHere = document.querySelector("#svg");
+      let rect = svgHere.getBoundingClientRect();
+      let currentX = event.clientX - rect.left;
+      let currentY = event.clientY - rect.top;
+      console.log("hide");
+      let onNode = false;
+      for (let i in nodesGlobal) {
+        let singleNode = nodesGlobal[i];
+        if (
+          Math.pow(
+            Math.pow(singleNode.x - currentX, 2) + Math.pow(singleNode.y - currentY, 2),
+            0.5
+          ) < 10
+        ) {
+          onNode = true;
+          console.log("from", parseInt(dragStartNodeId.substring(1)), "to", i);
+          let dragEndNodeId = "v" + i.toString();
+          var newLink = {
+            source: parseInt(dragStartNodeId.substring(1)),
+            target: parseInt(i), //parseInt(dragEndNodeId.substring(1)),
+            weight: 1,
+          };
+          update([...nodesGlobal], [...linksGlobal, newLink]);
+        }
+      }
+      dragLine.classed("hidden", true);
+      setTimeout(function () {
+        isDragLine = false;
+      }, 100);
     }
-    dragLine.classed("hidden", true);
-    isDrag = false;
   }
 
   function hideDragLine2() {
     dragLine.classed("hidden", true);
-    isDrag = false;
-  }
-
-  function endDragLine(d) {
-    console.log("end");
-    //  if (!mousedownNode || mousedownNode === d) return;
-    //return if link already exists
-    let dragEndNodeId = d.path[0].id;
-    var newLink = {
-      source: parseInt(dragStartNodeId.substring(1)),
-      target: parseInt(dragEndNodeId.substring(1)),
-      weight: 1,
-    };
-    //console.log("EDL");
-    update([...nodesGlobal], [...linksGlobal, newLink]);
-
-    /*  for (var i = 0; i < links.length; i++) {
-      var l = links[i];
-      if (
-        (l.source === mousedownNode && l.target === d) ||
-        (l.source === d && l.target === mousedownNode)
-      ) {
-        return;
-      }
-  } */
-    // mousedownNode.degree++;
-    //.degree++;
+    isDragLine = false;
   }
 
   function update(nodes, links) {
+    let navbox = document.querySelector(".top-bar-container");
+    let offsetTop; //= 220;
+    offsetTop = navbox.clientHeight;
+    console.log([window.innerWidth, window.innerHeight - offsetTop]);
+    d3.select(main.current)
+      .selectAll("svg")
+      .attr("height", window.innerHeight - navbox.clientHeight)
+      .attr("width", window.innerWidth);
+
     nodesGlobal = nodes;
     linksGlobal = links;
     setNodes(nodes);
@@ -357,7 +392,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .on("mousedown", function (d) {
         beginDragLine(d);
       })
-      .on("mouseup", endDragLine)
       .merge(vertex);
 
     ////console.log(vertex)
@@ -376,7 +410,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .append("line")
       .attr("marker-end", "url(#arrow)")
       .attr("id", function (d) {
-        return "e" + d.source.toString() + "-" + d.target.toString();
+        if (typeof d.source === "object"){
+          return "e" + d.source.name.toString() + "-" + d.target.name.toString();
+        }else {
+        return "e" + d.source.toString() + "-" + d.target.toString();}
       })
       .merge(edge);
 
@@ -386,7 +423,16 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     d3.selectAll(".gSingleLine").selectAll("text").remove();
     d3.selectAll(".gSingleNode").selectAll("text").remove();
     // edgelabels
-    linkText = svg
+    /* linkText = svg
+      .selectAll(".gSingleLine")
+      .data(links)
+      .append("circle")
+      .attr("class", "gLinkText")
+      .attr("r", 10)
+      .style("stroke-width", "0px")
+      .style("fill", "white"); */
+
+    linkText2 = svg
       .selectAll(".gSingleLine")
       .data(links)
       .append("text")
@@ -408,11 +454,12 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         return d.name.toString();
       })
       .style("font-size", 12)
+      .style("user-select", "none")
       .attr("stroke-width", 0)
-      .style("fill", "white");
+      .style("fill", "black");
 
     if (isWeighted === 0) {
-      linkText.attr("opacity", 0);
+      linkText2.attr("opacity", 0);
     }
 
     d3.select(main.current)
@@ -423,7 +470,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     // Update and restart the simulation.
     simulation.nodes(nodes);
     simulation.force("link").links(links);
-    simulation.alpha(1).restart();
+    simulation.alpha(0.7).restart();
   }
 
   const addNode = () => {
@@ -460,26 +507,50 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .attr("y2", function (d) {
         return d.target.y;
       });
-    linkText
-      .attr("x", function (d) {
+    /* linkText
+      .attr("cx", function (d) {
         if (d.target.x > d.source.x) {
           return d.source.x + (d.target.x - d.source.x) / 2;
         } else {
           return d.target.x + (d.source.x - d.target.x) / 2;
         }
       })
-      .attr("y", function (d) {
+      .attr("cy", function (d) {
         if (d.target.y > d.source.y) {
           return d.source.y + (d.target.y - d.source.y) / 2;
         } else {
           return d.target.y + (d.source.y - d.target.y) / 2;
+        }
+      }); */
+    linkText2
+      .attr("x", function (d) {
+        let correctionCoeff = 0.5;
+        //console.log(d);
+        let name = d.weight;
+        for (let char of name.toString()) {
+          correctionCoeff = correctionCoeff + 3.5;
+          if (char === "1") {
+            correctionCoeff = correctionCoeff - 2;
+          }
+        }
+        if (d.target.x > d.source.x) {
+          return d.source.x + (d.target.x - d.source.x) / 2 - correctionCoeff;
+        } else {
+          return d.target.x + (d.source.x - d.target.x) / 2 - correctionCoeff;
+        }
+      })
+      .attr("y", function (d) {
+        if (d.target.y > d.source.y) {
+          return d.source.y + (d.target.y - d.source.y) / 2 + 4;
+        } else {
+          return d.target.y + (d.source.y - d.target.y) / 2 + 4;
         }
       });
     nodeText
       .attr("x", function (d) {
         // console.log(d);
         //console.log(d.x);
-        let correctionCoeff = 0.5;
+        let correctionCoeff = 0.5 - 15;
         let name = d.name;
         for (let char of name.toString()) {
           correctionCoeff = correctionCoeff + 3.5;
@@ -501,7 +572,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         } */
       })
       .attr("y", function (d) {
-        return Math.max(radius, Math.min(HEIGHT - radius, d.y)) + 4;
+        return Math.max(radius, Math.min(HEIGHT - radius, d.y)) + 4 - 15;
       });
   }
 
@@ -527,9 +598,11 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   const recolorEdge = (i, j, color) => {
     if (i === "all" || j === "all") {
       d3.select(main.current).select("svg").selectAll("line").attr("stroke", color);
-    }
+    } else {
     let edgeId = "#e" + i.toString() + "-" + j.toString();
-    d3.select(main.current).select("svg").select(edgeId).attr("stroke", color);
+    console.log(edgeId)
+    console.log(linksGlobal)
+    d3.select(main.current).select("svg").select(edgeId).attr("stroke", color);}
   };
 
   const changeDirected = (int) => {
@@ -575,7 +648,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     currentEdgeBFS = "";
     previousExploredBFS = [];
     queue = "";
-    currentDistance = "";
+    levelSets = []; 
   };
 
   function BFS_stepper(index) {
@@ -587,12 +660,32 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     recolorEdge("all", "all", "grey");
     const source = BFS_STEP_State[index][0].source.name;
     const target = BFS_STEP_State[index][0].target.name;
-    currentDistance = BFS_STEP_State[index][4].join(", ");
-    queue = BFS_STEP_State[index][3].join(", ");
+    queue = BFS_STEP_State[index][3]; 
+    const distances = BFS_STEP_State[index][4]
+    let levels = []; 
+    for (let dist of distances){
+      if (!levels.includes(dist.toString())){
+        if(dist !== Infinity){
+          levels.push(dist.toString());
+        }
+      }
+    }
+    let table = [];
+
+    if (levels.length > 0){
+      for (let level of levels){
+        let nodesAtLevel = [];
+        for (let n = 0; n < distances.length; n++){
+          if (BFS_STEP_State[index][4][n].toString() === level){
+            nodesAtLevel.push(n); 
+          }
+        }
+        table.push("Level Set "+level+" : "+nodesAtLevel.join(", ")); 
+      }
+    }
+    levelSets = Array.from(table).join(" || ");
 
     for (let i = 0; i <= index - 1; i++) {
-      const currStart = BFS_STEP_State[i][0].source.name;
-      const currEnd = BFS_STEP_State[i][0].target.name;
       const previous = BFS_STEP_State[i][2];
       visitedNodesBFS.add(previous);
       previousExploredBFS.add(previous);
@@ -648,7 +741,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     }
   }
   const nextStep = () => {
-    if (showLegend) {
+    if (showBFSLegend) {
       BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
       setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
     } else {
@@ -657,9 +750,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     }
   };
   const prevStep = () => {
-    if (showLegend) {
-      BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, -1)));
-      setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, -1)));
+    if (showBFSLegend) {
+      BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
+      setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
     } else {
       Dijkstra_stepper(Math.min(Dijkstra_STEP_State.length - 1, Math.max(Dijkstra_INDEX - 1, 0)));
       setDijkstra_INDEX(Math.min(Dijkstra_STEP_State.length - 1, Math.max(Dijkstra_INDEX - 1, 0)));
@@ -667,15 +760,14 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   };
 
   let legend = <div></div>;
-
-  if (showLegend === true || showDijkstra === true) {
+  if (showBFSLegend === true || showDijkstra === true) {
     legend = (
       <div className="container">
         <div className="Algorithm-legend">
           {" "}
           <table className="legend-table">
             <tr>
-              <th>BFS Legend</th>
+              {showBFSLegend ? (<th>BFS Legend</th>) : (<th>Dijkstra Legend</th>)}
             </tr>
             <tr>
               <td width="34%" />
@@ -708,7 +800,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           <div>Current Edge = {currentEdgeBFS}</div>
           <div>Visited Nodes = {Array.from(visitedNodesBFS).join(", ")} </div>
           <div>Queue = {queue}</div>
-          <div>Current Distances = {currentDistance}</div>
+          <div>Table = {levelSets}</div>
         </div>
       </div>
     );
@@ -832,17 +924,17 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             </>
           )}
         </div>
-      </div>
 
-      <div className="second-bar">
-        <SaveLoadGraph
-          userId={userId}
-          nodesState={nodesGlobal}
-          linksState={linksGlobal}
-          GraphSimulation={GraphSimulation}
-          isCurrentDirected={isCurrentDirected}
-          hideLegend={hideLegend}
-        />
+        <div className="second-bar">
+          <SaveLoadGraph
+            userId={userId}
+            nodesState={nodesGlobal}
+            linksState={linksGlobal}
+            GraphSimulation={GraphSimulation}
+            isCurrentDirected={isCurrentDirected}
+            hideLegend={hideLegend}
+          />
+        </div>
       </div>
       <div id="main" className="Graphs-svgContainer" ref={main} /* width="500px" height="500px" */>
         {legend}
