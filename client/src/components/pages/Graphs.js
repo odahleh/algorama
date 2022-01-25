@@ -15,12 +15,16 @@ import Dijkstra from "../modules/Dijkstra.js";
 import FloydWarshall from "../modules/FloydWarshall.js";
 
 const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
+//Initialization for BFS Display
 let currentNodeBFS = undefined;
 let visitedNodesBFS = new Set();
 let currentEdgeBFS = "";
 let previousExploredBFS = new Set();
-let queue = "";
-let currentDistance = "";
+let queue = [];
+let levelSets = [];
+
+//Initialization for Dijkstra Display
+let minNodesDijkstra = new Set();
 
 let simulation;
 let svg;
@@ -51,13 +55,13 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   const [isWeighted, setWeighted] = useState(0);
   const [isCurrentDirected, setCurrentDirected] = useState(0);
   const [isCurrentWeighted, setCurrentWeighted] = useState(0);
-  let [showLegend, setShowedLegend] = useState(false);
+  let [showBFSLegend, setShowedBFS] = useState(false);
   let [BFS_STEP_State, setBFS_STEP] = useState([]);
   let [BFS_INDEX, setBFS_INDEX] = useState(-1);
   let [startNodeBFS, setStartNodeBFS] = useState("");
   let [Dijkstra_STEP_State, setDijkstra_State] = useState([]);
   let [Dijkstra_INDEX, setDijkstra_INDEX] = useState(-1);
-  let [showDijkstra, setShowedDijkstra] = useState(false);
+  let [showDijkstraLegend, setShowedDijkstra] = useState(false);
   let [currentMode, setCurrentMode] = useState("cre");
 
   useLayoutEffect(() => {
@@ -396,7 +400,11 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .append("line")
       .attr("marker-end", "url(#arrow)")
       .attr("id", function (d) {
-        return "e" + d.source.toString() + "-" + d.target.toString();
+        if (typeof d.source === "object") {
+          return "e" + d.source.name.toString() + "-" + d.target.name.toString();
+        } else {
+          return "e" + d.source.toString() + "-" + d.target.toString();
+        }
       })
       .merge(edge);
 
@@ -581,9 +589,12 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   const recolorEdge = (i, j, color) => {
     if (i === "all" || j === "all") {
       d3.select(main.current).select("svg").selectAll("line").attr("stroke", color);
+    } else {
+      let edgeId = "#e" + i.toString() + "-" + j.toString();
+      console.log(edgeId);
+      console.log(linksGlobal);
+      d3.select(main.current).select("svg").select(edgeId).attr("stroke", color);
     }
-    let edgeId = "#e" + i.toString() + "-" + j.toString();
-    d3.select(main.current).select("svg").select(edgeId).attr("stroke", color);
   };
 
   const changeDirected = (int) => {
@@ -612,24 +623,33 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     setWeighted(1 - isWeighted);
   };
 
-  const displayLegend = () => {
-    setShowedLegend(true);
+  const displayBFSLegend = () => {
+    setShowedBFS(true);
   };
 
-  const hideLegend = () => {
-    setShowedLegend(false);
+  const hideBFSLegend = () => {
+    setShowedBFS(false);
   };
 
-  const displayDijkstra = () => {
+  const displayDijkstraLegend = () => {
     setShowedDijkstra(true);
   };
-  const emptyCounter = () => {
+
+  const hideDijkstraLegend = () => {
+    setShowedDijkstra(false);
+  };
+
+  const emptyBFSCounter = () => {
     visitedNodesBFS.clear();
     currentNodeBFS = undefined;
     currentEdgeBFS = "";
     previousExploredBFS = [];
     queue = "";
-    currentDistance = "";
+    levelSets = [];
+  };
+
+  const emptyDijkstraCounter = () => {
+    minNodesDijkstra.clear();
   };
 
   function BFS_stepper(index) {
@@ -641,12 +661,32 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     recolorEdge("all", "all", "grey");
     const source = BFS_STEP_State[index][0].source.name;
     const target = BFS_STEP_State[index][0].target.name;
-    currentDistance = BFS_STEP_State[index][4].join(", ");
-    queue = BFS_STEP_State[index][3].join(", ");
+    queue = BFS_STEP_State[index][3];
+    const distances = BFS_STEP_State[index][4];
+    let levels = [];
+    for (let dist of distances) {
+      if (!levels.includes(dist.toString())) {
+        if (dist !== Infinity) {
+          levels.push(dist.toString());
+        }
+      }
+    }
+    let table = [];
+
+    if (levels.length > 0) {
+      for (let level of levels) {
+        let nodesAtLevel = [];
+        for (let n = 0; n < distances.length; n++) {
+          if (BFS_STEP_State[index][4][n].toString() === level) {
+            nodesAtLevel.push(n);
+          }
+        }
+        table.push("Level Set " + level + " : " + nodesAtLevel.join(", "));
+      }
+    }
+    levelSets = Array.from(table).join(" || ");
 
     for (let i = 0; i <= index - 1; i++) {
-      const currStart = BFS_STEP_State[i][0].source.name;
-      const currEnd = BFS_STEP_State[i][0].target.name;
       const previous = BFS_STEP_State[i][2];
       visitedNodesBFS.add(previous);
       previousExploredBFS.add(previous);
@@ -674,45 +714,44 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     );
   }
   function Dijkstra_stepper(index) {
+    minNodesDijkstra.add(parseInt(startNodeBFS));
+    console.log("START NODE", startNodeBFS);
     console.log("DIJKSTRA STATE", Dijkstra_STEP_State);
-    for (let i = 0; i < Dijkstra_STEP_State.length; i++) {
-      if (Dijkstra_STEP_State[i][2] === false) {
-        recolorNode(Dijkstra_STEP_State[i][0], "black");
-        // recolorEdge(
-        //   Dijkstra_STEP_State[i][1].source.name,
-        //   Dijkstra_STEP_State[i][1].target.name,
-        //   "grey"
-        // );
+    console.log("VISITED", minNodesDijkstra);
+    for (let i = 0; i < index; i++) {
+      let [target, edge, is_min] = Dijkstra_STEP_State[i];
+      if (!is_min && !minNodesDijkstra.has(target)) {
+        recolorNode(target, "black");
+        recolorEdge(edge.source.name, edge.target.name, "grey");
+      }
+      if (minNodesDijkstra.has(target)) {
+        console.log("in");
+        recolorNode(target, "red");
+        recolorEdge(edge.source.name, edge.target.name, "red");
       }
     }
-    //console.log("INDEX", index);
-    if (Dijkstra_STEP_State[index][2] && Dijkstra_STEP_State[index][0] !== parseInt(startNodeBFS)) {
-      recolorNode(Dijkstra_STEP_State[index][0], "red");
-      recolorEdge(
-        Dijkstra_STEP_State[index][1].source.name,
-        Dijkstra_STEP_State[index][1].target.name,
-        "red"
-      );
-    } else if (!Dijkstra_STEP_State[index][2]) {
-      recolorNode(Dijkstra_STEP_State[index][0], "blue");
-      recolorEdge(
-        Dijkstra_STEP_State[index][1].source.name,
-        Dijkstra_STEP_State[index][1].target.name,
-        "blue"
-      );
+    console.log("INDEX", index);
+    let [target, edge, is_min] = Dijkstra_STEP_State[index];
+    if (is_min) {
+      minNodesDijkstra.add(target);
+      recolorNode(target, "red");
+      recolorEdge(edge.source.name, edge.target.name, "red");
+    } else {
+      recolorNode(target, "blue");
+      recolorEdge(edge.source.name, edge.target.name, "blue");
     }
   }
   const nextStep = () => {
-    if (showLegend) {
+    if (showBFSLegend) {
       BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
       setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
     } else {
-      Dijkstra_stepper(Math.min(Dijkstra_STEP_State.length - 1, Math.max(1 + Dijkstra_INDEX, -1)));
-      setDijkstra_INDEX(Math.min(Dijkstra_STEP_State.length - 1, Math.max(1 + Dijkstra_INDEX, -1)));
+      Dijkstra_stepper(Math.min(Dijkstra_STEP_State.length - 1, Math.max(1 + Dijkstra_INDEX, 0)));
+      setDijkstra_INDEX(Math.min(Dijkstra_STEP_State.length - 1, Math.max(1 + Dijkstra_INDEX, 0)));
     }
   };
   const prevStep = () => {
-    if (showLegend) {
+    if (showBFSLegend) {
       BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
       setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
     } else {
@@ -722,16 +761,13 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   };
 
   let legend = <div></div>;
-
-  if (showLegend === true || showDijkstra === true) {
+  if (showBFSLegend === true || showDijkstraLegend === true) {
     legend = (
       <div className="container">
         <div className="Algorithm-legend">
           {" "}
           <table className="legend-table">
-            <tr>
-              <th>BFS Legend</th>
-            </tr>
+            <tr>{showBFSLegend ? <th>BFS Legend</th> : <th>Dijkstra Legend</th>}</tr>
             <tr>
               <td width="34%" />
             </tr>
@@ -763,7 +799,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           <div>Current Edge = {currentEdgeBFS}</div>
           <div>Visited Nodes = {Array.from(visitedNodesBFS).join(", ")} </div>
           <div>Queue = {queue}</div>
-          <div>Current Distances = {currentDistance}</div>
+          <div>Table = {levelSets}</div>
         </div>
       </div>
     );
@@ -875,7 +911,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                     changeDirected={changeDirected}
                     weighted={isWeighted}
                     changeWeighted={changeWeighted}
-                    hideLegend={hideLegend}
+                    hideBFSLegend={hideBFSLegend}
+                    hideDijkstraLegend={hideDijkstraLegend}
                     update={update}
                     nodes={nodesGlobal}
                     links={linksGlobal}
@@ -903,12 +940,13 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   recolorEdge={recolorEdge}
                   linksState={linksGlobal}
                   nodesState={nodesGlobal}
-                  displayLegend={displayLegend}
+                  displayBFSLegend={displayBFSLegend}
                   setBFS_STEP={setBFS_STEP}
                   setBFS_INDEX={setBFS_INDEX}
                   startNodeBFS={startNodeBFS}
                   setStartNodeBFS={setStartNodeBFS}
-                  emptyCounter={emptyCounter}
+                  emptyBFSCounter={emptyBFSCounter}
+                  hideDijkstraLegend={hideDijkstraLegend}
                 />
                 <Dijkstra
                   recolorNode={recolorNode}
@@ -916,10 +954,11 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   linksState={linksGlobal}
                   nodesState={nodesGlobal}
                   startNode={startNodeBFS}
-                  hideLegend={hideLegend}
+                  hideBFSLegend={hideBFSLegend}
                   setDijkstra_State={setDijkstra_State}
                   setDijkstra_INDEX={setDijkstra_INDEX}
-                  displayDijkstra={displayDijkstra}
+                  displayDijkstraLegend={displayDijkstraLegend}
+                  emptyDijkstraCounter={emptyDijkstraCounter}
                 />
 
                 <FloydWarshall
@@ -927,7 +966,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   linksState={linksGlobal}
                   nodesState={nodesGlobal}
                   startNode={startNodeBFS}
-                  hideLegend={hideLegend}
+                  hideBFSLegend={hideBFSLegend}
+                  hideDijkstraLegend={hideDijkstraLegend}
                 />
               </div>
             </>

@@ -64,7 +64,8 @@ const SaveLoadGraph = (props) => {
     let i = parseInt(id.charAt(id.length - 1));
     //console.log(i);
     //console.log(loadedGraphs[i].edges);
-    props.hideLegend();
+    props.hideBFSLegend();
+    props.hideDijkstraLegend();
     props.GraphSimulation(loadedGraphs[i].nodes, loadedGraphs[i].edges);
     // console.log("Will be available soon!");
   };

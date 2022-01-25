@@ -7,12 +7,13 @@ const BFS = ({
   recolorEdge,
   linksState,
   nodesState,
-  displayLegend,
+  displayBFSLegend,
   setBFS_STEP,
   setBFS_INDEX,
   startNodeBFS,
   setStartNodeBFS,
-  emptyCounter,
+  emptyBFSCounter,
+  hideDijkstraLegend
 }) => {
   let [showBFSProgress, setShowBFSProgress] = useState(false);
 
@@ -33,7 +34,8 @@ const BFS = ({
     return [neighbors, neighborsEdges];
   }
   function BFS() {
-    emptyCounter();
+    hideDijkstraLegend();
+    emptyBFSCounter();
     recolorNode("all", "black");
     recolorEdge("all", "all", "grey");
     // BFS_stepper(0);
@@ -41,7 +43,7 @@ const BFS = ({
     if (startNodeBFS === "") {
       alert("Please set a start node for BFS.");
     } else {
-      displayLegend(); 
+      displayBFSLegend(); 
       setBFS_INDEX(-1);
       let start = { name: parseInt(startNodeBFS) };
       setShowBFSProgress(true);

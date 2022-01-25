@@ -29,6 +29,8 @@ const NewGraphInput = (props) => {
 
   const onSubmit = () => {
     props.GraphSimulation([], []);
+    props.hideBFSLegend();
+    props.hideDijkstraLegend();
     //startGraph(valueNodes, valueEdges);
   };
 
@@ -37,6 +39,8 @@ const NewGraphInput = (props) => {
   };
 
   const addNode = () => {
+    props.hideBFSLegend();
+    props.hideDijkstraLegend();
     if (valueNodes === "") {
       console.log("zero");
       if (props.nodes.length === 0) {
@@ -64,6 +68,8 @@ const NewGraphInput = (props) => {
   };
 
   const addEdge = () => {
+    props.hideBFSLegend();
+    props.hideDijkstraLegend();
     if (isNaN(valueEdges) || isNaN(valueEdges2) || isNaN(valueWeight)) {
       alert("Invalid input. Please put the node's numbers.");
     } else if (
@@ -111,7 +117,8 @@ const NewGraphInput = (props) => {
       }
       //console.log(links);
     }
-    props.hideLegend();
+    props.hideBFSLegend();
+    props.hideDijkstraLegend();
     props.GraphSimulation(nodes, links, directed);
   };
 

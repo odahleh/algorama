@@ -2,7 +2,7 @@ import React, { Component, useEffect, useState } from "react";
 import "../../utilities.css";
 import "../pages/Graphs.css";
 
-const FloydWarshall = ({ recolorNode, linksState, nodesState }) => {
+const FloydWarshall = ({ recolorNode, linksState, nodesState, hideBFSLegend, hideDijkstraLegend }) => {
   let [showFWProgress, setShowFWProgress] = useState(false);
   let [FWStepState, setFWStepState] = useState([]);
   let [FWIndex, setFWIndex] = useState(-1);
@@ -44,6 +44,8 @@ const FloydWarshall = ({ recolorNode, linksState, nodesState }) => {
   }
 
   function floydwarshall() {
+    hideBFSLegend(); 
+    hideDijkstraLegend();
     let links = linksState;
     let nodes = nodesState;
     let distanceMatrix = matrixInit(nodes, links);
