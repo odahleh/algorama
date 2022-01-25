@@ -63,7 +63,7 @@ const App = () => {
     return (
       <>
         <Router>
-          <Index path='/' handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
+          <Index path="/" handleLogin={handleLogin} handleLogout={handleLogout} userId={userId} />
           <NotFound default />
         </Router>
       </>

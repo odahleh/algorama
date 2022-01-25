@@ -54,6 +54,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   let [Dijkstra_STEP_State, setDijkstra_State] = useState([]);
   let [Dijkstra_INDEX, setDijkstra_INDEX] = useState(-1);
   let [showDijkstra, setShowedDijkstra] = useState(false);
+  let [currentMode, setCurrentMode] = useState("cre");
   console.log(showLegend);
 
   useEffect(() => {
@@ -727,6 +728,14 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     );
   }
 
+  const changeMode = () => {
+    if (currentMode === "alg") {
+      setCurrentMode("cre");
+    } else {
+      setCurrentMode("alg");
+    }
+  };
+
   return (
     <div className="Graphs-pageContainer">
       <div className="top-bar-container">
@@ -746,71 +755,107 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             />
           </div>
         </div>
-        <div className="Graphs-ModeSelector">
-          <div>Edit</div>
-          <div>Load and Save</div>
-          <div>Algorithms</div>
-        </div>
-        <div className="Graphs-text">Create a new graph or run an algorithm</div>
-        <div className="Graphs-topbar">
-          <div className=" u-flex u-flex-wrap">
-            <NewGraphInput
-              GraphSimulation={GraphSimulation}
-              directed={isDirected}
-              changeDirected={changeDirected}
-              weighted={isWeighted}
-              changeWeighted={changeWeighted}
-              hideLegend={hideLegend}
-            />
-            <button className="button" onClick={addNode}>
-              Add Node
-            </button>
-            <BFS
-              recolorNode={recolorNode}
-              recolorEdge={recolorEdge}
-              linksState={linksGlobal}
-              nodesState={nodesGlobal}
-              displayLegend={displayLegend}
-              setBFS_STEP={setBFS_STEP}
-              setBFS_INDEX={setBFS_INDEX}
-              startNodeBFS={startNodeBFS}
-              setStartNodeBFS={setStartNodeBFS}
-              emptyCounter={emptyCounter}
-            />
-            <Dijkstra
-              recolorNode={recolorNode}
-              recolorEdge={recolorEdge}
-              linksState={linksGlobal}
-              nodesState={nodesGlobal}
-              startNode={startNodeBFS}
-              hideLegend={hideLegend}
-              setDijkstra_State={setDijkstra_State}
-              setDijkstra_INDEX={setDijkstra_INDEX}
-              displayDijkstra={displayDijkstra}
-            />
+        <div className="u-flex u-flex-alignCenter">
+          <div className="Graphs-ModeSelector" onClick={changeMode}>
+            <div
+              className={
+                currentMode === "alg"
+                  ? "Graphs-ModeSelectorTextCre"
+                  : "Graphs-ModeSelectorTextHidden"
+              }
+            >
+              {currentMode === "alg" ? "Create & Load" : ""}
+            </div>
 
-            <FloydWarshall
-              recolorNode={recolorNode}
-              linksState={linksGlobal}
-              nodesState={nodesGlobal}
-              startNode={startNodeBFS}
-              hideLegend={hideLegend}
-            />
+            <div
+              className={
+                currentMode === "alg"
+                  ? "Graphs-ModeSelectorTextHidden"
+                  : "Graphs-ModeSelectorTextAlg"
+              }
+            >
+              {currentMode === "alg" ? "" : "Algorithms"}
+            </div>
+
+            <div
+              className={
+                currentMode === "alg"
+                  ? "Graphs-ModeSelectorSelectedAlg"
+                  : "Graphs-ModeSelectorSelectedCre"
+              }
+            >
+              {" "}
+              {currentMode === "alg" ? "Algorithms" : "Create & Load"}
+            </div>
           </div>
-        </div>
-        <div className="Graphs-text">Save and load your graphs</div>
-        <div className="second-bar">
-          <SaveLoadGraph
-            userId={userId}
-            nodesState={nodesGlobal}
-            linksState={linksGlobal}
-            GraphSimulation={GraphSimulation}
-            isCurrentDirected={isCurrentDirected}
-            hideLegend={hideLegend}
-          />
+          {currentMode === "cre" ? (
+            <>
+              <div className="Graphs-text">Create and edit the graph: </div>
+              <div className="Graphs-topbar">
+                <div className=" u-flex u-flex-wrap">
+                  <NewGraphInput
+                    GraphSimulation={GraphSimulation}
+                    directed={isDirected}
+                    changeDirected={changeDirected}
+                    weighted={isWeighted}
+                    changeWeighted={changeWeighted}
+                    hideLegend={hideLegend}
+                  />
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="Graphs-text">Run a graph algorithm:</div>
+
+              <div className="Graphs-topbar u-flex">
+                <BFS
+                  recolorNode={recolorNode}
+                  recolorEdge={recolorEdge}
+                  linksState={linksGlobal}
+                  nodesState={nodesGlobal}
+                  displayLegend={displayLegend}
+                  setBFS_STEP={setBFS_STEP}
+                  setBFS_INDEX={setBFS_INDEX}
+                  startNodeBFS={startNodeBFS}
+                  setStartNodeBFS={setStartNodeBFS}
+                  emptyCounter={emptyCounter}
+                />
+                <Dijkstra
+                  recolorNode={recolorNode}
+                  recolorEdge={recolorEdge}
+                  linksState={linksGlobal}
+                  nodesState={nodesGlobal}
+                  startNode={startNodeBFS}
+                  hideLegend={hideLegend}
+                  setDijkstra_State={setDijkstra_State}
+                  setDijkstra_INDEX={setDijkstra_INDEX}
+                  displayDijkstra={displayDijkstra}
+                />
+
+                <FloydWarshall
+                  recolorNode={recolorNode}
+                  linksState={linksGlobal}
+                  nodesState={nodesGlobal}
+                  startNode={startNodeBFS}
+                  hideLegend={hideLegend}
+                />
+              </div>
+            </>
+          )}
         </div>
       </div>
-
+      <div className="Graphs-text">Save and load your graphs</div>
+      <div className="second-bar">
+        <SaveLoadGraph
+          userId={userId}
+          nodesState={nodesGlobal}
+          linksState={linksGlobal}
+          GraphSimulation={GraphSimulation}
+          isCurrentDirected={isCurrentDirected}
+          hideLegend={hideLegend}
+        />
+      </div>
       <div id="main" className="Graphs-svgContainer" ref={main} /* width="500px" height="500px" */>
         {legend}
         <svg width={window.innerWidth} height={window.innerHeight} onClick={mama} />
