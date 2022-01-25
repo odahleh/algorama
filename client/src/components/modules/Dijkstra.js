@@ -12,7 +12,7 @@ const Dijkstra = ({
   setDijkstra_State,
   setDijkstra_INDEX,
   displayDijkstraLegend,
-  emptyDijkstraCounter
+  emptyDijkstraCounter,
 }) => {
   function dijkstra() {
     recolorNode("all", "black");

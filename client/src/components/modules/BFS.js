@@ -13,7 +13,7 @@ const BFS = ({
   startNodeBFS,
   setStartNodeBFS,
   emptyBFSCounter,
-  hideDijkstraLegend
+  hideDijkstraLegend,
 }) => {
   let [showBFSProgress, setShowBFSProgress] = useState(false);
 
@@ -43,7 +43,7 @@ const BFS = ({
     if (startNodeBFS === "") {
       alert("Please set a start node for BFS.");
     } else {
-      displayBFSLegend(); 
+      displayBFSLegend();
       setBFS_INDEX(-1);
       let start = { name: parseInt(startNodeBFS) };
       setShowBFSProgress(true);
@@ -54,16 +54,16 @@ const BFS = ({
       let distanceArray = [];
       let BFS_STEP = [];
       for (let node in nodes) {
-        if (node !== start.name){
+        if (node !== start.name) {
           distanceArray.push(Infinity);
-        }else{
+        } else {
           distanceArray.push(0);
         }
       }
       let queue = [parseInt(startNodeBFS)];
       let level = 0;
       let visibleDistance = Array.from(distanceArray);
-      let visibleQueue = [parseInt(startNodeBFS)]; 
+      let visibleQueue = [parseInt(startNodeBFS)];
       while (queue.length > 0) {
         let neighbors = [];
         for (let next of queue) {
@@ -81,17 +81,23 @@ const BFS = ({
           // console.log(currNeighbors);
           for (let neigh in currNeighbors) {
             // console.log("NEIGH");
-            if (!visited.has(currNeighbors[neigh])){
-              if (!neighbors.includes(currNeighbors[neigh])){
+            if (!visited.has(currNeighbors[neigh])) {
+              if (!neighbors.includes(currNeighbors[neigh])) {
                 visibleQueue.push(currNeighbors[neigh]);
                 neighbors.push(currNeighbors[neigh]);
               }
               //BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], next]);
             }
-            BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], next, Array.from(visibleQueue), Array.from(visibleDistance)]);
-            }
+            BFS_STEP.push([
+              currNeighborsEdges[neigh],
+              currNeighbors[neigh],
+              next,
+              Array.from(visibleQueue),
+              Array.from(visibleDistance),
+            ]);
           }
-        
+        }
+
         queue = neighbors;
         // console.log("queue", queue);
       }

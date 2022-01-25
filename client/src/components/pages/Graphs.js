@@ -83,14 +83,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           );
         }
       }, 500);
-
-      /*  if (displaySimulation) {
-        currentSimulation.force(
-          "center",
-          d3.forceCenter(window.innerWidth / 2, (window.innerHeight - navbox.clientHeight) / 2)
-        );
-      } */
-      //setSize([window.innerWidth, window.innerHeight]);
+      setHeight(window.innerHeight - navbox.clientHeight);
+      setWidth(window.innerWidth);
     }
     window.addEventListener("resize", updateSize);
     updateSize();
@@ -487,16 +481,16 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     edge
       .attr("x1", function (d) {
         //console.log(d.source.x);
-        return d.source.x;
+        return Math.max(radius, Math.min(WIDTH - radius, d.source.x));
       })
       .attr("y1", function (d) {
-        return d.source.y;
+        return Math.max(radius, Math.min(HEIGHT - radius, d.source.y));
       })
       .attr("x2", function (d) {
-        return d.target.x;
+        return Math.max(radius, Math.min(WIDTH - radius, d.target.x));
       })
       .attr("y2", function (d) {
-        return d.target.y;
+        return Math.max(radius, Math.min(HEIGHT - radius, d.target.y));
       });
     /* linkText
       .attr("cx", function (d) {
@@ -525,16 +519,28 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           }
         }
         if (d.target.x > d.source.x) {
-          return d.source.x + (d.target.x - d.source.x) / 2 - correctionCoeff;
+          return Math.max(
+            radius,
+            Math.min(WIDTH - radius, d.source.x + (d.target.x - d.source.x) / 2 - correctionCoeff)
+          );
         } else {
-          return d.target.x + (d.source.x - d.target.x) / 2 - correctionCoeff;
+          return Math.max(
+            radius,
+            Math.min(WIDTH - radius, d.target.x + (d.source.x - d.target.x) / 2 - correctionCoeff)
+          );
         }
       })
       .attr("y", function (d) {
         if (d.target.y > d.source.y) {
-          return d.source.y + (d.target.y - d.source.y) / 2 + 4;
+          return Math.max(
+            radius,
+            Math.min(HEIGHT - radius, d.source.y + (d.target.y - d.source.y) / 2 + 4)
+          );
         } else {
-          return d.target.y + (d.source.y - d.target.y) / 2 + 4;
+          return Math.max(
+            radius,
+            Math.min(HEIGHT - radius, d.target.y + (d.source.y - d.target.y) / 2 + 4)
+          );
         }
       });
     nodeText
@@ -549,21 +555,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             correctionCoeff = correctionCoeff - 2;
           }
         }
-        return Math.max(radius, Math.min(WIDTH - radius, d.x)) - correctionCoeff;
-        /*  if (d.name === 21) {
-          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 7;
-        } else if (d.name > 19) {
-          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 7;
-        } else if (d.name > 9) {
-          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 5;
-        } else if (d.name > 9) {
-          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 5;
-        } else {
-          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 4;
-        } */
+        return Math.max(radius, Math.min(WIDTH - radius, d.x - correctionCoeff));
       })
       .attr("y", function (d) {
-        return Math.max(radius, Math.min(HEIGHT - radius, d.y)) + 4 - 15;
+        return Math.max(radius, Math.min(HEIGHT - radius, d.y + 4 - 15));
       });
   }
 
@@ -805,9 +800,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     );
   }
 
-  const hala = () => {
+  /* const hala = () => {
     console.log("barca");
-  };
+  }; */
 
   const changeMode = () => {
     if (currentMode === "alg") {
@@ -926,7 +921,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   linksState={linksGlobal}
                   GraphSimulation={GraphSimulation}
                   isCurrentDirected={isCurrentDirected}
-                  hideLegend={hideLegend}
+                  hideBFSLegend={hideBFSLegend}
                 />
               </div>
             </>
