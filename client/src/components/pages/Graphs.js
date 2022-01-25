@@ -19,8 +19,8 @@ let currentNodeBFS = undefined;
 let visitedNodesBFS = new Set();
 let currentEdgeBFS = "";
 let previousExploredBFS = new Set();
-let queue = "";
-let currentDistance = "";
+let queue = [];
+let levelSets = [];
 
 let simulation;
 let svg;
@@ -50,7 +50,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   const [isWeighted, setWeighted] = useState(0);
   const [isCurrentDirected, setCurrentDirected] = useState(0);
   const [isCurrentWeighted, setCurrentWeighted] = useState(0);
-  let [showLegend, setShowedLegend] = useState(false);
+  let [showBFSLegend, setShowedLegend] = useState(false);
   let [BFS_STEP_State, setBFS_STEP] = useState([]);
   let [BFS_INDEX, setBFS_INDEX] = useState(-1);
   let [startNodeBFS, setStartNodeBFS] = useState("");
@@ -418,7 +418,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .append("line")
       .attr("marker-end", "url(#arrow)")
       .attr("id", function (d) {
-        return "e" + d.source.toString() + "-" + d.target.toString();
+        if (typeof d.source === "object"){
+          return "e" + d.source.name.toString() + "-" + d.target.name.toString();
+        }else {
+        return "e" + d.source.toString() + "-" + d.target.toString();}
       })
       .merge(edge);
 
@@ -603,9 +606,11 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   const recolorEdge = (i, j, color) => {
     if (i === "all" || j === "all") {
       d3.select(main.current).select("svg").selectAll("line").attr("stroke", color);
-    }
+    } else {
     let edgeId = "#e" + i.toString() + "-" + j.toString();
-    d3.select(main.current).select("svg").select(edgeId).attr("stroke", color);
+    console.log(edgeId)
+    console.log(linksGlobal)
+    d3.select(main.current).select("svg").select(edgeId).attr("stroke", color);}
   };
 
   const changeDirected = (int) => {
@@ -651,7 +656,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     currentEdgeBFS = "";
     previousExploredBFS = [];
     queue = "";
-    currentDistance = "";
+    levelSets = []; 
   };
 
   function BFS_stepper(index) {
@@ -663,12 +668,32 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     recolorEdge("all", "all", "grey");
     const source = BFS_STEP_State[index][0].source.name;
     const target = BFS_STEP_State[index][0].target.name;
-    currentDistance = BFS_STEP_State[index][4].join(", ");
-    queue = BFS_STEP_State[index][3].join(", ");
+    queue = BFS_STEP_State[index][3]; 
+    const distances = BFS_STEP_State[index][4]
+    let levels = []; 
+    for (let dist of distances){
+      if (!levels.includes(dist.toString())){
+        if(dist !== Infinity){
+          levels.push(dist.toString());
+        }
+      }
+    }
+    let table = [];
+
+    if (levels.length > 0){
+      for (let level of levels){
+        let nodesAtLevel = [];
+        for (let n = 0; n < distances.length; n++){
+          if (BFS_STEP_State[index][4][n].toString() === level){
+            nodesAtLevel.push(n); 
+          }
+        }
+        table.push("Level Set "+level+" : "+nodesAtLevel.join(", ")); 
+      }
+    }
+    levelSets = Array.from(table).join(" || ");
 
     for (let i = 0; i <= index - 1; i++) {
-      const currStart = BFS_STEP_State[i][0].source.name;
-      const currEnd = BFS_STEP_State[i][0].target.name;
       const previous = BFS_STEP_State[i][2];
       visitedNodesBFS.add(previous);
       previousExploredBFS.add(previous);
@@ -725,7 +750,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     }
   }
   const nextStep = () => {
-    if (showLegend) {
+    if (showBFSLegend) {
       BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
       setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
     } else {
@@ -734,7 +759,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     }
   };
   const prevStep = () => {
-    if (showLegend) {
+    if (showBFSLegend) {
       BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
       setBFS_INDEX(Math.min(BFS_STEP_State.length - 1, Math.max(BFS_INDEX - 1, 0)));
     } else {
@@ -744,15 +769,14 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   };
 
   let legend = <div></div>;
-
-  if (showLegend === true || showDijkstra === true) {
+  if (showBFSLegend === true || showDijkstra === true) {
     legend = (
       <div className="container">
         <div className="Algorithm-legend">
           {" "}
           <table className="legend-table">
             <tr>
-              <th>BFS Legend</th>
+              {showBFSLegend ? (<th>BFS Legend</th>) : (<th>Dijkstra Legend</th>)}
             </tr>
             <tr>
               <td width="34%" />
@@ -785,7 +809,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           <div>Current Edge = {currentEdgeBFS}</div>
           <div>Visited Nodes = {Array.from(visitedNodesBFS).join(", ")} </div>
           <div>Queue = {queue}</div>
-          <div>Current Distances = {currentDistance}</div>
+          <div>Table = {levelSets}</div>
         </div>
       </div>
     );
