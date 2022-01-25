@@ -19,7 +19,8 @@ const Dijkstra = ({ recolorNode, recolorEdge, linksState, nodesState, startNode,
       let links = linksState;
       let nodes = nodesState;
       let Dijkstra_STEP =[]; 
-      let distanceArray = [parseInt(startNode)]; //MODIFY FOR DIFFERENT STARTING NODE
+      //MODIFY FOR DIFFERENT STARTING NODE
+      let distanceArray = [0]; //MODIFY FOR DIFFERENT STARTING NODE
       let parentArray = [];
       let pqueue = [];
       for (let node of nodes) {
