@@ -2,11 +2,19 @@ import React, { Component, useEffect, useState } from "react";
 import "../../utilities.css";
 import "../pages/Graphs.css";
 
-
-const BFS = ({ recolorNode, recolorEdge, linksState, nodesState, displayLegend, setBFS_STEP, setBFS_INDEX, startNodeBFS, setStartNodeBFS, emptyCounter}) => {
+const BFS = ({
+  recolorNode,
+  recolorEdge,
+  linksState,
+  nodesState,
+  displayLegend,
+  setBFS_STEP,
+  setBFS_INDEX,
+  startNodeBFS,
+  setStartNodeBFS,
+  emptyCounter,
+}) => {
   let [showBFSProgress, setShowBFSProgress] = useState(false);
-
-  
 
   function findNeighbors(start, links) {
     let neighbors = [];
@@ -39,6 +47,7 @@ const BFS = ({ recolorNode, recolorEdge, linksState, nodesState, displayLegend, 
       setShowBFSProgress(true);
       let links = linksState;
       let nodes = nodesState;
+      console.log(links, nodes);
       let visited = new Set();
       let distanceArray = [];
       let BFS_STEP = [];
@@ -83,13 +92,9 @@ const BFS = ({ recolorNode, recolorEdge, linksState, nodesState, displayLegend, 
     }
   }
 
-
-
-
   const handleStartNodeBFS = (event) => {
     setStartNodeBFS(event.target.value);
   };
-
 
   return (
     <div>
