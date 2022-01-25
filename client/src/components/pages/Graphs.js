@@ -15,10 +15,10 @@ import Dijkstra from "../modules/Dijkstra.js";
 import FloydWarshall from "../modules/FloydWarshall.js";
 
 const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
-let userIDList = [];
 let currentNodeBFS = undefined;
 let visitedNodesBFS = new Set();
 let currentEdgeBFS = "";
+let previousExploredBFS = new Set();
 
 let simulation;
 let svg;
@@ -71,7 +71,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       }, 500);
     } */
     );
-  });
+  }
+  ,[userId, userName]
+  );
 
   const handleResize = () => {
     d3.select(main.current)
@@ -571,43 +573,48 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     visitedNodesBFS.clear();
     currentNodeBFS = undefined;
     currentEdgeBFS = "";
+    previousExploredBFS = [];
   };
 
   function BFS_stepper(index) {
     //BFS_STEP saves every edge and target node that BFS looks at, both visited and unvisited.
     visitedNodesBFS = new Set();
+    previousExploredBFS = new Set();
     console.log(index);
-    recolorNodeBorder("all", "black");
+    recolorNode("all", "black");
     recolorEdge("all", "all", "grey");
     const source = BFS_STEP_State[index][0].source.name;
     const target = BFS_STEP_State[index][0].target.name;
     for (let i = 0; i <= index - 1; i++) {
       const currStart = BFS_STEP_State[i][0].source.name;
       const currEnd = BFS_STEP_State[i][0].target.name;
-      recolorNodeBorder(currStart, "blue");
-      recolorEdge(currStart, currEnd, "blue");
-      recolorNodeBorder(currEnd, "blue");
+      const previous = BFS_STEP_State[i][2];
       visitedNodesBFS.add(currStart);
       visitedNodesBFS.add(currEnd);
+      previousExploredBFS.add(previous);
     }
-    recolorNodeBorder(parseInt(startNodeBFS), "red");
+    for (let prev of previousExploredBFS){
+      recolorNode(prev, "yellow");
+    }
     if (source === BFS_STEP_State[index][1]) {
-      recolorNodeBorder(target, "yellow");
+      recolorNode(target, "yellow");
       currentNodeBFS = target;
       visitedNodesBFS.add(target);
+      previousExploredBFS.add(target);
       currentEdgeBFS = "From " + target.toString() + " to " + source.toString();
     } else if (target === BFS_STEP_State[index][1]) {
       currentNodeBFS = source;
       visitedNodesBFS.add(source);
-      recolorNodeBorder(source, "yellow");
+      recolorNode(source, "yellow");
+      previousExploredBFS.add(source);
       currentEdgeBFS = "From " + source.toString() + " to " + target.toString();
     }
     recolorEdge(BFS_STEP_State[index][0].source.name, BFS_STEP_State[index][0].target.name, "aqua");
-    if (BFS_STEP_State[index][2]) {
-      recolorNodeBorder(BFS_STEP_State[index][1], "aqua");
-    }
   }
-
+  function Dijkstra_stepper(index) {
+    recolorNodeBorder("all", "black");
+    recolorEdge("all", "all", "grey");
+  };
   const nextStep = () => {
     if (showLegend) {
       BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
@@ -627,8 +634,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     }
   };
 
+  let legend = <div></div>;
+
   if (showLegend === true || showDijkstra === true) {
-    console.log("a");
     legend = (
       <div className="container">
         <div className="Algorithm-legend">
