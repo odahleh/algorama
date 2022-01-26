@@ -113,7 +113,7 @@
 }
 
 .Graphs-topbar {
-  margin: 8px 8px;;
+  margin: 8px 8px;
   display: flex;
   /* border-bottom: 1px solid; */
   /* border: 1px solid;
@@ -124,7 +124,7 @@
   padding: 0px 8px;
 }
 
-.second-bar{
+.second-bar {
   margin: 8px;
 }
 
@@ -172,7 +172,7 @@
   transition: all 0.5s;
 }
 
-.InputBox3{
+.InputBox3 {
   margin: 4px 8px 4px 16px;
   border: 0px;
   border-bottom: 2px solid;
@@ -181,7 +181,7 @@
   text-align: center;
 }
 
-.InputBox3:focus{
+.InputBox3:focus {
   outline: none;
   border: 0px;
   border-bottom: 2px solid;
@@ -225,7 +225,7 @@ input[type="range"]::-webkit-slider-thumb {
   stroke-width: 0;
 }
 
-.Graphs-ModeSelector{
+.Graphs-ModeSelector {
   position: relative;
   padding: 0px -8px;
   margin: 8px 24px;
@@ -239,7 +239,7 @@ input[type="range"]::-webkit-slider-thumb {
   width: 246px;
 }
 
-.Graphs-ModeSelectorSelectedCre{
+.Graphs-ModeSelectorSelectedCre {
   color: white;
   display: flex;
   align-items: center;
@@ -253,11 +253,11 @@ input[type="range"]::-webkit-slider-thumb {
   padding: 0px 8px;
   transition: left 0.5s;
   width: 107px;
- /*  padding: 5.5px;
+  /*  padding: 5.5px;
   margin: 5.5px; */
 }
 
-.Graphs-ModeSelectorSelectedAlg{
+.Graphs-ModeSelectorSelectedAlg {
   text-align: center;
   color: white;
   width: 81px;
@@ -272,12 +272,11 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 32px;
   padding: 0px 21px;
   transition: left 0.5s;
- /*  padding: 5.5px;
+  /*  padding: 5.5px;
   margin: 5.5px; */
 }
 
-
-.Graphs-ModeSelectorTextAlg{
+.Graphs-ModeSelectorTextAlg {
   margin: 0px 8px;
   width: 107px;
   text-align: center;
@@ -287,7 +286,7 @@ input[type="range"]::-webkit-slider-thumb {
   left: 120px;
 }
 
-.Graphs-ModeSelectorTextCre{
+.Graphs-ModeSelectorTextCre {
   margin: 0px 8px;
   width: 107px;
   position: absolute;
@@ -295,15 +294,47 @@ input[type="range"]::-webkit-slider-thumb {
   left: 0px;
 }
 
-.Graphs-ModeSelectorTextHidden{
+.Graphs-ModeSelectorTextHidden {
   width: 0px;
-} 
+}
 
-.container{
+.Legend-table td:nth-child(2) {
+  padding-left: 8px;
+  width: 120px;
+}
+
+.Graphs-instructions {
+  user-select: none;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes float {
+  0% {
+    transform: translatey(0px);
+  }
+  50% {
+    transform: translatey(-5px);
+  }
+  100% {
+    transform: translatey(0px);
+  }
+}
+
+.Graphs-instructions > p {
+  animation: float 2s ease-in-out infinite;
+}
+
+.container {
   position: absolute;
 }
-.Algorithm-legend{
-
+.Algorithm-legend {
   margin: 24px;
   border: 1px solid black;
   border-collapse: collapse;
@@ -311,26 +342,26 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 16px;
 }
 
-.infoLegend{
+.infoLegend {
   border: 1px solid black;
   border-radius: 16px;
   padding: 8px;
   margin: 24px;
 }
-.redCircle{
+.redCircle {
   border-radius: 32px;
   height: 16px;
   width: 16px;
   background-color: red;
 }
 
-.redEdge{
-  border-bottom:8px solid red;
+.redEdge {
+  border-bottom: 8px solid red;
   width: 40px;
   margin-top: 6px;
 }
 
-.blueCircle{
+.blueCircle {
   border-radius: 32px;
   height: 16px;
   width: 16px;
@@ -338,12 +369,12 @@ input[type="range"]::-webkit-slider-thumb {
   margin-top: 2px;
 }
 
-.blueEdge{
-  border-bottom:8px solid blue;
+.blueEdge {
+  border-bottom: 8px solid blue;
   width: 40px;
   margin-top: 6px;
 }
-.pinkCircle{
+.pinkCircle {
   border-radius: 32px;
   height: 16px;
   width: 16px;
@@ -351,21 +382,20 @@ input[type="range"]::-webkit-slider-thumb {
   margin-top: 2px;
 }
 
-
-.aquaEdge{
-  border-bottom:8px solid #00c2a5;
+.aquaEdge {
+  border-bottom: 8px solid #00c2a5;
   width: 40px;
   margin-top: 6px;
 }
 
-.gLinkText{
+.gLinkText {
   border-radius: 32px;
   height: 16px;
   width: 16px;
   background-color: pink;
 }
 
-.Graphs-infoBubble{
+.Graphs-infoBubble {
   border: 1px solid;
   border-color: #aaa;
   border-radius: 16px;
@@ -373,70 +403,68 @@ input[type="range"]::-webkit-slider-thumb {
   padding: 8px;
 }
 
-.Graphs-infoBlock{
+.Graphs-infoBlock {
   text-align: center;
   margin: 8px;
 }
 
-.Graphs-infoBox{
+.Graphs-infoBox {
   position: absolute;
   top: 8px;
   left: 25px;
 }
 
-.Graphs-infoBoxRight{
+.Graphs-infoBoxRight {
   position: absolute;
   top: 8px;
   right: 25px;
 }
 
-.abcdefg{
+.abcdefg {
   margin: 8px 25px;
   height: 1px;
   background-color: #000000;
   /* width: 1000px; */
 }
 
-.abcdefh{
+.abcdefh {
   margin: 8px 25px 24px;
   height: 1px;
   background-color: #000000;
   /* width: 1000px; */
 }
 
-.ghijklm{
+.ghijklm {
   margin-bottom: 32px;
 }
 
-.Graph-legend-new td:nth-child(1){
-text-align: center;
-width: 40px;
-
+.Graph-legend-new td:nth-child(1) {
+  text-align: center;
+  width: 40px;
 }
 
-.Graph-legend-new td:nth-child(2){
+.Graph-legend-new td:nth-child(2) {
   text-align: right;
+}
 
-  }
+.Graph-legend-new {
+  margin-right: 8px;
+}
 
-  .Graph-legend-new{
-    margin-right: 8px;
-  }
-
-.Graphs-infoBoxRightTop{
+.Graphs-infoBoxRightTop {
   position: absolute;
   top: 8px;
   right: 25px;
 }
 
-.Edge-from{
+.Edge-from {
   margin-left: 16px;
 }
 
-.Edge-weight{
-  margin-left:-4px;
+.Edge-weight {
+  margin-left: -4px;
 }
 
-.Graphs-yourGraphsText{
+.Graphs-yourGraphsText {
   margin-left: 16px;
 }

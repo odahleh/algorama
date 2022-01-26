@@ -26,10 +26,10 @@ let levelSets = [];
 
 //Initialization for Dijkstra Display
 let minNodesDijkstra = new Set();
-let currentNeighborDijkstra = undefined; 
-let visitedNodesDijkstra = new Set(); 
-let queueDijkstra = []; 
-let distanceArrayDijkstra = []; 
+let currentNeighborDijkstra = undefined;
+let visitedNodesDijkstra = new Set();
+let queueDijkstra = [];
+let distanceArrayDijkstra = [];
 let currentEdgeDijkstra = "";
 
 let simulation;
@@ -129,6 +129,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   };
 
   const GraphSimulation = (nodes, links) => {
+    setIsSimulation(true);
     console.log("generating graph for", nodes, links);
     if (displaySimulation === false) {
       const svg = d3
@@ -718,7 +719,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   const emptyDijkstraCounter = () => {
     minNodesDijkstra.clear();
     queueDijkstra = "";
-    currentNeighborDijkstra = undefined; 
+    currentNeighborDijkstra = undefined;
     visitedNodesDijkstra.clear();
     distanceArrayDijkstra = []; 
     currentEdgeDijkstra = "";
@@ -789,7 +790,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     recolorEdge(edge.source.name, edge.target.name, "#00c2a5");
   }
 
-
   function Dijkstra_stepper(index) {
     // reset all nodes + edges to original color
     recolorNode("all", "black");
@@ -812,7 +812,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     let [target, edge, is_min, distances, pQueue] = Dijkstra_STEP_State[index];
 
     if (!is_min) {
-      currentNeighborDijkstra = target; 
+      currentNeighborDijkstra = target;
       recolorNode(target, "blue");
       currentEdgeDijkstra = edge.source.name.toString() + " \u2192 " + edge.target.name.toString();
       recolorEdge(edge.source.name, edge.target.name, "blue");
@@ -1069,76 +1069,84 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       </div>
       <div id="main" className="Graphs-svgContainer" ref={main} /* width="500px" height="500px" */>
         <svg width={window.innerWidth} height={window.innerHeight} onClick={mama} />
+        {isSimulation ? (
+          <></>
+        ) : (
+          <div className="Graphs-instructions" onClick={mama}>
+            <p>Click to add a node.</p>
+            <p>Drag from one node to another to add an edge.</p>
+            <p>Choose Algorithms in the menu above to move the nodes by dragging them. </p>
+          </div>
+        )}
         {(showBFSLegend === true || showDijkstraLegend === true) && currentMode === "alg" ? (
           <>
             <div className="Graphs-infoBox">
-              <table>
+              <table className="Legend-table">
                 {showBFSLegend ? (
-                <>
-                <tr>
-                  <td>Start Node</td>
-                  <td>{startNodeBFS}</td>
-                </tr>
+                  <>
+                    <tr>
+                      <td>Start Node</td>
+                      <td>{startNodeBFS}</td>
+                    </tr>
 
-                <tr>
-                  <td>Current Node</td>
-                  <td>{currentNodeBFS}</td>
-                </tr>
+                    <tr>
+                      <td>Current Node</td>
+                      <td>{currentNodeBFS}</td>
+                    </tr>
 
-                <tr>
-                  <td>Current Edge</td>
-                  <td>{currentEdgeBFS}</td>
-                </tr>
+                    <tr>
+                      <td>Current Edge</td>
+                      <td>{currentEdgeBFS}</td>
+                    </tr>
 
-                <tr>
-                  <td>Visited Nodes</td>
-                  <td>{Array.from(visitedNodesBFS).join(", ")}</td>
-                </tr>
+                    <tr>
+                      <td>Visited Nodes</td>
+                      <td>{Array.from(visitedNodesBFS).join(", ")}</td>
+                    </tr>
 
-                <tr>
-                  <td>Queue</td>
-                  <td>{Array.from(queue).join(", ")}</td>
-                </tr>
-                <tr>
-                  <td>Table</td>
-                  <tr>
+                    <tr>
+                      <td>Queue</td>
+                      <td>{Array.from(queue).join(", ")}</td>
+                    </tr>
+
                     {levelSets.map((level) => (
-                      <tr>{level}</tr>
+                      <tr>
+                        <td>{level.split(":")[0]}</td>
+                        <td>{level.split(":")[1]}</td>
+                      </tr>
                     ))}
-                  </tr>
-                </tr>
-                </>
+                  </>
                 ) : (
                   <>
-                  <tr>
-                  <td>Start Node</td>
-                  <td>{startNodeBFS}</td>
-                </tr>
-                <tr>
-                  <td>Current Neighbor</td>
-                  <td>{currentNeighborDijkstra}</td>
-                </tr>
+                    <tr>
+                      <td>Start Node</td>
+                      <td>{startNodeBFS}</td>
+                    </tr>
+                    <tr>
+                      <td>Current Neighbor</td>
+                      <td>{currentNeighborDijkstra}</td>
+                    </tr>
 
-                <tr>
-                  <td>Current Edge</td>
-                  <td>{currentEdgeDijkstra}</td>
-                </tr>
+                    <tr>
+                      <td>Current Edge</td>
+                      <td>{currentEdgeDijkstra}</td>
+                    </tr>
 
-                <tr>
-                  <td>Visited Nodes</td>
-                  <td>{Array.from(visitedNodesDijkstra).join(", ")}</td>
-                </tr>
+                    <tr>
+                      <td>Visited Nodes</td>
+                      <td>{Array.from(visitedNodesDijkstra).join(", ")}</td>
+                    </tr>
 
-                <tr>
-                  <td>Priority Queue</td>
-                  <td>{Array.from(queueDijkstra).join(", ")}</td>
-                </tr>
+                    <tr>
+                      <td>Priority Queue</td>
+                      <td>{Array.from(queueDijkstra).join(", ")}</td>
+                    </tr>
 
-                <tr>
-                  <td>Distance Array</td>
-                  <td>{distanceArrayDijkstra.join(", ")}</td>
-                </tr>
-                </>
+                    <tr>
+                      <td>Distance Array</td>
+                      <td>{distanceArrayDijkstra.join(", ")}</td>
+                    </tr>
+                  </>
                 )}
               </table>
             </div>
@@ -1153,46 +1161,46 @@ const Graphs = ({ userId, handleLogout, userName }) => {
               <div className="u-flex u-flex-justifyRight">
                 <table className="Graph-legend-new">
                   {showBFSLegend ? (
-                  <>
-                  <tr>
-                    <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
-                      <div className="aquaEdge" />
-                    </td>
-                    <td>Current Path</td>
-                  </tr>
-                  <tr>
-                    <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
-                      <div className="pinkCircle" />
-                    </td>
-                    <td>Visited Nodes</td>
-                  </tr>
-                  </>
+                    <>
+                      <tr>
+                        <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
+                          <div className="aquaEdge" />
+                        </td>
+                        <td>Current Path</td>
+                      </tr>
+                      <tr>
+                        <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
+                          <div className="pinkCircle" />
+                        </td>
+                        <td>Visited Nodes</td>
+                      </tr>
+                    </>
                   ) : (
                     <>
-                    <tr>
-                    <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
-                      <div className="blueCircle" />
-                    </td>
-                    <td>Current Neighbor</td>
-                    </tr>
-                    <tr>
-                    <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
-                      <div className="blueEdge" />
-                    </td>
-                    <td>Current Path</td>
-                    </tr>
-                    <tr>
-                    <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
-                      <div className="redCircle" />
-                    </td>
-                    <td>Visited Nodes</td>
-                    </tr>
-                    <tr>
-                    <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
-                      <div className="redEdge" />
-                    </td>
-                    <td>Shortest Paths</td>
-                    </tr>
+                      <tr>
+                        <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
+                          <div className="blueCircle" />
+                        </td>
+                        <td>Current Neighbor</td>
+                      </tr>
+                      <tr>
+                        <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
+                          <div className="blueEdge" />
+                        </td>
+                        <td>Current Path</td>
+                      </tr>
+                      <tr>
+                        <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
+                          <div className="redCircle" />
+                        </td>
+                        <td>Visited Nodes</td>
+                      </tr>
+                      <tr>
+                        <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
+                          <div className="redEdge" />
+                        </td>
+                        <td>Shortest Paths</td>
+                      </tr>
                     </>
                   )}
                 </table>
