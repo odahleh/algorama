@@ -852,8 +852,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     let nextQueue = Dijkstra_STEP_State[Math.min(index + 1, Dijkstra_STEP_State.length - 1)][4];
     queueDijkstra = Array.from(nextQueue).sort(sortBasedOnDistance);
     for (let j = 0; j <= index; j++) {
-      const node = Dijkstra_STEP_State[j][0]; 
-      if (nextDistances[node] === Infinity){
+      const node = Dijkstra_STEP_State[j][0];
+      if (nextDistances[node] === Infinity) {
         console.log(node, "target");
         recolorNode(node, "black");
       }
