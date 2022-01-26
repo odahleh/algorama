@@ -23,7 +23,7 @@ let currentEdgeBFS = "";
 let previousExploredBFS = new Set();
 let queue = [];
 let levelSets = [];
-
+let displayStartBFS = undefined;
 //Initialization for Dijkstra Display
 let minNodesDijkstra = new Set();
 let currentNeighborDijkstra = undefined;
@@ -31,6 +31,7 @@ let visitedNodesDijkstra = new Set();
 let queueDijkstra = [];
 let distanceArrayDijkstra = [];
 let currentEdgeDijkstra = "";
+let displayStartDijkstra = undefined;
 
 let simulation;
 let svg;
@@ -719,6 +720,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     previousExploredBFS = [];
     queue = "";
     levelSets = [];
+    displayStartBFS = undefined;
   };
 
   const emptyDijkstraCounter = () => {
@@ -728,6 +730,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     visitedNodesDijkstra.clear();
     distanceArrayDijkstra = [];
     currentEdgeDijkstra = "";
+    displayStartDijkstra = undefined; 
   };
 
   function BFS_stepper(index) {
@@ -739,7 +742,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     recolorNode("all", "black");
     recolorEdge("all", "all", "grey");
     //Edge explored at this state, Current node, parent node, current queue, and current distanceArray
-    let [edge, current, parent, currQueue, distances] = BFS_STEP_State[index];
+    let [edge, current, parent, currQueue, distances, st] = BFS_STEP_State[index];
     const source = edge.source.name;
     const target = edge.target.name;
     queue = Array.from(currQueue);
@@ -793,6 +796,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       currentEdgeBFS = source.toString() + " \u2192 " + target.toString();
     }
     recolorEdge(edge.source.name, edge.target.name, "#00c2a5");
+    displayStartBFS = BFS_STEP_State[index][5];
   }
 
   function Dijkstra_stepper(index) {
@@ -814,7 +818,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       }
     }
     // if is not min (neighbor being considered), color blue, else color red
-    let [target, edge, is_min, distances, pQueue] = Dijkstra_STEP_State[index];
+    let [target, edge, is_min, distances, pQueue, name] = Dijkstra_STEP_State[index];
 
     if (!is_min) {
       currentNeighborDijkstra = target;
@@ -840,6 +844,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     }
     let nextQueue = Dijkstra_STEP_State[Math.min(index + 1, Dijkstra_STEP_State.length - 1)][4];
     queueDijkstra = Array.from(nextQueue).sort(sortBasedOnDistance);
+    displayStartDijkstra = Dijkstra_STEP_State[index][5];
   }
   const nextStep = () => {
     if (showBFSLegend) {
@@ -1089,7 +1094,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   <>
                     <tr>
                       <td>Start Node</td>
-                      <td>{startNodeBFS}</td>
+                      <td>{displayStartBFS}</td>
                     </tr>
 
                     <tr>
@@ -1123,7 +1128,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   <>
                     <tr>
                       <td>Start Node</td>
-                      <td>{startNodeBFS}</td>
+                      <td>{displayStartDijkstra}</td>
                     </tr>
                     <tr>
                       <td>Current Neighbor</td>
