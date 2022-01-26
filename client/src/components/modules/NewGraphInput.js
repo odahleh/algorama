@@ -90,16 +90,17 @@ const NewGraphInput = (props) => {
     ) {
       alert("Invalid input. One or both of those nodes don't exist.");
     } else {
-      if (valueWeight.trim() === "") {
-        props.update(props.nodes, [
-          ...props.links,
-          {
-            source: parseInt(valueEdges),
-            target: parseInt(valueEdges2),
-            weight: 1,
-          },
-        ]);
-      } else {
+      let unique = true;
+      for (let singleLink of props.links) {
+        if (
+          singleLink.source.name === parseInt(valueEdges) &&
+          singleLink.target.name === parseInt(valueEdges2)
+        ) {
+          unique = false;
+          /* console.log("exists"); */
+        }
+      }
+      if (unique === true) {
         props.update(props.nodes, [
           ...props.links,
           {
@@ -108,6 +109,13 @@ const NewGraphInput = (props) => {
             weight: parseInt(valueWeight),
           },
         ]);
+      } else {
+        alert(
+          "You already added an edge from " +
+            parseInt(valueEdges).toString() +
+            " to " +
+            parseInt(valueEdges2).toString()
+        );
       }
     }
   };
