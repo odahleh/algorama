@@ -785,6 +785,14 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       //alg functions
       d3.selectAll("circle").on("mousedown.drag", null);
 
+      //Make sure the graphs go to regular color display
+      recolorNode("all", "black"); 
+      recolorEdge("all", "all", "grey");
+      emptyBFSCounter();
+      emptyDijkstraCounter();
+      setBFS_INDEX(-1); 
+      hideBFSLegend(); 
+      hideDijkstraLegend();
       setCurrentMode("cre");
     } else {
       console.log("alg");
@@ -952,7 +960,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       </div>
       <div id="main" className="Graphs-svgContainer" ref={main} /* width="500px" height="500px" */>
         <svg width={window.innerWidth} height={window.innerHeight} onClick={mama} />
-        {showBFSLegend === true || showDijkstraLegend === true ? (
+        {(showBFSLegend === true || showDijkstraLegend === true) && currentMode === "alg" ? (
           <>
             <div className="Graphs-infoBox">
               <table>
