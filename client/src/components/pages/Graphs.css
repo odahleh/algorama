@@ -172,6 +172,15 @@
   transition: all 0.5s;
 }
 
+.InputBox3{
+  margin: 4px 8px 4px 16px;
+  border: 0px;
+  border-bottom: 2px solid;
+  border-color: #aaa;
+  width: 40px;
+  text-align: center;
+}
+
 .Graphs-switch {
   overflow: hidden;
   margin: 8px;
@@ -392,4 +401,16 @@ width: 40px;
   position: absolute;
   top: 8px;
   right: 25px;
+}
+
+.Edge-from{
+  margin-left: 16px;
+}
+
+.Edge-weight{
+  margin-left:-4px;
+}
+
+.Graphs-yourGraphsText{
+  margin-left: 16px;
 }

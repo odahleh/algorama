@@ -795,20 +795,24 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       hideDijkstraLegend();
       setCurrentMode("cre");
     } else {
-      console.log("alg");
-      d3.select("#svg").on("mousemove", null).on("mouseup", null).on("mouseleave", null);
-      /* .on("click", hala); */
+      if (nodesGlobal.length === 0) {
+        alert("Please create a graph before going to algorithm mode.");
+      } else {
+        console.log("alg");
+        d3.select("#svg").on("mousemove", null).on("mouseup", null).on("mouseleave", null);
+        /* .on("click", hala); */
 
-      d3.selectAll(".gLinks").on("mousedown", null);
+        d3.selectAll(".gLinks").on("mousedown", null);
 
-      d3.selectAll("circle").on("mousedown", null);
+        d3.selectAll("circle").on("mousedown", null);
 
-      //alg functions
-      d3.selectAll("circle").call(
-        d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended)
-      );
+        //alg functions
+        d3.selectAll("circle").call(
+          d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended)
+        );
 
-      setCurrentMode("alg");
+        setCurrentMode("alg");
+      }
     }
   };
 

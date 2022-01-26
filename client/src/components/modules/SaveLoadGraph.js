@@ -112,7 +112,7 @@ const SaveLoadGraph = (props) => {
       {/* 
       <div className="Graphs-text">Save and load your graphs</div> */}
       <div className="Graphs-topbar u-flex u-flex-wrap u-flex-alignCenter" id="Graphs-loadingMenu">
-        <span>Your Graphs:</span>
+        <span>Save Graph:</span>
         <span className="Graph-names u-flex u-flex-alignCenter">
           <input
             type="text"
@@ -125,7 +125,7 @@ const SaveLoadGraph = (props) => {
             Save
           </button>
         </span>
-
+        <span className="Graphs-yourGraphsText">Your Graphs:</span>
         {/* <button onClick={loadGraph} className="button u-marginButton">
         {" "}
         Load{" "}
