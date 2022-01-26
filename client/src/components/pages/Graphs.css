@@ -350,6 +350,25 @@ input[type="range"]::-webkit-slider-thumb {
   background-color: red;
 }
 
+.redEdge {
+  border-bottom: 8px solid red;
+  width: 40px;
+  margin-top: 6px;
+}
+
+.blueCircle {
+  border-radius: 32px;
+  height: 16px;
+  width: 16px;
+  background-color: blue;
+  margin-top: 2px;
+}
+
+.blueEdge {
+  border-bottom: 8px solid blue;
+  width: 40px;
+  margin-top: 6px;
+}
 .pinkCircle {
   border-radius: 32px;
   height: 16px;
