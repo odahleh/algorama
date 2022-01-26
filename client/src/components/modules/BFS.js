@@ -52,29 +52,15 @@ const BFS = ({
     // setBFS_INDEX(0);
     if (startNodeBFS === "") {
       alert("Please set a start node for BFS.");
-<<<<<<< HEAD
     } else if (isNaN(startNodeBFS)) {
-      alert("This is not a valid input. Please input a valid node.");
+      alert("Invalid input. Please input a valid node.");
     } else if (isWeighted === 1) {
       alert(
-        "BFS does not support in weightd graphs. Please run another Algoritm or choose an unweighted graphs."
+        "BFS does not support weighted graphs. Please run another algorithm or select an unweighted graph."
       );
     } else if (parseInt(startNodeBFS) >= nodesState.length || parseInt(startNodeBFS) < 0) {
       alert("This is not a valid starting node. Please select a valid starting node.");
     } else {
-=======
-    } 
-    else if (isNaN(startNodeBFS)){
-      alert("This is not a valid input. Please input a valid node."); 
-    }
-    else if(isWeighted === 1){
-      alert("BFS does not support in weighted graphs. Please run another Algorithm or select an unweighted graph.");
-    }
-    else if (parseInt(startNodeBFS) >= nodesState.length || parseInt(startNodeBFS) < 0){
-      alert("This is not a valid starting node. Please select a valid starting node.")
-    }
-    else {
->>>>>>> 83f766b2db3190eb90d33f2f5969e25cb9406dd0
       displayBFSLegend();
       setBFS_INDEX(-1);
       let start = { name: parseInt(startNodeBFS) };

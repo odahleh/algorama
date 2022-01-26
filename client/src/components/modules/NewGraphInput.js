@@ -78,18 +78,19 @@ const NewGraphInput = (props) => {
     props.hideDijkstraLegend();
     if (
       isNaN(valueEdges) ||
-      valueEdges === "" ||
-      isNaN(valueEdges2) | (valueEdges2 === "") ||
+      valueEdges.trim() === "" ||
+      isNaN(valueEdges2) ||
+      valueEdges2.trim() === "" ||
       isNaN(valueWeight)
     ) {
-      alert("Invalid input. Please put the node's numbers.");
+      alert("Invalid input. Please put the nodes' numbers.");
     } else if (
       parseInt(valueEdges) >= props.nodes.length ||
       parseInt(valueEdges2) >= props.nodes.length
     ) {
       alert("Invalid input. One or both of those nodes don't exist.");
     } else {
-      if (valueWeight === "") {
+      if (valueWeight.trim() === "") {
         props.update(props.nodes, [
           ...props.links,
           {

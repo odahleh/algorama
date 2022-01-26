@@ -26,7 +26,7 @@ const Dijkstra = ({
     if (startNode === "") {
       alert("Please set a start node for Dijkstra.");
     } else if (isNaN(startNodeBFS)) {
-      alert("This is not a valid input. Please input a valid node.");
+      alert("Invalid input. Please input a valid node.");
     } else if (parseInt(startNode) >= nodesState.length || parseInt(startNode) < 0) {
       alert("This is not a valid starting node. Please select a valid starting node.");
     } else {
@@ -35,7 +35,7 @@ const Dijkstra = ({
       for (let edge of linksState) {
         if (edge.weight < 0) {
           alert(
-            "This algorithm does not support negative weights, please choose a different graph."
+            "This algorithm does not support negative weights. Please choose a different graph."
           );
           negativeWeights = true;
         }
