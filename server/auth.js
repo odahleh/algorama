@@ -55,15 +55,17 @@ function getOrCreateUser(user) {
           { source: 12, target: 2, weight: 2 },
           { source: 2, target: 3, weight: 8 },
           { source: 4, target: 3, weight: 2 },
+          { source: 3, target: 4, weight: 6 },
           { source: 3, target: 7, weight: 22 },
           { source: 7, target: 6, weight: 6 },
-          { source: 6, target: 5, weight: 3 },
+          { source: 5, target: 6, weight: 3 },
           { source: 11, target: 7, weight: 2 },
           { source: 11, target: 0, weight: 7 },
           { source: 0, target: 7, weight: 4 },
           { source: 0, target: 9, weight: 2 },
           { source: 9, target: 10, weight: 6 },
           { source: 9, target: 8, weight: 7 },
+          { source: 8, target: 9, weight: 9 },
         ],
       });
 
