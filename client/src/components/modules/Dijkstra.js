@@ -13,6 +13,8 @@ const Dijkstra = ({
   setDijkstra_INDEX,
   displayDijkstraLegend,
   emptyDijkstraCounter,
+  isWeighted,
+  isDirected
 }) => {
   function dijkstra() {
     recolorNode("all", "black");
@@ -51,7 +53,7 @@ const Dijkstra = ({
             curMin = distanceArray[node];
           }
         }
-        Dijkstra_STEP.push([u, returnEdge(u, parentArray[u], links), true]);
+        Dijkstra_STEP.push([u, returnEdge(parentArray[u], u, links), true]);
         let uIndex = pqueue.indexOf(u);
         pqueue.splice(uIndex, 1);
         let [neighbors, currNeighborEdges] = findNeighbors({ name: u }, links);
@@ -72,21 +74,33 @@ const Dijkstra = ({
   }
   function returnEdgeWeights(u, v, links) {
     for (let edge of links) {
-      if (
-        (edge.source.name === u && edge.target.name === v) ||
-        (edge.source.name === v && edge.target.name === u)
-      ) {
-        return edge.weight;
+      if (isWeighted === 1){
+        if (
+          (edge.source.name === u && edge.target.name === v) ||
+          (edge.source.name === v && edge.target.name === u)
+        ) {
+          return edge.weight;
+        }
+      }
+      else{
+        return 1; 
       }
     }
   }
   function returnEdge(u, v, links) {
     for (let edge of links) {
-      if (
-        (edge.source.name === u && edge.target.name === v) ||
-        (edge.source.name === v && edge.target.name === u)
-      ) {
-        return edge;
+      if (isDirected === 1){
+        if(edge.source.name === u && edge.target.name === v){
+          return edge;
+        }
+      }
+      else{
+        if (
+          (edge.source.name === u && edge.target.name === v) ||
+          (edge.source.name === v && edge.target.name === u)
+        ) {
+          return edge;
+        }
       }
     }
   }
@@ -94,12 +108,21 @@ const Dijkstra = ({
     let neighbors = [];
     let currNeighborEdges = [];
     for (let edge of links) {
-      if (edge.source.name === start.name) {
-        neighbors.push(edge.target.name);
-        currNeighborEdges.push(edge);
-      } else if (edge.target.name === start.name) {
-        neighbors.push(edge.source.name);
-        currNeighborEdges.push(edge);
+      if(isDirected === 1){
+        if (edge.source.name === start.name) {
+          neighbors.push(edge.target.name);
+          currNeighborEdges.push(edge);
+        } 
+      }
+      else{
+        if (edge.source.name === start.name){
+          neighbors.push(edge.target.name);
+          currNeighborEdges.push(edge);
+        }
+        else if (edge.target.name === start.name) {
+          neighbors.push(edge.source.name);
+          currNeighborEdges.push(edge);
+        }
       }
     }
     return [neighbors, currNeighborEdges];
