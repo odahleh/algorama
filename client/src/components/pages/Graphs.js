@@ -344,42 +344,47 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             0.5
           ) < 10
         ) {
-          onNode = true;
-          let dragEndNodeId = "v" + i.toString();
-          let thisWeight = "1";
-          console.log(isWeightedVariable);
-          if (weightsDisplay === 1) {
-            console.log("prompt");
-            thisWeight = window.prompt("Give this edge a weight", "1");
-            /* console.log(thisWeight); */
-          }
-          if (thisWeight !== null) {
-            let newLink = {
-              source: parseInt(dragStartNodeId.substring(1)),
-              target: parseInt(i), //parseInt(dragEndNodeId.substring(1)),
-              weight: parseInt(thisWeight),
-            };
-            let unique = true;
-            for (let singleLink of linksGlobal) {
-              console.log(singleLink, newLink);
-              if (
-                singleLink.source.name === newLink.source &&
-                singleLink.target.name === newLink.target
-              ) {
-                unique = false;
-                console.log("exists");
-              }
+          if (parseInt(i) === parseInt(dragStartNodeId.substring(1))) {
+            alert("You can't create an edge from a node to itself.");
+          } else {
+            onNode = true;
+            let dragEndNodeId = "v" + i.toString();
+            let thisWeight = "1";
+            console.log(isWeightedVariable);
+            if (weightsDisplay === 1) {
+              console.log("prompt");
+              thisWeight = window.prompt("Give this edge a weight", "1");
+              /* console.log(thisWeight); */
             }
-            if (unique === true) {
-              console.log("exists not");
-              update([...nodesGlobal], [...linksGlobal, newLink]);
-            } else {
-              alert(
-                "You already added an edge from " +
-                  newLink.source.toString() +
-                  " to " +
-                  newLink.target.toString()
-              );
+
+            if (thisWeight !== null) {
+              let newLink = {
+                source: parseInt(dragStartNodeId.substring(1)),
+                target: parseInt(i), //parseInt(dragEndNodeId.substring(1)),
+                weight: parseInt(thisWeight),
+              };
+              let unique = true;
+              for (let singleLink of linksGlobal) {
+                console.log(singleLink, newLink);
+                if (
+                  singleLink.source.name === newLink.source &&
+                  singleLink.target.name === newLink.target
+                ) {
+                  unique = false;
+                  console.log("exists");
+                }
+              }
+              if (unique === true) {
+                console.log("exists not");
+                update([...nodesGlobal], [...linksGlobal, newLink]);
+              } else {
+                alert(
+                  "You already added an edge from " +
+                    newLink.source.toString() +
+                    " to " +
+                    newLink.target.toString()
+                );
+              }
             }
           }
         }
