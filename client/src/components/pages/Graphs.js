@@ -41,8 +41,8 @@ let linksGlobal = [];
 let dragStartX, dragStartY, dragStartNodeId;
 let isDragLine = false;
 let timeOutFunctionId;
-let weightsDisplay = 0; 
-let directionDisplay = 0; 
+let weightsDisplay = 0;
+let directionDisplay = 0;
 
 let legend = <div></div>;
 
@@ -276,7 +276,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     weightsDisplay = 1 - weightsDisplay;
   };
 
-function beginDragLine(d) {
+  function beginDragLine(d) {
     isDragLine = true;
     console.log("Start", isWeighted, isWeightedVariable, weightsDisplay);
     dragStartNodeId = d.path[0].id;
@@ -497,7 +497,6 @@ function beginDragLine(d) {
     simulation.alpha(0.7).restart();
   }
 
-
   //force upon creation
   function ticked() {
     let widthHere = window.innerWidth;
@@ -641,7 +640,7 @@ function beginDragLine(d) {
       d3.select(main.current).select("path").attr("opacity", 0);
     }
     setDirected(1 - isDirected);
-    directionDisplay = 1 - directionDisplay; 
+    directionDisplay = 1 - directionDisplay;
   };
 
   const displayBFSLegend = () => {
@@ -695,6 +694,7 @@ function beginDragLine(d) {
         }
       }
     }
+    levels.sort();
     let table = [];
     //For the current levels, display all the current nodes at the distance
     if (levels.length > 0) {
@@ -709,7 +709,7 @@ function beginDragLine(d) {
       }
     }
     //avoid aliasing
-    levelSets = Array.from(table).join(" || ");
+    levelSets = Array.from(table);
 
     //Find all already explored nodes and mark them, then color them
     for (let i = 0; i <= index - 1; i++) {
@@ -1026,7 +1026,11 @@ function beginDragLine(d) {
 
                 <tr>
                   <td>Table</td>
-                  <td>{levelSets}</td>
+                  <tr>
+                    {levelSets.map((level) => (
+                      <tr>{level}</tr>
+                    ))}
+                  </tr>
                 </tr>
               </table>
             </div>
