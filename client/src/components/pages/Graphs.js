@@ -54,8 +54,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   let [linksState, setLinks] = useState([]);
   const [isDirected, setDirected] = useState(0);
   const [isWeighted, setWeighted] = useState(0);
-  const [isCurrentDirected, setCurrentDirected] = useState(0);
-  const [isCurrentWeighted, setCurrentWeighted] = useState(0);
   let [showBFSLegend, setShowedBFS] = useState(false);
   let [BFS_STEP_State, setBFS_STEP] = useState([]);
   let [BFS_INDEX, setBFS_INDEX] = useState(-1);
@@ -118,8 +116,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
 
   const GraphSimulation = (nodes, links) => {
     console.log("generating graph for", nodes, links);
-    setCurrentDirected(isDirected);
-    setCurrentWeighted(isWeighted);
     if (displaySimulation === false) {
       const svg = d3
         .select(main.current)
@@ -423,7 +419,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .data(links)
       .append("text")
       .text(function (d) {
-        if (false) {
+        if (isWeighted === 1) {
           return d.weight.toString();
         } else {
           return "1";
@@ -816,6 +812,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     }
   };
 
+
+  console.log(isWeighted, "isWei"); 
+  console.log(isDirected, "isDir");
   return (
     <div className="Graphs-pageContainer">
       <div className="top-bar-container">
@@ -918,6 +917,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   setStartNodeBFS={setStartNodeBFS}
                   emptyBFSCounter={emptyBFSCounter}
                   hideDijkstraLegend={hideDijkstraLegend}
+                  is
                 />
                 <Dijkstra
                   recolorNode={recolorNode}
@@ -952,7 +952,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                 nodesState={nodesGlobal}
                 linksState={linksGlobal}
                 GraphSimulation={GraphSimulation}
-                isCurrentDirected={isCurrentDirected}
+                isDirected={isDirected}
                 hideBFSLegend={hideBFSLegend}
                 hideDijkstraLegend={hideDijkstraLegend}
               />
@@ -990,7 +990,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
 
                 <tr>
                   <td>Queue</td>
-                  <td>{queue}</td>
+                  <td>{Array.from(queue).join(", ")}</td>
                 </tr>
 
                 <tr>

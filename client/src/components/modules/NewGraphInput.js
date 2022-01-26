@@ -122,6 +122,7 @@ const NewGraphInput = (props) => {
     props.GraphSimulation(nodes, links, directed);
   };
 
+  console.log(valueWeight, "value weight");
   return (
     <div className="u-flex u-flex-wrap">
       <div className="u-flex u-flex-alignCenter Graph-names">
