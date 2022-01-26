@@ -1065,14 +1065,12 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   <td>{Array.from(queue).join(", ")}</td>
                 </tr>
 
-                <tr>
-                  <td>Table</td>
+                {levelSets.map((level) => (
                   <tr>
-                    {levelSets.map((level) => (
-                      <tr>{level}</tr>
-                    ))}
+                    <td>{level.split(":")[0]}</td>
+                    <td>{level.split(":")[1]}</td>
                   </tr>
-                </tr>
+                ))}
               </table>
             </div>
             <div className="Graphs-infoBoxRightTop">
