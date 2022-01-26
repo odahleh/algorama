@@ -13,6 +13,7 @@ import SaveLoadGraph from "../modules/SaveLoadGraph.js";
 import BFS from "../modules/BFS.js";
 import Dijkstra from "../modules/Dijkstra.js";
 import FloydWarshall from "../modules/FloydWarshall.js";
+import Legend from "../modules/Legend.js";
 
 const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
 //Initialization for BFS Display
@@ -83,14 +84,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           );
         }
       }, 500);
-
-      /*  if (displaySimulation) {
-        currentSimulation.force(
-          "center",
-          d3.forceCenter(window.innerWidth / 2, (window.innerHeight - navbox.clientHeight) / 2)
-        );
-      } */
-      //setSize([window.innerWidth, window.innerHeight]);
+      setHeight(window.innerHeight - navbox.clientHeight);
+      setWidth(window.innerWidth);
     }
     window.addEventListener("resize", updateSize);
     updateSize();
@@ -487,16 +482,16 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     edge
       .attr("x1", function (d) {
         //console.log(d.source.x);
-        return d.source.x;
+        return Math.max(radius, Math.min(WIDTH - radius, d.source.x));
       })
       .attr("y1", function (d) {
-        return d.source.y;
+        return Math.max(radius, Math.min(HEIGHT - radius, d.source.y));
       })
       .attr("x2", function (d) {
-        return d.target.x;
+        return Math.max(radius, Math.min(WIDTH - radius, d.target.x));
       })
       .attr("y2", function (d) {
-        return d.target.y;
+        return Math.max(radius, Math.min(HEIGHT - radius, d.target.y));
       });
     /* linkText
       .attr("cx", function (d) {
@@ -525,16 +520,28 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           }
         }
         if (d.target.x > d.source.x) {
-          return d.source.x + (d.target.x - d.source.x) / 2 - correctionCoeff;
+          return Math.max(
+            radius,
+            Math.min(WIDTH - radius, d.source.x + (d.target.x - d.source.x) / 2 - correctionCoeff)
+          );
         } else {
-          return d.target.x + (d.source.x - d.target.x) / 2 - correctionCoeff;
+          return Math.max(
+            radius,
+            Math.min(WIDTH - radius, d.target.x + (d.source.x - d.target.x) / 2 - correctionCoeff)
+          );
         }
       })
       .attr("y", function (d) {
         if (d.target.y > d.source.y) {
-          return d.source.y + (d.target.y - d.source.y) / 2 + 4;
+          return Math.max(
+            radius,
+            Math.min(HEIGHT - radius, d.source.y + (d.target.y - d.source.y) / 2 + 4)
+          );
         } else {
-          return d.target.y + (d.source.y - d.target.y) / 2 + 4;
+          return Math.max(
+            radius,
+            Math.min(HEIGHT - radius, d.target.y + (d.source.y - d.target.y) / 2 + 4)
+          );
         }
       });
     nodeText
@@ -549,21 +556,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             correctionCoeff = correctionCoeff - 2;
           }
         }
-        return Math.max(radius, Math.min(WIDTH - radius, d.x)) - correctionCoeff;
-        /*  if (d.name === 21) {
-          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 7;
-        } else if (d.name > 19) {
-          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 7;
-        } else if (d.name > 9) {
-          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 5;
-        } else if (d.name > 9) {
-          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 5;
-        } else {
-          return Math.max(radius, Math.min(WIDTH - radius, d.x)) - 4;
-        } */
+        return Math.max(radius, Math.min(WIDTH - radius, d.x - correctionCoeff));
       })
       .attr("y", function (d) {
-        return Math.max(radius, Math.min(HEIGHT - radius, d.y)) + 4 - 15;
+        return Math.max(radius, Math.min(HEIGHT - radius, d.y + 4 - 15));
       });
   }
 
@@ -657,12 +653,15 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     visitedNodesBFS = new Set();
     previousExploredBFS = new Set();
     console.log(index);
+    //Start everything with the default colors
     recolorNode("all", "black");
     recolorEdge("all", "all", "grey");
-    const source = BFS_STEP_State[index][0].source.name;
-    const target = BFS_STEP_State[index][0].target.name;
-    queue = BFS_STEP_State[index][3];
-    const distances = BFS_STEP_State[index][4];
+    //Edge explored at this state, Current node, parent node, current queue, and current distanceArray
+    let [edge, current, parent, currQueue, distances] = BFS_STEP_State[index]; 
+    const source = edge.source.name;
+    const target = edge.target.name;
+    queue = Array.from(currQueue); 
+    //Find the current distances different than infinity called them levels
     let levels = [];
     for (let dist of distances) {
       if (!levels.includes(dist.toString())) {
@@ -672,7 +671,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       }
     }
     let table = [];
-
+    //For the current levels, display all the current nodes at the distance
     if (levels.length > 0) {
       for (let level of levels) {
         let nodesAtLevel = [];
@@ -684,8 +683,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         table.push("Level Set " + level + " : " + nodesAtLevel.join(", "));
       }
     }
+    //avoid aliasing
     levelSets = Array.from(table).join(" || ");
 
+    //Find all already explored nodes and mark them, then color them 
     for (let i = 0; i <= index - 1; i++) {
       const previous = BFS_STEP_State[i][2];
       visitedNodesBFS.add(previous);
@@ -694,13 +695,14 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     for (let prev of previousExploredBFS) {
       recolorNode(prev, "pink");
     }
-    if (source === BFS_STEP_State[index][1]) {
+    //Color only current node and not the naighbor, then the current edge
+    if (source === current) {
       recolorNode(target, "pink");
       currentNodeBFS = target;
       visitedNodesBFS.add(target);
       previousExploredBFS.add(target);
       currentEdgeBFS = "From " + target.toString() + " to " + source.toString();
-    } else if (target === BFS_STEP_State[index][1]) {
+    } else if (target === current) {
       currentNodeBFS = source;
       visitedNodesBFS.add(source);
       recolorNode(source, "pink");
@@ -708,11 +710,13 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       currentEdgeBFS = "From " + source.toString() + " to " + target.toString();
     }
     recolorEdge(
-      BFS_STEP_State[index][0].source.name,
-      BFS_STEP_State[index][0].target.name,
+      edge.source.name,
+      edge.target.name,
       "#00c2a5"
     );
   }
+
+
   function Dijkstra_stepper(index) {
     // reset all nodes + edges to original color
     recolorNode("all", "black");
@@ -762,7 +766,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   let legend = <div></div>;
   if (showBFSLegend === true || showDijkstraLegend === true) {
     legend = (
-      <div className="container">
+      <div className="container u-flex">
         <div className="Algorithm-legend">
           {" "}
           <table className="legend-table">
@@ -832,9 +836,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     );
   }
 
-  const hala = () => {
+  /* const hala = () => {
     console.log("barca");
-  };
+  }; */
 
   const changeMode = () => {
     if (currentMode === "alg") {
@@ -1002,8 +1006,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           )}
         </div>
       </div>
+      <div className=" u-flex legend-tables">
+          {legend}
+      </div>
       <div id="main" className="Graphs-svgContainer" ref={main} /* width="500px" height="500px" */>
-        {legend}
         <svg width={window.innerWidth} height={window.innerHeight} onClick={mama} />
         {""}
       </div>
