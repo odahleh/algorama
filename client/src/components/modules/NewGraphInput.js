@@ -89,6 +89,8 @@ const NewGraphInput = (props) => {
       parseInt(valueEdges2) >= props.nodes.length
     ) {
       alert("Invalid input. One or both of those nodes don't exist.");
+    } else if (parseInt(valueEdges.trim()) === parseInt(valueEdges2.trim())) {
+      alert("You can't create an edge from a node to itself.");
     } else {
       let unique = true;
       for (let singleLink of props.links) {
