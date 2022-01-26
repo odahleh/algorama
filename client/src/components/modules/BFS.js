@@ -59,7 +59,7 @@ const BFS = ({
       alert("This is not a valid input. Please input a valid node."); 
     }
     else if(isWeighted === 1){
-      alert("BFS does not support in weightd graphs. Please run another Algoritm or choose an unweighted graphs.");
+      alert("BFS does not support in weighted graphs. Please run another Algorithm or select an unweighted graph.");
     }
     else if (parseInt(startNodeBFS) >= nodesState.length || parseInt(startNodeBFS) < 0){
       alert("This is not a valid starting node. Please select a valid starting node.")
