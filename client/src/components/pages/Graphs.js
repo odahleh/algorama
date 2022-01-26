@@ -721,6 +721,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     currentNeighborDijkstra = undefined; 
     visitedNodesDijkstra.clear();
     distanceArrayDijkstra = []; 
+    currentEdgeDijkstra = "";
   };
 
   function BFS_stepper(index) {
@@ -820,19 +821,21 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       recolorNode(target, "red");
       recolorEdge(edge.source.name, edge.target.name, "red");
     }
-    for (let d = 0; d<distances.length; d++){
-      if (distances[d] === Infinity){
+
+    let nextDistances = Dijkstra_STEP_State[Math.min(index+1, Dijkstra_STEP_State.length-1)][3];
+    for (let d = 0; d<nextDistances.length; d++){
+      if (nextDistances[d] === Infinity){
         distanceArrayDijkstra.push(" \u221E "); 
       }
       else{
-        distanceArrayDijkstra.push(distances[d]);
+        distanceArrayDijkstra.push(nextDistances[d]);
       }
     }
-    let nextDistances = Dijkstra_STEP_State[Math.min(index+1, Dijkstra_STEP_State.length)][3];
     function sortBasedOnDistance(a,b){
       return nextDistances[a]-nextDistances[b];
     }
-    queueDijkstra = Array.from(pQueue).sort(sortBasedOnDistance);
+    let nextQueue = Dijkstra_STEP_State[Math.min(index+1, Dijkstra_STEP_State.length-1)][4];
+    queueDijkstra = Array.from(nextQueue).sort(sortBasedOnDistance);
 
   };
   const nextStep = () => {
