@@ -655,12 +655,15 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     visitedNodesBFS = new Set();
     previousExploredBFS = new Set();
     console.log(index);
+    //Start everything with the default colors
     recolorNode("all", "black");
     recolorEdge("all", "all", "grey");
-    const source = BFS_STEP_State[index][0].source.name;
-    const target = BFS_STEP_State[index][0].target.name;
-    queue = BFS_STEP_State[index][3];
-    const distances = BFS_STEP_State[index][4];
+    //Edge explored at this state, Current node, parent node, current queue, and current distanceArray
+    let [edge, current, parent, currQueue, distances] = BFS_STEP_State[index];
+    const source = edge.source.name;
+    const target = edge.target.name;
+    queue = Array.from(currQueue);
+    //Find the current distances different than infinity called them levels
     let levels = [];
     for (let dist of distances) {
       if (!levels.includes(dist.toString())) {
@@ -670,7 +673,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       }
     }
     let table = [];
-
+    //For the current levels, display all the current nodes at the distance
     if (levels.length > 0) {
       for (let level of levels) {
         let nodesAtLevel = [];
@@ -682,8 +685,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         table.push("Level Set " + level + " : " + nodesAtLevel.join(", "));
       }
     }
+    //avoid aliasing
     levelSets = Array.from(table).join(" || ");
 
+    //Find all already explored nodes and mark them, then color them
     for (let i = 0; i <= index - 1; i++) {
       const previous = BFS_STEP_State[i][2];
       visitedNodesBFS.add(previous);
@@ -692,62 +697,50 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     for (let prev of previousExploredBFS) {
       recolorNode(prev, "pink");
     }
-    if (source === BFS_STEP_State[index][1]) {
+    //Color only current node and not the naighbor, then the current edge
+    if (source === current) {
       recolorNode(target, "pink");
       currentNodeBFS = target;
       visitedNodesBFS.add(target);
       previousExploredBFS.add(target);
-      currentEdgeBFS = target.toString() + " -> " + source.toString();
+      currentEdgeBFS = target.toString() + " \u2192 " + source.toString();
     } else if (target === BFS_STEP_State[index][1]) {
       currentNodeBFS = source;
       visitedNodesBFS.add(source);
       recolorNode(source, "pink");
       previousExploredBFS.add(source);
-      currentEdgeBFS = "From " + source.toString() + " to " + target.toString();
+      currentEdgeBFS = source.toString() + " \u2192 " + target.toString();
     }
-    recolorEdge(
-      BFS_STEP_State[index][0].source.name,
-      BFS_STEP_State[index][0].target.name,
-      "#00c2a5"
-    );
+    recolorEdge(edge.source.name, edge.target.name, "#00c2a5");
   }
-  function Dijkstra_stepper(index) {
-    minNodesDijkstra.add(parseInt(startNodeBFS));
-    console.log("START NODE", startNodeBFS);
-    console.log("DIJKSTRA STATE", Dijkstra_STEP_State);
-    console.log("VISITED", minNodesDijkstra);
-    for (let i = index; i < Dijkstra_STEP_State.length; i++) {
-      let [target, edge, is_min] = Dijkstra_STEP_State[i];
-      recolorNode(target, "black");
-      recolorEdge(edge.source.name, edge.target.name, "grey");
-    }
 
+  function Dijkstra_stepper(index) {
+    // reset all nodes + edges to original color
+    recolorNode("all", "black");
+    recolorEdge("all", "all", "grey");
+
+    // color start node red
     recolorNode(parseInt(startNodeBFS), "red");
 
+    // if node is min of pqueue (on shortest path) color red, else will stay black
     for (let i = 0; i < index; i++) {
       let [target, edge, is_min] = Dijkstra_STEP_State[i];
-      if (!is_min && !minNodesDijkstra.has(target)) {
-        recolorNode(target, "black");
-        recolorEdge(edge.source.name, edge.target.name, "grey");
-      }
-      if (minNodesDijkstra.has(target)) {
-        console.log("in");
+      if (is_min) {
         recolorNode(target, "red");
         recolorEdge(edge.source.name, edge.target.name, "red");
       }
     }
-
-    console.log("INDEX", index);
+    // if is not min (neighbor being considered), color blue, else color red
     let [target, edge, is_min] = Dijkstra_STEP_State[index];
     if (!is_min) {
       recolorNode(target, "blue");
       recolorEdge(edge.source.name, edge.target.name, "blue");
     } else {
-      minNodesDijkstra.add(target);
       recolorNode(target, "red");
       recolorEdge(edge.source.name, edge.target.name, "red");
     }
   }
+
   const nextStep = () => {
     if (showBFSLegend) {
       BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
