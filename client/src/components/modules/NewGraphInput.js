@@ -125,22 +125,19 @@ const NewGraphInput = (props) => {
   return (
     <div className="u-flex u-flex-wrap">
       <div className="u-flex u-flex-alignCenter Graph-names">
-        <button className="button" onClick={addNode}>
-          Add nodes
-        </button>
         <input
           type="text"
           value={valueNodes}
           onChange={handleChangeNodes}
           placeholder={"#"}
-          className="InputBox InputBoxSmall"
+          className="InputBox3"
         />
+        <button className="button" onClick={addNode}>
+          Add nodes
+        </button>
       </div>
       <div className="u-flex u-flex-alignCenter Graph-names">
-        <button className="button " onClick={addEdge}>
-          Add Edge
-        </button>
-        <p>from</p>
+        <p className="Edge-from">From</p>
         <input
           type="text"
           value={valueEdges}
@@ -156,7 +153,7 @@ const NewGraphInput = (props) => {
           placeholder={"# node"}
           className="InputBox InputBoxSmall"
         />
-        <p>, weight</p>
+        <p className="Edge-weight"> , weight</p>
         <input
           type="text"
           value={valueWeight}
@@ -164,6 +161,9 @@ const NewGraphInput = (props) => {
           placeholder={"#"}
           className="InputBox InputBoxSmall"
         />
+        <button className="button " onClick={addEdge}>
+          add Edge
+        </button>
       </div>
       <div className="Graph-names u-flex u-flex-alignCenter">
         <input
