@@ -58,6 +58,9 @@ const BFS = ({
     else if(isWeighted === 1){
       alert("BFS does not support in weightd graphs. Please run another Algoritm or choose an unweighted graphs.");
     }
+    else if (parseInt(startNode) >= nodesState.length || parseInt(startNode) < 0){
+      alert("This is not a valid starting node. Please select a valid starting node.")
+    }
     else {
       displayBFSLegend();
       setBFS_INDEX(-1);
