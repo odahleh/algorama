@@ -26,6 +26,9 @@ const Dijkstra = ({
     if (startNode === "") {
       alert("Please set a start node for Dijkstra.");
     }
+    else if (isNaN(startNodeBFS)){
+      alert("This is not a valid input. Please input a valid node."); 
+    }
     else if (parseInt(startNode) >= nodesState.length || parseInt(startNode) < 0){
       alert("This is not a valid starting node. Please select a valid starting node.")
     }
@@ -49,6 +52,7 @@ const Dijkstra = ({
           let distanceArray = [];
           let parentArray = [];
           let pqueue = [];
+          let start = parseInt(startNode);
           for (let node of nodes) {
             if (node.name !== parseInt(startNode)) {
               distanceArray.push(Infinity);
@@ -66,12 +70,12 @@ const Dijkstra = ({
                 curMin = distanceArray[node];
               }
             }
-            Dijkstra_STEP.push([u, returnEdge(parentArray[u], u, links), true, Array.from(distanceArray), Array.from(pqueue)]);
+            Dijkstra_STEP.push([u, returnEdge(parentArray[u], u, links), true, Array.from(distanceArray), Array.from(pqueue), start]);
             let uIndex = pqueue.indexOf(u);
             pqueue.splice(uIndex, 1);
             let [neighbors, currNeighborEdges] = findNeighbors({ name: u }, links);
             for (let v of neighbors) {
-              Dijkstra_STEP.push([v, currNeighborEdges[neighbors.indexOf(v)], false, Array.from(distanceArray), Array.from(pqueue)]);
+              Dijkstra_STEP.push([v, currNeighborEdges[neighbors.indexOf(v)], false, Array.from(distanceArray), Array.from(pqueue), start]);
               let alt = distanceArray[u] + returnEdgeWeights(u, v, links);
               if (alt < distanceArray[v]) {
                 distanceArray[v] = alt;
