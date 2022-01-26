@@ -72,15 +72,15 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   let [showDijkstraLegend, setShowedDijkstra] = useState(false);
   let [currentMode, setCurrentMode] = useState("cre");
 
-  console.log("is Weighted", isWeighted);
+  /* console.log("is Weighted", isWeighted); */
   useLayoutEffect(() => {
     function updateSize() {
-      console.log("updateSize");
+      /* console.log("updateSize"); */
       let navbox = document.querySelector(".top-bar-container");
       let offsetTop; //= 220;
       offsetTop = navbox.clientHeight;
-      console.log([window.innerWidth, window.innerHeight - offsetTop]);
-      d3.select(main.current)
+      /*       console.log([window.innerWidth, window.innerHeight - offsetTop]);
+       */ d3.select(main.current)
         .selectAll("svg")
         .attr("height", window.innerHeight - navbox.clientHeight)
         .attr("width", window.innerWidth);
@@ -118,8 +118,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .attr("height", window.innerHeight - navbox.clientHeight)
       .attr("width", window.innerWidth);
     let navbox = document.querySelector(".top-bar-container");
-    console.log("resize");
-    setHeight(window.innerHeight - navbox.clientHeight);
+    /*     console.log("resize");
+     */ setHeight(window.innerHeight - navbox.clientHeight);
     setWidth(window.innerWidth);
     if (displaySimulation) {
       currentSimulation.force(
@@ -131,12 +131,12 @@ const Graphs = ({ userId, handleLogout, userName }) => {
 
   const GraphSimulation = (nodes, links) => {
     if (nodes.length === 0) {
-      console.log("no");
+      /* console.log("no"); */
       setIsSimulation(false);
     } else {
       setIsSimulation(true);
     }
-    console.log("generating graph for", nodes, links);
+    /* console.log("generating graph for", nodes, links); */
     if (displaySimulation === false) {
       const svg = d3
         .select(main.current)
@@ -271,7 +271,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   }
 
   const changeWeighted = (int) => {
-    console.log("changeWeighted");
+    /* console.log("changeWeighted"); */
     if (isWeighted === 0) {
       d3.select(main.current)
         .selectAll("svg")
@@ -291,8 +291,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
 
   function beginDragLine(d) {
     isDragLine = true;
-    console.log("Start", isWeighted, isWeightedVariable, weightsDisplay);
-    dragStartNodeId = d.path[0].id;
+    /*     console.log("Start", isWeighted, isWeightedVariable, weightsDisplay);
+     */ dragStartNodeId = d.path[0].id;
     mousedownNode = d.path[0];
     dragStartX = mousedownNode.cx.baseVal.value;
     dragStartY = mousedownNode.cy.baseVal.value;
@@ -363,9 +363,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             onNode = true;
             let dragEndNodeId = "v" + i.toString();
             let thisWeight = "1";
-            console.log(isWeightedVariable);
+            /* console.log(isWeightedVariable); */
             if (weightsDisplay === 1) {
-              console.log("prompt");
+              /*   console.log("prompt"); */
               thisWeight = window.prompt("Give this edge a weight", "1");
               /* console.log(thisWeight); */
             }
@@ -378,17 +378,17 @@ const Graphs = ({ userId, handleLogout, userName }) => {
               };
               let unique = true;
               for (let singleLink of linksGlobal) {
-                console.log(singleLink, newLink);
+                /* console.log(singleLink, newLink); */
                 if (
                   singleLink.source.name === newLink.source &&
                   singleLink.target.name === newLink.target
                 ) {
                   unique = false;
-                  console.log("exists");
+                  /* console.log("exists"); */
                 }
               }
               if (unique === true) {
-                console.log("exists not");
+                /*  console.log("exists not"); */
                 update([...nodesGlobal], [...linksGlobal, newLink]);
               } else {
                 alert(
@@ -499,9 +499,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       })
       .style("font-size", 16)
       .attr("stroke-width", 0)
-      .style("user-select", "none")
-      //.style("filter", "drop-shadow( 0px 0px 6px white) drop-shadow( 0px 0px 6px white)")
-      .on("click", hala);
+      .style("user-select", "none");
+    //.style("filter", "drop-shadow( 0px 0px 6px white) drop-shadow( 0px 0px 6px white)")
+    /* .on("click", hala); */
 
     nodeText = svg
       .selectAll(".gSingleNode")
@@ -517,7 +517,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     //.style("filter", "drop-shadow( 0px 0px 6px white) drop-shadow( 0px 0px 6px white)");
 
     if (weightsDisplay === 0) {
-      console.log("weight disapper");
+      /* console.log("weight disapper"); */
       linkText2.attr("opacity", 0);
     }
 
@@ -730,7 +730,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     visitedNodesDijkstra.clear();
     distanceArrayDijkstra = [];
     currentEdgeDijkstra = "";
-    displayStartDijkstra = undefined; 
+    displayStartDijkstra = undefined;
   };
 
   function BFS_stepper(index) {
@@ -865,13 +865,13 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     }
   };
 
-  const hala = () => {
+  /* const hala = () => {
     console.log("barca");
-  };
+  }; */
 
   const changeMode = () => {
     if (currentMode === "alg") {
-      console.log("cre");
+      /*  console.log("cre"); */
       //cre functions
       d3.select("#svg")
         .on("mousemove", updateDragLine)
@@ -903,7 +903,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       if (nodesGlobal.length === 0) {
         alert("Please create a graph before going to algorithm mode.");
       } else {
-        console.log("alg");
+        /* console.log("alg"); */
         d3.select("#svg").on("mousemove", null).on("mouseup", null).on("mouseleave", null);
         /* .on("click", hala); */
 

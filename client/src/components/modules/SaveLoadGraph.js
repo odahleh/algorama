@@ -28,7 +28,7 @@ const SaveLoadGraph = (props) => {
     for (let edge of props.linksState) {
       edgeNames.push({ source: edge.source.name, target: edge.target.name, weight: edge.weight });
     }
-    console.log(nodeNames, edgeNames);
+    /* console.log(nodeNames, edgeNames); */
     if (nodeNames.length > 0 && valueGraphName.length > 0) {
       const graphDoc = {
         user: props.userId,
@@ -40,7 +40,7 @@ const SaveLoadGraph = (props) => {
 
       post("/api/savegraph", graphDoc).then((graph) => {
         setLoadedGraphs([...loadedGraphs, graph]);
-        console.log(graph);
+        /* console.log(graph); */
       });
     } else {
       alert("You cannot save a graph that is empty and/or does not have a name.");
@@ -58,7 +58,7 @@ const SaveLoadGraph = (props) => {
   };
 
   const generateGraph = (event) => {
-    console.log("generate");
+    /* console.log("generate"); */
     //setDisplaySimulation(false);
     let id = event.target.id;
     let i = parseInt(id.charAt(id.length - 1));
@@ -75,15 +75,13 @@ const SaveLoadGraph = (props) => {
     let i = parseInt(objectId.charAt(objectId.length - 1));
     let graphToDelete = loadedGraphs[i];
     let graphId = graphToDelete._id;
-    console.log(graphId);
+    /* console.log(graphId); */
 
     setTimeout(function () {
       setLoadedGraphs(loadedGraphs.slice(0, i).concat(loadedGraphs.slice(i + 1)));
     }, 0);
 
-    post("/api/deletegraph", { id: graphId }).then((returnedText) => {
-      console.log(returnedText);
-    });
+    post("/api/deletegraph", { id: graphId });
   };
 
   let graphList;
@@ -126,6 +124,7 @@ const SaveLoadGraph = (props) => {
           </button>
         </span>
         <span className="Graphs-yourGraphsText">Your Graphs:</span>
+        {/*  */}
         {/* <button onClick={loadGraph} className="button u-marginButton">
         {" "}
         Load{" "}

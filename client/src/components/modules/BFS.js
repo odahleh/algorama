@@ -15,7 +15,7 @@ const BFS = ({
   emptyBFSCounter,
   hideDijkstraLegend,
   isWeighted,
-  isDirected
+  isDirected,
 }) => {
   let [showBFSProgress, setShowBFSProgress] = useState(false);
 
@@ -25,13 +25,12 @@ const BFS = ({
     // console.log("links", links);
     for (let edge of links) {
       //Currently using directions
-      if (isDirected === 1){
-        if(edge.source.name === start.name){
+      if (isDirected === 1) {
+        if (edge.source.name === start.name) {
           neighbors.push(edge.target.name);
           neighborsEdges.push(edge);
         }
-      } 
-      else{
+      } else {
         if (edge.source.name === start.name) {
           neighbors.push(edge.target.name);
           neighborsEdges.push(edge);
@@ -45,7 +44,6 @@ const BFS = ({
     return [neighbors, neighborsEdges];
   }
   function BFS() {
-
     hideDijkstraLegend();
     emptyBFSCounter();
     recolorNode("all", "black");
@@ -54,24 +52,22 @@ const BFS = ({
     // setBFS_INDEX(0);
     if (startNodeBFS === "") {
       alert("Please set a start node for BFS.");
-    } 
-    else if (isNaN(startNodeBFS)){
-      alert("This is not a valid input. Please input a valid node."); 
-    }
-    else if(isWeighted === 1){
-      alert("BFS does not support in weightd graphs. Please run another Algoritm or choose an unweighted graphs.");
-    }
-    else if (parseInt(startNodeBFS) >= nodesState.length || parseInt(startNodeBFS) < 0){
-      alert("This is not a valid starting node. Please select a valid starting node.")
-    }
-    else {
+    } else if (isNaN(startNodeBFS)) {
+      alert("This is not a valid input. Please input a valid node.");
+    } else if (isWeighted === 1) {
+      alert(
+        "BFS does not support in weightd graphs. Please run another Algoritm or choose an unweighted graphs."
+      );
+    } else if (parseInt(startNodeBFS) >= nodesState.length || parseInt(startNodeBFS) < 0) {
+      alert("This is not a valid starting node. Please select a valid starting node.");
+    } else {
       displayBFSLegend();
       setBFS_INDEX(-1);
       let start = { name: parseInt(startNodeBFS) };
       setShowBFSProgress(true);
       let links = linksState;
       let nodes = nodesState;
-      console.log(links, nodes);
+      /* console.log(links, nodes); */
       let visited = new Set();
       let distanceArray = [];
       let BFS_STEP = [];
@@ -116,7 +112,7 @@ const BFS = ({
               next,
               Array.from(visibleQueue),
               Array.from(visibleDistance),
-              start.name
+              start.name,
             ]);
           }
         }
@@ -124,7 +120,7 @@ const BFS = ({
         queue = neighbors;
         // console.log("queue", queue);
       }
-      console.log(distanceArray);
+      /*   console.log(distanceArray); */
       // console.log(BFS_STEP);
       setBFS_STEP(BFS_STEP);
     }

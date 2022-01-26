@@ -3,7 +3,7 @@ import "../../utilities.css";
 import "../pages/Graphs.css";
 
 const Legend = () => {
-  return <div>Hi Duiti</div>;
+  return <div></div>;
 };
 
 export default Legend;

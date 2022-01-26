@@ -58,7 +58,7 @@ const NewGraphInput = (props) => {
       let factor = (2 * Math.PI) / valueNodes;
       let radiusHere = 100;
       for (let i in range(parseInt(valueNodes))) {
-        console.log(i);
+        /* console.log(i); */
         currentNodes.push({
           name: props.nodes.length + parseInt(i),
           x: props.width / 2 + radiusHere * Math.sin(factor * i),
@@ -144,7 +144,7 @@ const NewGraphInput = (props) => {
     props.GraphSimulation(nodes, links, directed);
   };
 
-  console.log(valueWeight, "value weight");
+  /* console.log(valueWeight, "value weight"); */
   return (
     <div className="u-flex u-flex-wrap">
       <div className="u-flex u-flex-alignCenter Graph-names">
