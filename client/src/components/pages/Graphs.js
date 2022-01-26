@@ -52,8 +52,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   let [HEIGHT, setHeight] = useState(null);
   let [nodesState, setNodes] = useState([]);
   let [linksState, setLinks] = useState([]);
-  const [isDirected, setDirected] = useState(0);
-  const [isWeighted, setWeighted] = useState(0);
+  let [isDirected, setDirected] = useState(0);
+  let [isWeighted, setWeighted] = useState(0);
   let [showBFSLegend, setShowedBFS] = useState(false);
   let [BFS_STEP_State, setBFS_STEP] = useState([]);
   let [BFS_INDEX, setBFS_INDEX] = useState(-1);
@@ -339,6 +339,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   }
 
   function update(nodes, links) {
+    console.log(isWeighted);
+    console.log(nodes, links);
     let navbox = document.querySelector(".top-bar-container");
     let offsetTop; //= 220;
     offsetTop = navbox.clientHeight;
@@ -419,11 +421,12 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .data(links)
       .append("text")
       .text(function (d) {
-        if (isWeighted === 1) {
-          return d.weight.toString();
-        } else {
+        console.log(d);
+        /* if (d.weight) { */
+        return d.weight.toString();
+        /* } else {
           return "1";
-        }
+        } */
       })
       .style("font-size", 16)
       .attr("stroke-width", 0)
@@ -443,6 +446,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .style("fill", "black");
 
     if (isWeighted === 0) {
+      console.log("weight disapper");
       linkText2.attr("opacity", 0);
     }
 
@@ -782,12 +786,12 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       d3.selectAll("circle").on("mousedown.drag", null);
 
       //Make sure the graphs go to regular color display
-      recolorNode("all", "black"); 
+      recolorNode("all", "black");
       recolorEdge("all", "all", "grey");
       emptyBFSCounter();
       emptyDijkstraCounter();
-      setBFS_INDEX(-1); 
-      hideBFSLegend(); 
+      setBFS_INDEX(-1);
+      hideBFSLegend();
       hideDijkstraLegend();
       setCurrentMode("cre");
     } else {
@@ -812,8 +816,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     }
   };
 
-
-  console.log(isWeighted, "isWei"); 
+  console.log(isWeighted, "isWei");
   console.log(isDirected, "isDir");
   return (
     <div className="Graphs-pageContainer">
