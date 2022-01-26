@@ -47,6 +47,7 @@ let directionDisplay = 0;
 let legend = <div></div>;
 
 const Graphs = ({ userId, handleLogout, userName }) => {
+  let [isSimulation, setIsSimulation] = useState(false);
   const [main, setRef1] = useState(React.createRef());
   let [currentSimulation, setCurrentSimulation] = useState(null);
   let [displaySimulation, setDisplaySimulation] = useState(false);
