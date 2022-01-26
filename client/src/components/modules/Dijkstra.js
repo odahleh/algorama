@@ -53,12 +53,12 @@ const Dijkstra = ({
             curMin = distanceArray[node];
           }
         }
-        Dijkstra_STEP.push([u, returnEdge(parentArray[u], u, links), true]);
+        Dijkstra_STEP.push([u, returnEdge(parentArray[u], u, links), true, Array.from(distanceArray), Array.from(pqueue)]);
         let uIndex = pqueue.indexOf(u);
         pqueue.splice(uIndex, 1);
         let [neighbors, currNeighborEdges] = findNeighbors({ name: u }, links);
         for (let v of neighbors) {
-          Dijkstra_STEP.push([v, currNeighborEdges[neighbors.indexOf(v)], false]);
+          Dijkstra_STEP.push([v, currNeighborEdges[neighbors.indexOf(v)], false, Array.from(distanceArray), Array.from(pqueue)]);
           let alt = distanceArray[u] + returnEdgeWeights(u, v, links);
           if (alt < distanceArray[v]) {
             distanceArray[v] = alt;

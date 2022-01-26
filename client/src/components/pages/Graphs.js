@@ -26,6 +26,11 @@ let levelSets = [];
 
 //Initialization for Dijkstra Display
 let minNodesDijkstra = new Set();
+let currentNeighborDijkstra = undefined; 
+let visitedNodesDijkstra = new Set(); 
+let queueDijkstra = []; 
+let distanceArrayDijkstra = []; 
+let currentEdgeDijkstra = "";
 
 let simulation;
 let svg;
@@ -671,6 +676,10 @@ function beginDragLine(d) {
 
   const emptyDijkstraCounter = () => {
     minNodesDijkstra.clear();
+    queueDijkstra = "";
+    currentNeighborDijkstra = undefined; 
+    visitedNodesDijkstra.clear();
+    distanceArrayDijkstra = []; 
   };
 
   function BFS_stepper(index) {
@@ -695,6 +704,7 @@ function beginDragLine(d) {
         }
       }
     }
+
     let table = [];
     //For the current levels, display all the current nodes at the distance
     if (levels.length > 0) {
@@ -737,33 +747,53 @@ function beginDragLine(d) {
     recolorEdge(edge.source.name, edge.target.name, "#00c2a5");
   }
 
+
   function Dijkstra_stepper(index) {
     // reset all nodes + edges to original color
     recolorNode("all", "black");
     recolorEdge("all", "all", "grey");
-
+    visitedNodesDijkstra = new Set();
+    distanceArrayDijkstra = [];
     // color start node red
     recolorNode(parseInt(startNodeBFS), "red");
 
     // if node is min of pqueue (on shortest path) color red, else will stay black
     for (let i = 0; i < index; i++) {
-      let [target, edge, is_min] = Dijkstra_STEP_State[i];
+      let [target, edge, is_min, distArr, pq] = Dijkstra_STEP_State[i];
       if (is_min) {
         recolorNode(target, "red");
         recolorEdge(edge.source.name, edge.target.name, "red");
+        visitedNodesDijkstra.add(target);
       }
     }
     // if is not min (neighbor being considered), color blue, else color red
-    let [target, edge, is_min] = Dijkstra_STEP_State[index];
+    let [target, edge, is_min, distances, pQueue] = Dijkstra_STEP_State[index];
+
     if (!is_min) {
+      currentNeighborDijkstra = target; 
       recolorNode(target, "blue");
+      currentEdgeDijkstra = edge.source.name.toString() + " \u2192 " + edge.target.name.toString();
       recolorEdge(edge.source.name, edge.target.name, "blue");
     } else {
+      currentNeighborDijkstra = undefined;
       recolorNode(target, "red");
       recolorEdge(edge.source.name, edge.target.name, "red");
     }
-  }
+    for (let d = 0; d<distances.length; d++){
+      if (distances[d] === Infinity){
+        distanceArrayDijkstra.push(" \u221E "); 
+      }
+      else{
+        distanceArrayDijkstra.push(distances[d]);
+      }
+    }
+    let nextDistances = Dijkstra_STEP_State[Math.min(index+1, Dijkstra_STEP_State.length)][3];
+    function sortBasedOnDistance(a,b){
+      return nextDistances[a]-nextDistances[b];
+    }
+    queueDijkstra = Array.from(pQueue).sort(sortBasedOnDistance);
 
+  };
   const nextStep = () => {
     if (showBFSLegend) {
       BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
@@ -999,6 +1029,8 @@ function beginDragLine(d) {
           <>
             <div className="Graphs-infoBox">
               <table>
+                {showBFSLegend ? (
+                <>
                 <tr>
                   <td>Start Node</td>
                   <td>{startNodeBFS}</td>
@@ -1023,11 +1055,43 @@ function beginDragLine(d) {
                   <td>Queue</td>
                   <td>{Array.from(queue).join(", ")}</td>
                 </tr>
-
                 <tr>
                   <td>Table</td>
                   <td>{levelSets}</td>
                 </tr>
+                </>
+                ) : (
+                  <>
+                  <tr>
+                  <td>Start Node</td>
+                  <td>{startNodeBFS}</td>
+                </tr>
+                <tr>
+                  <td>Current Neighbor</td>
+                  <td>{currentNeighborDijkstra}</td>
+                </tr>
+
+                <tr>
+                  <td>Current Edge</td>
+                  <td>{currentEdgeDijkstra}</td>
+                </tr>
+
+                <tr>
+                  <td>Visited Nodes</td>
+                  <td>{Array.from(visitedNodesDijkstra).join(", ")}</td>
+                </tr>
+
+                <tr>
+                  <td>Priority Queue</td>
+                  <td>{Array.from(queueDijkstra).join(", ")}</td>
+                </tr>
+
+                <tr>
+                  <td>Distance Array</td>
+                  <td>{distanceArrayDijkstra.join(", ")}</td>
+                </tr>
+                </>
+                )}
               </table>
             </div>
             <div className="Graphs-infoBoxRightTop">
@@ -1040,6 +1104,8 @@ function beginDragLine(d) {
               </button>
               <div className="u-flex u-flex-justifyRight">
                 <table className="Graph-legend-new">
+                  {showBFSLegend ? (
+                  <>
                   <tr>
                     <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
                       <div className="aquaEdge" />
@@ -1052,6 +1118,35 @@ function beginDragLine(d) {
                     </td>
                     <td>Visited Nodes</td>
                   </tr>
+                  </>
+                  ) : (
+                    <>
+                    <tr>
+                    <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
+                      <div className="blueCircle" />
+                    </td>
+                    <td>Current Neighbor</td>
+                    </tr>
+                    <tr>
+                    <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
+                      <div className="blueEdge" />
+                    </td>
+                    <td>Current Path</td>
+                    </tr>
+                    <tr>
+                    <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
+                      <div className="redCircle" />
+                    </td>
+                    <td>Visited Nodes</td>
+                    </tr>
+                    <tr>
+                    <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
+                      <div className="redEdge" />
+                    </td>
+                    <td>Shortest Paths</td>
+                    </tr>
+                    </>
+                  )}
                 </table>
               </div>
             </div>{" "}
