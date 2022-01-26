@@ -101,9 +101,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     setWidth(window.innerWidth);
   }, [HEIGHT, WIDTH]);
 
-  console.log(isWeighted, "line 101");
+  /*  console.log(isWeighted, "line 101"); */
   let isWeightedVariable = isWeighted;
-  console.log(isWeightedVariable);
+  /* console.log(isWeightedVariable); */
 
   const handleResize = () => {
     d3.select(main.current)
@@ -302,32 +302,33 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     );
   }
 
-  function hideDragLine() {
-    if (!isDragLine) {
-      let bodyHere = document.querySelector("body");
-      let rect = bodyHere.getBoundingClientRect();
+  function addNodeatMouse() {
+    let bodyHere = document.querySelector("body");
+    let rect = bodyHere.getBoundingClientRect();
+    let currentX = event.clientX - rect.left;
+    let currentY = event.clientY - rect.top;
+    let navbox = document.querySelector(".top-bar-container");
+    let offsetTop = navbox.clientHeight;
+    if (nodesGlobal.length === 0) {
+      GraphSimulation(
+        [...nodesGlobal, { name: 0, x: currentX, y: currentY - offsetTop }],
+        linksGlobal
+      );
+    } else {
+      let svgHere = document.querySelector("#svg");
+      let rect = svgHere.getBoundingClientRect();
       let currentX = event.clientX - rect.left;
       let currentY = event.clientY - rect.top;
-      let navbox = document.querySelector(".top-bar-container");
-      let offsetTop = navbox.clientHeight;
-      if (nodesGlobal.length === 0) {
-        GraphSimulation(
-          [...nodesGlobal, { name: 0, x: currentX, y: currentY - offsetTop }],
-          linksGlobal
-        );
-      } else {
-        let svgHere = document.querySelector("#svg");
-        let rect = svgHere.getBoundingClientRect();
-        let currentX = event.clientX - rect.left;
-        let currentY = event.clientY - rect.top;
-        //nodesGlobal.push({ name: nodesGlobal.length, x: currentX, y: currentY });
-        //GraphSimulation(nodesGlobal, linksGlobal)
+      //nodesGlobal.push({ name: nodesGlobal.length, x: currentX, y: currentY });
+      //GraphSimulation(nodesGlobal, linksGlobal)
 
-        update(
-          [...nodesGlobal, { name: nodesGlobal.length, x: currentX, y: currentY }],
-          linksGlobal
-        );
-      }
+      update([...nodesGlobal, { name: nodesGlobal.length, x: currentX, y: currentY }], linksGlobal);
+    }
+  }
+
+  function hideDragLine() {
+    if (!isDragLine) {
+      addNodeatMouse();
     } else {
       let svgHere = document.querySelector("#svg");
       let rect = svgHere.getBoundingClientRect();
@@ -343,22 +344,48 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             0.5
           ) < 10
         ) {
-          onNode = true;
-          let dragEndNodeId = "v" + i.toString();
-          let thisWeight = "1";
-          console.log(isWeightedVariable);
-          if (weightsDisplay === 1) {
-            console.log("prompt");
-            thisWeight = window.prompt("Give this edge a weight", "1");
-            console.log(thisWeight);
-          }
-          if (thisWeight !== null) {
-            var newLink = {
-              source: parseInt(dragStartNodeId.substring(1)),
-              target: parseInt(i), //parseInt(dragEndNodeId.substring(1)),
-              weight: parseInt(thisWeight),
-            };
-            update([...nodesGlobal], [...linksGlobal, newLink]);
+          if (parseInt(i) === parseInt(dragStartNodeId.substring(1))) {
+            alert("You can't create an edge from a node to itself.");
+          } else {
+            onNode = true;
+            let dragEndNodeId = "v" + i.toString();
+            let thisWeight = "1";
+            console.log(isWeightedVariable);
+            if (weightsDisplay === 1) {
+              console.log("prompt");
+              thisWeight = window.prompt("Give this edge a weight", "1");
+              /* console.log(thisWeight); */
+            }
+
+            if (thisWeight !== null) {
+              let newLink = {
+                source: parseInt(dragStartNodeId.substring(1)),
+                target: parseInt(i), //parseInt(dragEndNodeId.substring(1)),
+                weight: parseInt(thisWeight),
+              };
+              let unique = true;
+              for (let singleLink of linksGlobal) {
+                console.log(singleLink, newLink);
+                if (
+                  singleLink.source.name === newLink.source &&
+                  singleLink.target.name === newLink.target
+                ) {
+                  unique = false;
+                  console.log("exists");
+                }
+              }
+              if (unique === true) {
+                console.log("exists not");
+                update([...nodesGlobal], [...linksGlobal, newLink]);
+              } else {
+                alert(
+                  "You already added an edge from " +
+                    newLink.source.toString() +
+                    " to " +
+                    newLink.target.toString()
+                );
+              }
+            }
           }
         }
       }
@@ -375,8 +402,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   }
 
   function update(nodes, links) {
-    console.log(isWeightedVariable);
-    console.log(nodes, links);
+    /* console.log(isWeightedVariable);
+    console.log(nodes, links); */
     let navbox = document.querySelector(".top-bar-container");
     let offsetTop; //= 220;
     offsetTop = navbox.clientHeight;
@@ -389,15 +416,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     linksGlobal = links;
     setNodes(nodes);
     setLinks(links);
-    ////console.log(nodesGlobal, linksGlobal);
-    //console.log(nodes, links);
 
     // Apply the general update pattern to the nodes.#
-    ////console.log(vertex);
     vertex = vertex.data(nodes);
-    ////console.log(vertex);
     vertex.exit().remove();
-    ////console.log(vertex);
     vertex = vertex
       .enter()
       .append("g")
@@ -412,8 +434,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         beginDragLine(d);
       })
       .merge(vertex);
-
-    ////console.log(vertex)
 
     d3.selectAll("circle"); //.call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended))
     d3.selectAll(".gLinks").on("mousedown", function (event) {
@@ -457,7 +477,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .data(links)
       .append("text")
       .text(function (d) {
-        console.log(d);
+        /* console.log(d); */
         /* if (d.weight) { */
         return d.weight.toString();
         /* } else {
@@ -467,6 +487,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .style("font-size", 16)
       .attr("stroke-width", 0)
       .style("user-select", "none")
+      //.style("filter", "drop-shadow( 0px 0px 6px white) drop-shadow( 0px 0px 6px white)")
       .on("click", hala);
 
     nodeText = svg
@@ -480,6 +501,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .style("user-select", "none")
       .attr("stroke-width", 0)
       .style("fill", "black");
+    //.style("filter", "drop-shadow( 0px 0px 6px white) drop-shadow( 0px 0px 6px white)");
 
     if (weightsDisplay === 0) {
       console.log("weight disapper");
@@ -553,34 +575,53 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             correctionCoeff = correctionCoeff - 2;
           }
         }
+
+        let h = d.target.y - d.source.y;
+        let w = d.target.x - d.source.x;
+        let r = 15;
+        let OSCx = (h * r) / Math.sqrt(Math.pow(h, 2) + Math.pow(w, 2));
+        let OSCy = (w * r) / Math.sqrt(Math.pow(h, 2) + Math.pow(w, 2));
         if (d.target.x > d.source.x) {
-          return Math.max(
-            radius,
-            Math.min(
-              widthHere - radius,
-              d.source.x + (d.target.x - d.source.x) / 2 - correctionCoeff
-            )
+          return (
+            Math.max(
+              radius,
+              Math.min(
+                widthHere - radius,
+                d.source.x + (d.target.x - d.source.x) / 2 - correctionCoeff
+              )
+            ) + OSCx
           );
         } else {
-          return Math.max(
-            radius,
-            Math.min(
-              widthHere - radius,
-              d.target.x + (d.source.x - d.target.x) / 2 - correctionCoeff
-            )
+          return (
+            Math.max(
+              radius,
+              Math.min(
+                widthHere - radius,
+                d.target.x + (d.source.x - d.target.x) / 2 - correctionCoeff
+              )
+            ) + OSCx
           );
         }
       })
       .attr("y", function (d) {
+        let h = d.target.y - d.source.y;
+        let w = d.target.x - d.source.x;
+        let r = 10;
+        let OSCx = (h * r) / Math.sqrt(Math.pow(h, 2) + Math.pow(w, 2));
+        let OSCy = (w * r) / Math.sqrt(Math.pow(h, 2) + Math.pow(w, 2));
         if (d.target.y > d.source.y) {
-          return Math.max(
-            radius,
-            Math.min(heightHere - radius, d.source.y + (d.target.y - d.source.y) / 2 + 4)
+          return (
+            Math.max(
+              radius,
+              Math.min(heightHere - radius, d.source.y + (d.target.y - d.source.y) / 2 + 4)
+            ) - OSCy
           );
         } else {
-          return Math.max(
-            radius,
-            Math.min(heightHere - radius, d.target.y + (d.source.y - d.target.y) / 2 + 4)
+          return (
+            Math.max(
+              radius,
+              Math.min(heightHere - radius, d.target.y + (d.source.y - d.target.y) / 2 + 4)
+            ) - OSCy
           );
         }
       });
@@ -627,8 +668,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       d3.select(main.current).select("svg").selectAll("line").attr("stroke", color);
     } else {
       let edgeId = "#e" + i.toString() + "-" + j.toString();
-      console.log(edgeId);
-      console.log(linksGlobal);
+      /* console.log(edgeId);
+      console.log(linksGlobal); */
       d3.select(main.current).select("svg").select(edgeId).attr("stroke", color);
     }
   };
@@ -676,7 +717,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     //BFS_STEP saves every edge and target node that BFS looks at, both visited and unvisited.
     visitedNodesBFS = new Set();
     previousExploredBFS = new Set();
-    console.log(index);
+    /*  console.log(index); */
     //Start everything with the default colors
     recolorNode("all", "black");
     recolorEdge("all", "all", "grey");
@@ -839,8 +880,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     }
   };
 
-  console.log(isWeighted, "isWei");
-  console.log(isDirected, "isDir");
+  /* console.log(isWeighted, "isWei");
+  console.log(isDirected, "isDir"); */
   return (
     <div className="Graphs-pageContainer">
       <div className="top-bar-container">
