@@ -917,7 +917,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   setStartNodeBFS={setStartNodeBFS}
                   emptyBFSCounter={emptyBFSCounter}
                   hideDijkstraLegend={hideDijkstraLegend}
-                  is
+                  isWeighted={isWeighted}
+                  isDirected={isDirected}
                 />
                 <Dijkstra
                   recolorNode={recolorNode}
@@ -930,6 +931,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   setDijkstra_INDEX={setDijkstra_INDEX}
                   displayDijkstraLegend={displayDijkstraLegend}
                   emptyDijkstraCounter={emptyDijkstraCounter}
+                  isWeighted={isWeighted}
+                  isDirected={isDirected}
                 />
 
                 <FloydWarshall

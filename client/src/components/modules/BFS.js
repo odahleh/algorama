@@ -14,6 +14,8 @@ const BFS = ({
   setStartNodeBFS,
   emptyBFSCounter,
   hideDijkstraLegend,
+  isWeighted,
+  isDirected
 }) => {
   let [showBFSProgress, setShowBFSProgress] = useState(false);
 
@@ -22,18 +24,28 @@ const BFS = ({
     let neighborsEdges = [];
     // console.log("links", links);
     for (let edge of links) {
-      if (edge.source.name === start.name) {
-        neighbors.push(edge.target.name);
-        neighborsEdges.push(edge);
-      } else if (edge.target.name === start.name) {
-        neighbors.push(edge.source.name);
-        neighborsEdges.push(edge);
+      //Currently using directions
+      if (isDirected === 1){
+        if(edge.source.name === start.name){
+          neighbors.push(edge.target.name);
+          neighborsEdges.push(edge);
+        }
+      } 
+      else{
+        if (edge.source.name === start.name) {
+          neighbors.push(edge.target.name);
+          neighborsEdges.push(edge);
+        } else if (edge.target.name === start.name) {
+          neighbors.push(edge.source.name);
+          neighborsEdges.push(edge);
+        }
       }
     }
     // console.log(neighbors);
     return [neighbors, neighborsEdges];
   }
   function BFS() {
+
     hideDijkstraLegend();
     emptyBFSCounter();
     recolorNode("all", "black");
@@ -42,7 +54,11 @@ const BFS = ({
     // setBFS_INDEX(0);
     if (startNodeBFS === "") {
       alert("Please set a start node for BFS.");
-    } else {
+    } 
+    else if(isWeighted === 1){
+      alert("BFS does not support in weightd graphs. Please run another Algoritm or choose an unweighted graphs.");
+    }
+    else {
       displayBFSLegend();
       setBFS_INDEX(-1);
       let start = { name: parseInt(startNodeBFS) };
