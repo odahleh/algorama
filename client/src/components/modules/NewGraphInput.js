@@ -76,7 +76,12 @@ const NewGraphInput = (props) => {
   const addEdge = () => {
     props.hideBFSLegend();
     props.hideDijkstraLegend();
-    if (isNaN(valueEdges) || isNaN(valueEdges2) || isNaN(valueWeight)) {
+    if (
+      isNaN(valueEdges) ||
+      valueEdges === "" ||
+      isNaN(valueEdges2) | (valueEdges2 === "") ||
+      isNaN(valueWeight)
+    ) {
       alert("Invalid input. Please put the node's numbers.");
     } else if (
       parseInt(valueEdges) >= props.nodes.length ||
@@ -84,14 +89,25 @@ const NewGraphInput = (props) => {
     ) {
       alert("Invalid input. One or both of those nodes don't exist.");
     } else {
-      props.update(props.nodes, [
-        ...props.links,
-        {
-          source: parseInt(valueEdges),
-          target: parseInt(valueEdges2),
-          weight: parseInt(valueWeight),
-        },
-      ]);
+      if (valueWeight === "") {
+        props.update(props.nodes, [
+          ...props.links,
+          {
+            source: parseInt(valueEdges),
+            target: parseInt(valueEdges2),
+            weight: 1,
+          },
+        ]);
+      } else {
+        props.update(props.nodes, [
+          ...props.links,
+          {
+            source: parseInt(valueEdges),
+            target: parseInt(valueEdges2),
+            weight: parseInt(valueWeight),
+          },
+        ]);
+      }
     }
   };
 
@@ -169,7 +185,7 @@ const NewGraphInput = (props) => {
           className="InputBox InputBoxSmall"
         />
         <button className="button " onClick={addEdge}>
-          add Edge
+          Add edge
         </button>
       </div>
       <div className="Graph-names u-flex u-flex-alignCenter">
