@@ -768,7 +768,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   let legend = <div></div>;
   if (showBFSLegend === true || showDijkstraLegend === true) {
     legend = (
-      <div className="container">
+      <div className="container u-flex">
         <div className="Algorithm-legend">
           {" "}
           <table className="legend-table">
@@ -976,15 +976,14 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   hideDijkstraLegend={hideDijkstraLegend}
                 />
               </div>
-              <div>
-                <Legend />
-              </div>
             </>
           )}
         </div>
       </div>
+      <div className=" u-flex legend-tables">
+          {legend}
+      </div>
       <div id="main" className="Graphs-svgContainer" ref={main} /* width="500px" height="500px" */>
-        {legend}
         <svg width={window.innerWidth} height={window.innerHeight} onClick={mama} />
         {""}
       </div>
