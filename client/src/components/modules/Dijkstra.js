@@ -26,7 +26,7 @@ const Dijkstra = ({
     if (startNode === "") {
       alert("Please set a start node for Dijkstra.");
     }
-    else if (isNaN(startNodeBFS)){
+    else if (isNaN(startNode)){
       alert("This is not a valid input. Please input a valid node."); 
     }
     else if (parseInt(startNode) >= nodesState.length || parseInt(startNode) < 0){
