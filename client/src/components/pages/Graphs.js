@@ -75,7 +75,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   /* console.log("is Weighted", isWeighted); */
   useLayoutEffect(() => {
     function updateSize() {
-      /* console.log("updateSize"); */
+      console.log("updateSize");
       let navbox = document.querySelector(".top-bar-container");
       let offsetTop; //= 220;
       offsetTop = navbox.clientHeight;
@@ -84,6 +84,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         .selectAll("svg")
         .attr("height", window.innerHeight - navbox.clientHeight)
         .attr("width", window.innerWidth);
+
       clearTimeout(timeOutFunctionId);
       timeOutFunctionId = setTimeout(function () {
         if (simulation) {
@@ -92,7 +93,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             d3.forceCenter(window.innerWidth / 2, (window.innerHeight - offsetTop) / 2)
           );
         }
-      }, 500);
+        if (isSimulation) {
+          simulation.alpha(0.7).restart();
+        }
+      }, 100);
       setHeight(window.innerHeight - navbox.clientHeight);
       setWidth(window.innerWidth);
     }

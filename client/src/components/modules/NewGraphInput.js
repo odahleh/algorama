@@ -166,7 +166,7 @@ const NewGraphInput = (props) => {
           type="text"
           value={valueEdges}
           onChange={handleChangeEdges}
-          placeholder={"# node"}
+          placeholder={"node"}
           className="InputBox InputBoxSmall"
         />
         <p>to</p>
@@ -174,7 +174,7 @@ const NewGraphInput = (props) => {
           type="text"
           value={valueEdges2}
           onChange={handleChangeEdges2}
-          placeholder={"# node"}
+          placeholder={"node"}
           className="InputBox InputBoxSmall"
         />
         <p className="Edge-weight"> , weight</p>
