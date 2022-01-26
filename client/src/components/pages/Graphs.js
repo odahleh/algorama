@@ -736,6 +736,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         }
       }
     }
+    levels.sort();
     let table = [];
     //For the current levels, display all the current nodes at the distance
     if (levels.length > 0) {
@@ -750,7 +751,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       }
     }
     //avoid aliasing
-    levelSets = Array.from(table).join(" || ");
+    levelSets = Array.from(table);
 
     //Find all already explored nodes and mark them, then color them
     for (let i = 0; i <= index - 1; i++) {
@@ -1067,7 +1068,11 @@ const Graphs = ({ userId, handleLogout, userName }) => {
 
                 <tr>
                   <td>Table</td>
-                  <td>{levelSets}</td>
+                  <tr>
+                    {levelSets.map((level) => (
+                      <tr>{level}</tr>
+                    ))}
+                  </tr>
                 </tr>
               </table>
             </div>
