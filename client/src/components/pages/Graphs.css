@@ -181,6 +181,14 @@
   text-align: center;
 }
 
+.InputBox3:focus{
+  outline: none;
+  border: 0px;
+  border-bottom: 2px solid;
+  border-color: var(--primary);
+  transition: all 0.5s;
+}
+
 .Graphs-switch {
   overflow: hidden;
   margin: 8px;

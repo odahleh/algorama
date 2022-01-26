@@ -65,6 +65,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
 
   useLayoutEffect(() => {
     function updateSize() {
+      console.log("updateSize");
       let navbox = document.querySelector(".top-bar-container");
       let offsetTop; //= 220;
       offsetTop = navbox.clientHeight;
@@ -88,7 +89,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     window.addEventListener("resize", updateSize);
     updateSize();
     return () => window.removeEventListener("resize", updateSize);
-  }, []);
+  });
 
   useEffect(() => {
     let navbox = document.querySelector(".top-bar-container");
@@ -96,6 +97,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     setHeight(window.innerHeight - navbox.clientHeight);
     setWidth(window.innerWidth);
   }, [HEIGHT, WIDTH]);
+
+  let isWeightedVariable = isWeighted;
+  console.log(isWeightedVariable);
 
   const handleResize = () => {
     d3.select(main.current)
@@ -318,13 +322,21 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         ) {
           onNode = true;
           let dragEndNodeId = "v" + i.toString();
-          let thisWeight = window.prompt("Give this edge a weight", "1");
-          var newLink = {
-            source: parseInt(dragStartNodeId.substring(1)),
-            target: parseInt(i), //parseInt(dragEndNodeId.substring(1)),
-            weight: parseInt(thisWeight),
-          };
-          update([...nodesGlobal], [...linksGlobal, newLink]);
+          let thisWeight = "1";
+          console.log(isWeightedVariable);
+          if (isWeightedVariable === 1) {
+            console.log("prompt");
+            thisWeight = window.prompt("Give this edge a weight", "1");
+            console.log(thisWeight);
+          }
+          if (thisWeight !== null) {
+            var newLink = {
+              source: parseInt(dragStartNodeId.substring(1)),
+              target: parseInt(i), //parseInt(dragEndNodeId.substring(1)),
+              weight: parseInt(thisWeight),
+            };
+            update([...nodesGlobal], [...linksGlobal, newLink]);
+          }
         }
       }
       dragLine.classed("hidden", true);
@@ -340,7 +352,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   }
 
   function update(nodes, links) {
-    console.log(isWeighted);
+    console.log(isWeightedVariable);
     console.log(nodes, links);
     let navbox = document.querySelector(".top-bar-container");
     let offsetTop; //= 220;
@@ -446,7 +458,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .attr("stroke-width", 0)
       .style("fill", "black");
 
-    if (isWeighted === 0) {
+    if (isWeightedVariable === 0) {
       console.log("weight disapper");
       linkText2.attr("opacity", 0);
     }
@@ -473,28 +485,33 @@ const Graphs = ({ userId, handleLogout, userName }) => {
 
   //force upon creation
   function ticked() {
+    let widthHere = window.innerWidth;
+    let navbox = document.querySelector(".top-bar-container");
+
+    let offsetTopHere = navbox.clientHeight;
+    let heightHere = window.innerHeight - offsetTopHere;
     let radius = 10;
     vertex
       .attr("cx", function (d) {
         //console.log(d.x);
-        return Math.max(radius, Math.min(WIDTH - radius, d.x));
+        return Math.max(radius, Math.min(widthHere - radius, d.x));
       })
       .attr("cy", function (d) {
-        return Math.max(radius, Math.min(HEIGHT - radius, d.y));
+        return Math.max(radius, Math.min(heightHere - radius, d.y));
       });
     edge
       .attr("x1", function (d) {
         //console.log(d.source.x);
-        return Math.max(radius, Math.min(WIDTH - radius, d.source.x));
+        return Math.max(radius, Math.min(widthHere - radius, d.source.x));
       })
       .attr("y1", function (d) {
-        return Math.max(radius, Math.min(HEIGHT - radius, d.source.y));
+        return Math.max(radius, Math.min(heightHere - radius, d.source.y));
       })
       .attr("x2", function (d) {
-        return Math.max(radius, Math.min(WIDTH - radius, d.target.x));
+        return Math.max(radius, Math.min(widthHere - radius, d.target.x));
       })
       .attr("y2", function (d) {
-        return Math.max(radius, Math.min(HEIGHT - radius, d.target.y));
+        return Math.max(radius, Math.min(heightHere - radius, d.target.y));
       });
     /* linkText
       .attr("cx", function (d) {
@@ -525,12 +542,18 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         if (d.target.x > d.source.x) {
           return Math.max(
             radius,
-            Math.min(WIDTH - radius, d.source.x + (d.target.x - d.source.x) / 2 - correctionCoeff)
+            Math.min(
+              widthHere - radius,
+              d.source.x + (d.target.x - d.source.x) / 2 - correctionCoeff
+            )
           );
         } else {
           return Math.max(
             radius,
-            Math.min(WIDTH - radius, d.target.x + (d.source.x - d.target.x) / 2 - correctionCoeff)
+            Math.min(
+              widthHere - radius,
+              d.target.x + (d.source.x - d.target.x) / 2 - correctionCoeff
+            )
           );
         }
       })
@@ -538,12 +561,12 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         if (d.target.y > d.source.y) {
           return Math.max(
             radius,
-            Math.min(HEIGHT - radius, d.source.y + (d.target.y - d.source.y) / 2 + 4)
+            Math.min(heightHere - radius, d.source.y + (d.target.y - d.source.y) / 2 + 4)
           );
         } else {
           return Math.max(
             radius,
-            Math.min(HEIGHT - radius, d.target.y + (d.source.y - d.target.y) / 2 + 4)
+            Math.min(heightHere - radius, d.target.y + (d.source.y - d.target.y) / 2 + 4)
           );
         }
       });
@@ -559,10 +582,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             correctionCoeff = correctionCoeff - 2;
           }
         }
-        return Math.max(radius, Math.min(WIDTH - radius, d.x - correctionCoeff));
+        return Math.max(radius, Math.min(widthHere - radius, d.x - correctionCoeff));
       })
       .attr("y", function (d) {
-        return Math.max(radius, Math.min(HEIGHT - radius, d.y + 4 - 15));
+        return Math.max(radius, Math.min(heightHere - radius, d.y + 4 - 15));
       });
   }
 
@@ -606,6 +629,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   };
 
   const changeWeighted = (int) => {
+    console.log("changeWeighted");
     if (isWeighted === 0) {
       d3.select(main.current)
         .selectAll("svg")
