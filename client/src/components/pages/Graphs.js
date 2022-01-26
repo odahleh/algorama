@@ -714,42 +714,32 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     );
   }
   function Dijkstra_stepper(index) {
-    minNodesDijkstra.add(parseInt(startNodeBFS));
-    console.log("START NODE", startNodeBFS);
-    console.log("DIJKSTRA STATE", Dijkstra_STEP_State);
-    console.log("VISITED", minNodesDijkstra);
-    for (let i = index; i < Dijkstra_STEP_State.length; i++) {
-      let [target, edge, is_min] = Dijkstra_STEP_State[i];
-      recolorNode(target, "black");
-      recolorEdge(edge.source.name, edge.target.name, "grey");
-    }
+    // reset all nodes + edges to original color
+    recolorNode("all", "black");
+    recolorEdge("all", "all", "grey");
 
+    // color start node red
     recolorNode(parseInt(startNodeBFS), "red");
 
+    // if node is min of pqueue (on shortest path) color red, else will stay black
     for (let i = 0; i < index; i++) {
       let [target, edge, is_min] = Dijkstra_STEP_State[i];
-      if (!is_min && !minNodesDijkstra.has(target)) {
-        recolorNode(target, "black");
-        recolorEdge(edge.source.name, edge.target.name, "grey");
-      }
-      if (minNodesDijkstra.has(target)) {
-        console.log("in");
+      if (is_min) {
         recolorNode(target, "red");
         recolorEdge(edge.source.name, edge.target.name, "red");
       }
     }
-
-    console.log("INDEX", index);
+    // if is not min (neighbor being considered), color blue, else color red
     let [target, edge, is_min] = Dijkstra_STEP_State[index];
     if (!is_min) {
-            recolorNode(target, "blue");
+      recolorNode(target, "blue");
       recolorEdge(edge.source.name, edge.target.name, "blue");
     } else {
-      minNodesDijkstra.add(target);
       recolorNode(target, "red");
       recolorEdge(edge.source.name, edge.target.name, "red");
     }
   }
+
   const nextStep = () => {
     if (showBFSLegend) {
       BFS_stepper(Math.min(BFS_STEP_State.length - 1, Math.max(1 + BFS_INDEX, -1)));
@@ -776,21 +766,57 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         <div className="Algorithm-legend">
           {" "}
           <table className="legend-table">
-            <tr>{showBFSLegend ? <th>BFS Legend</th> : <th>Dijkstra Legend</th>}</tr>
+            {showBFSLegend ? (
+              <>
+                <tr>
+                  <th>BFS Legend</th>
+                </tr>
+                <tr>
+                  <td>
+                    <div className="pinkCircle" />
+                  </td>
+                  <td>Visited Nodes</td>
+                </tr>
+                <tr>
+                  <td>
+                    <div className="aquaEdge" />
+                  </td>
+                  <td>Current Path</td>
+                </tr>
+                <div className="infoLegend u-flex u-flexColumn">
+                  <div>Start Node = {startNodeBFS}</div>
+                  <div>Current Node = {currentNodeBFS} </div>
+                  <div>Current Edge = {currentEdgeBFS}</div>
+                  <div>Visited Nodes = {Array.from(visitedNodesBFS).join(", ")} </div>
+                  <div>Queue = {queue}</div>
+                  <div>Table = {levelSets}</div>
+                </div>
+              </>
+            ) : showDijkstraLegend ? (
+              <>
+                <tr>
+                  <th>Dijkstra Legend</th>
+                </tr>
+                <tr>
+                  <tr>
+                    <td>
+                      <div className="pinkCircle" />
+                    </td>
+                    <td>Visited Nodes</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div className="aquaEdge" />
+                    </td>
+                    <td>Current Path</td>
+                  </tr>
+                </tr>
+              </>
+            ) : (
+              <th>Floyd-Warshall Legend</th>
+            )}
             <tr>
               <td width="34%" />
-            </tr>
-            <tr>
-              <td>
-                <div className="aquaEdge" />
-              </td>
-              <td>Current Path</td>
-            </tr>
-            <tr>
-              <td>
-                <div className="pinkCircle" />
-              </td>
-              <td>Visited Nodes</td>
             </tr>
           </table>
           <div>
@@ -801,14 +827,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
               Next Step
             </button>
           </div>
-        </div>
-        <div className="infoLegend u-flex u-flexColumn">
-          <div>Start Node = {startNodeBFS}</div>
-          <div>Current Node = {currentNodeBFS} </div>
-          <div>Current Edge = {currentEdgeBFS}</div>
-          <div>Visited Nodes = {Array.from(visitedNodesBFS).join(", ")} </div>
-          <div>Queue = {queue}</div>
-          <div>Table = {levelSets}</div>
         </div>
       </div>
     );

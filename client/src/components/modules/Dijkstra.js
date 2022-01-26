@@ -64,7 +64,7 @@ const Dijkstra = ({
           }
         }
       }
-      // console.log(distanceArray);
+      console.log(distanceArray);
       // console.log(Dijkstra_STEP);
       Dijkstra_STEP.shift();
       setDijkstra_State(Dijkstra_STEP);
