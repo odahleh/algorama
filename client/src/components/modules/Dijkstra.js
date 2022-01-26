@@ -1,7 +1,7 @@
 import React, { Component, useEffect, useState } from "react";
 import "../../utilities.css";
 import "../pages/Graphs.css";
-
+import BFS from "./BFS";
 const Dijkstra = ({
   recolorNode,
   recolorEdge,
@@ -16,6 +16,51 @@ const Dijkstra = ({
   isWeighted,
   isDirected,
 }) => {
+  function run_bfs(){
+    let start = { name: parseInt(startNode) };
+    let links = linksState;
+    let nodes = nodesState;
+    console.log(links, nodes);
+    let visited = new Set();
+    let distanceArrayBFS = [];
+    for (let node in nodes) {
+      if (node !== start.name) {
+        distanceArrayBFS.push(Infinity);
+      } else {
+        distanceArrayBFS.push(0);
+      }
+    }
+    let queue = [parseInt(startNode)];
+    let level = 0;
+    while (queue.length > 0) {
+      let neighbors = [];
+      for (let next of queue) {
+        if (!visited.has(next)) {
+          visited.add(next);
+          distanceArrayBFS[next] = level;
+        }
+      }
+      level += 1;
+      for (let next of queue) {
+        // console.log("NEXT", next);
+        let [currNeighbors, currNeighborsEdges] = findNeighbors({ name: parseInt(next) }, links);
+        // console.log(currNeighbors);
+        for (let neigh in currNeighbors) {
+          // console.log("NEIGH");
+          if (!visited.has(currNeighbors[neigh])) {
+            if (!neighbors.includes(currNeighbors[neigh])) {
+              neighbors.push(currNeighbors[neigh]);
+            }
+            //BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], next]);
+          }
+        }
+      }
+
+      queue = neighbors;
+      // console.log("queue", queue);
+    }
+    return distanceArrayBFS; 
+  }
   function dijkstra() {
     recolorNode("all", "black");
     recolorEdge("all", "all", "grey");
@@ -25,42 +70,46 @@ const Dijkstra = ({
     emptyDijkstraCounter();
     if (startNode === "") {
       alert("Please set a start node for Dijkstra.");
-    } else if (isNaN(startNodeBFS)) {
-      alert("Invalid input. Please input a valid node.");
-    } else if (parseInt(startNode) >= nodesState.length || parseInt(startNode) < 0) {
-      alert("This is not a valid starting node. Please select a valid starting node.");
-    } else {
-      console.log(nodesState.length, "lenght");
-      let negativeWeights = false;
-      for (let edge of linksState) {
-        if (edge.weight < 0) {
-          alert(
-            "This algorithm does not support negative weights. Please choose a different graph."
-          );
-          negativeWeights = true;
+    }
+    else if (isNaN(startNode)){
+      alert("This is not a valid input. Please input a valid node."); 
+    }
+    else if (parseInt(startNode) >= nodesState.length || parseInt(startNode) < 0){
+      alert("This is not a valid starting node. Please select a valid starting node.")
+    }
+    else {
+        console.log(nodesState.length, "lenght");
+        console.log(nodesState, linksState, "nodes and edges"); 
+        let negativeWeights = false; 
+        for (let edge of linksState){
+          if (edge.weight < 0){
+            alert("This Algorithm does not support negative weights, please choose a different graph.");
+            negativeWeights = true; 
         }
       }
-      if (!negativeWeights) {
-        recolorNode(startNode, "red");
-        displayDijkstraLegend();
-        setDijkstra_INDEX(-1);
-        emptyDijkstraCounter();
-        let links = linksState;
-        let nodes = nodesState;
-        let Dijkstra_STEP = [];
-        let distanceArray = [];
-        let parentArray = [];
-        let pqueue = [];
-        let start = parseInt(startNode);
-        for (let node of nodes) {
-          if (node.name !== parseInt(startNode)) {
-            distanceArray.push(Infinity);
-          } else {
-            distanceArray.push(0);
+        if(!negativeWeights){
+          displayDijkstraLegend();
+          setDijkstra_INDEX(-1);
+          emptyDijkstraCounter();
+          let distanceBFS = run_bfs(); 
+          let links = linksState;
+          let nodes = nodesState;
+          let Dijkstra_STEP = [];
+          let distanceArray = [];
+          let parentArray = [];
+          let pqueue = [];
+          let start = parseInt(startNode);
+          for (let node of nodes) {
+            if (node.name !== parseInt(startNode)) {
+              distanceArray.push(Infinity);
+            } else {
+              distanceArray.push(0);
+            }
+            if (distanceBFS[node.name] !== Infinity){
+              pqueue.push(node.name);
+            }
           }
-          pqueue.push(node.name);
-        }
-        while (pqueue.length > 0) {
+          while (pqueue.length > 0) {
           let u = null;
           let curMin = Infinity;
           for (let node in distanceArray) {

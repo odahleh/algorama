@@ -688,6 +688,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       /* console.log(edgeId);
       console.log(linksGlobal); */
       d3.select(main.current).select("svg").select(edgeId).attr("stroke", color);
+      let edgeId2 = "#e" + j.toString() + "-" + i.toString();
+      d3.select(main.current).select("svg").select(edgeId2).attr("stroke", color);
     }
   };
 
@@ -805,6 +807,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
 
   function Dijkstra_stepper(index) {
     // reset all nodes + edges to original color
+    console.log(Dijkstra_STEP_State, "djk state");
     recolorNode("all", "black");
     recolorEdge("all", "all", "grey");
     visitedNodesDijkstra = new Set();
@@ -848,6 +851,13 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     }
     let nextQueue = Dijkstra_STEP_State[Math.min(index + 1, Dijkstra_STEP_State.length - 1)][4];
     queueDijkstra = Array.from(nextQueue).sort(sortBasedOnDistance);
+    for (let j = 0; j <= index; j++) {
+      const node = Dijkstra_STEP_State[j][0]; 
+      if (nextDistances[node] === Infinity){
+        console.log(node, "target");
+        recolorNode(node, "black");
+      }
+    }
     displayStartDijkstra = Dijkstra_STEP_State[index][5];
   }
   const nextStep = () => {
