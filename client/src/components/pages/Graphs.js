@@ -12,7 +12,7 @@ import NewGraphInput from "../modules/NewGraphInput.js";
 import SaveLoadGraph from "../modules/SaveLoadGraph.js";
 import BFS from "../modules/BFS.js";
 import Dijkstra from "../modules/Dijkstra.js";
-import FloydWarshall from "../modules/FloydWarshall.js";
+/* import FloydWarshall from "../modules/FloydWarshall.js"; */
 import Legend from "../modules/Legend.js";
 
 const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
@@ -1040,14 +1040,14 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   isDirected={isDirected}
                 />
 
-                <FloydWarshall
+                {/* <FloydWarshall
                   recolorNode={recolorNode}
                   linksState={linksGlobal}
                   nodesState={nodesGlobal}
                   startNode={startNodeBFS}
                   hideBFSLegend={hideBFSLegend}
                   hideDijkstraLegend={hideDijkstraLegend}
-                />
+                /> */}
               </div>
             </>
           )}
