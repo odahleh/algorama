@@ -13,6 +13,7 @@ import SaveLoadGraph from "../modules/SaveLoadGraph.js";
 import BFS from "../modules/BFS.js";
 import Dijkstra from "../modules/Dijkstra.js";
 import FloydWarshall from "../modules/FloydWarshall.js";
+import Legend from "../modules/Legend.js";
 
 const GOOGLE_CLIENT_ID = "747234267420-pibdfg10ckesdd8t6q0nffnegumvqpi3.apps.googleusercontent.com";
 //Initialization for BFS Display
@@ -713,6 +714,14 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     console.log("START NODE", startNodeBFS);
     console.log("DIJKSTRA STATE", Dijkstra_STEP_State);
     console.log("VISITED", minNodesDijkstra);
+    for (let i = index; i < Dijkstra_STEP_State.length; i++) {
+      let [target, edge, is_min] = Dijkstra_STEP_State[i];
+      recolorNode(target, "black");
+      recolorEdge(edge.source.name, edge.target.name, "grey");
+    }
+
+    recolorNode(parseInt(startNodeBFS), "red");
+
     for (let i = 0; i < index; i++) {
       let [target, edge, is_min] = Dijkstra_STEP_State[i];
       if (!is_min && !minNodesDijkstra.has(target)) {
@@ -725,15 +734,16 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         recolorEdge(edge.source.name, edge.target.name, "red");
       }
     }
+
     console.log("INDEX", index);
     let [target, edge, is_min] = Dijkstra_STEP_State[index];
-    if (is_min) {
+    if (!is_min) {
+      recolorNode(target, "blue");
+      recolorEdge(edge.source.name, edge.target.name, "blue");
+    } else {
       minNodesDijkstra.add(target);
       recolorNode(target, "red");
       recolorEdge(edge.source.name, edge.target.name, "red");
-    } else {
-      recolorNode(target, "blue");
-      recolorEdge(edge.source.name, edge.target.name, "blue");
     }
   }
   const nextStep = () => {
@@ -922,6 +932,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   GraphSimulation={GraphSimulation}
                   isCurrentDirected={isCurrentDirected}
                   hideBFSLegend={hideBFSLegend}
+                  hideDijkstraLegend={hideDijkstraLegend}
                 />
               </div>
             </>
@@ -964,6 +975,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   hideBFSLegend={hideBFSLegend}
                   hideDijkstraLegend={hideDijkstraLegend}
                 />
+              </div>
+              <div>
+                <Legend />
               </div>
             </>
           )}

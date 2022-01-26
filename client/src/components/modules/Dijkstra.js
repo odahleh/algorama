@@ -27,16 +27,18 @@ const Dijkstra = ({
       recolorNode(startNode, "red");
       displayDijkstraLegend();
       setDijkstra_INDEX(-1);
+      emptyDijkstraCounter();
       let links = linksState;
       let nodes = nodesState;
       let Dijkstra_STEP = [];
-      //MODIFY FOR DIFFERENT STARTING NODE
-      let distanceArray = [0]; //MODIFY FOR DIFFERENT STARTING NODE
+      let distanceArray = [];
       let parentArray = [];
       let pqueue = [];
       for (let node of nodes) {
         if (node.name !== parseInt(startNode)) {
           distanceArray.push(Infinity);
+        } else {
+          distanceArray.push(0);
         }
         pqueue.push(node.name);
       }
