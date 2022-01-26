@@ -1076,7 +1076,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         {(showBFSLegend === true || showDijkstraLegend === true) && currentMode === "alg" ? (
           <>
             <div className="Graphs-infoBox">
-              <table>
+              <table className="Legend-table">
                 {showBFSLegend ? (
                   <>
                     <tr>

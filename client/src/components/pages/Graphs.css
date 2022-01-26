@@ -298,6 +298,11 @@ input[type="range"]::-webkit-slider-thumb {
   width: 0px;
 }
 
+.Legend-table td:nth-child(2) {
+  padding-left: 8px;
+  width: 120px;
+}
+
 .Graphs-instructions {
   user-select: none;
   position: absolute;
