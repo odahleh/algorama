@@ -124,6 +124,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   };
 
   const GraphSimulation = (nodes, links) => {
+    setIsSimulation(true);
     console.log("generating graph for", nodes, links);
     if (displaySimulation === false) {
       const svg = d3
@@ -1037,6 +1038,15 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       </div>
       <div id="main" className="Graphs-svgContainer" ref={main} /* width="500px" height="500px" */>
         <svg width={window.innerWidth} height={window.innerHeight} onClick={mama} />
+        {isSimulation ? (
+          <></>
+        ) : (
+          <div className="Graphs-instructions" onClick={mama}>
+            <p>Click to add a node.</p>
+            <p>Drag from one node to another to add an edge.</p>
+            <p>Choose Algorithms in the menu above to move the nodes by dragging them. </p>
+          </div>
+        )}
         {(showBFSLegend === true || showDijkstraLegend === true) && currentMode === "alg" ? (
           <>
             <div className="Graphs-infoBox">
