@@ -72,10 +72,11 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   let [showDijkstraLegend, setShowedDijkstra] = useState(false);
   let [currentMode, setCurrentMode] = useState("cre");
 
+
   /* console.log("is Weighted", isWeighted); */
   useLayoutEffect(() => {
     function updateSize() {
-      console.log("updateSize");
+      //console.log("updateSize");
       let navbox = document.querySelector(".top-bar-container");
       let offsetTop; //= 220;
       offsetTop = navbox.clientHeight;
@@ -111,6 +112,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     setHeight(window.innerHeight - navbox.clientHeight);
     setWidth(window.innerWidth);
   }, [HEIGHT, WIDTH]);
+
 
   /*  console.log(isWeighted, "line 101"); */
   let isWeightedVariable = isWeighted;
@@ -807,7 +809,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
 
   function Dijkstra_stepper(index) {
     // reset all nodes + edges to original color
-    console.log(Dijkstra_STEP_State, "djk state");
+
     recolorNode("all", "black");
     recolorEdge("all", "all", "grey");
     visitedNodesDijkstra = new Set();
@@ -854,7 +856,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     for (let j = 0; j <= index; j++) {
       const node = Dijkstra_STEP_State[j][0]; 
       if (nextDistances[node] === Infinity){
-        console.log(node, "target");
         recolorNode(node, "black");
       }
     }
@@ -937,6 +938,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
 
   /* console.log(isWeighted, "isWei");
   console.log(isDirected, "isDir"); */
+
   return (
     <div className="Graphs-pageContainer">
       <div className="top-bar-container">
@@ -944,9 +946,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         <div className="u-flex u-flex-alignCenter">
           <div className="Graphs-title left-side ">
             {" "}
-            {userName
-              ? "Welcome to Algorama, " + userName.split(" ")[0] + "!"
-              : "Welcome to Algorama!"}
+              Welcome to Algorama!
           </div>
           <div className="right-side">
             <GoogleLogout

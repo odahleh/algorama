@@ -20,7 +20,6 @@ const Dijkstra = ({
     let start = { name: parseInt(startNode) };
     let links = linksState;
     let nodes = nodesState;
-    console.log(links, nodes);
     let visited = new Set();
     let distanceArrayBFS = [];
     for (let node in nodes) {
@@ -78,8 +77,6 @@ const Dijkstra = ({
       alert("This is not a valid starting node. Please select a valid starting node.")
     }
     else {
-        console.log(nodesState.length, "lenght");
-        console.log(nodesState, linksState, "nodes and edges"); 
         let negativeWeights = false; 
         for (let edge of linksState){
           if (edge.weight < 0){
@@ -145,7 +142,7 @@ const Dijkstra = ({
             }
           }
         }
-        console.log(distanceArray);
+        //console.log(distanceArray);
         // console.log(Dijkstra_STEP);
         Dijkstra_STEP.shift();
         setDijkstra_State(Dijkstra_STEP);
