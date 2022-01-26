@@ -653,12 +653,15 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     visitedNodesBFS = new Set();
     previousExploredBFS = new Set();
     console.log(index);
+    //Start everything with the default colors
     recolorNode("all", "black");
     recolorEdge("all", "all", "grey");
-    const source = BFS_STEP_State[index][0].source.name;
-    const target = BFS_STEP_State[index][0].target.name;
-    queue = BFS_STEP_State[index][3];
-    const distances = BFS_STEP_State[index][4];
+    //Edge explored at this state, Current node, parent node, current queue, and current distanceArray
+    let [edge, current, parent, currQueue, distances] = BFS_STEP_State[index]; 
+    const source = edge.source.name;
+    const target = edge.target.name;
+    queue = Array.from(currQueue); 
+    //Find the current distances different than infinity called them levels
     let levels = [];
     for (let dist of distances) {
       if (!levels.includes(dist.toString())) {
@@ -668,7 +671,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       }
     }
     let table = [];
-
+    //For the current levels, display all the current nodes at the distance
     if (levels.length > 0) {
       for (let level of levels) {
         let nodesAtLevel = [];
@@ -680,8 +683,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         table.push("Level Set " + level + " : " + nodesAtLevel.join(", "));
       }
     }
+    //avoid aliasing
     levelSets = Array.from(table).join(" || ");
 
+    //Find all already explored nodes and mark them, then color them 
     for (let i = 0; i <= index - 1; i++) {
       const previous = BFS_STEP_State[i][2];
       visitedNodesBFS.add(previous);
@@ -690,13 +695,14 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     for (let prev of previousExploredBFS) {
       recolorNode(prev, "pink");
     }
-    if (source === BFS_STEP_State[index][1]) {
+    //Color only current node and not the naighbor, then the current edge
+    if (source === current) {
       recolorNode(target, "pink");
       currentNodeBFS = target;
       visitedNodesBFS.add(target);
       previousExploredBFS.add(target);
       currentEdgeBFS = "From " + target.toString() + " to " + source.toString();
-    } else if (target === BFS_STEP_State[index][1]) {
+    } else if (target === current) {
       currentNodeBFS = source;
       visitedNodesBFS.add(source);
       recolorNode(source, "pink");
@@ -704,11 +710,13 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       currentEdgeBFS = "From " + source.toString() + " to " + target.toString();
     }
     recolorEdge(
-      BFS_STEP_State[index][0].source.name,
-      BFS_STEP_State[index][0].target.name,
+      edge.source.name,
+      edge.target.name,
       "#00c2a5"
     );
   }
+
+
   function Dijkstra_stepper(index) {
     minNodesDijkstra.add(parseInt(startNodeBFS));
     console.log("START NODE", startNodeBFS);
