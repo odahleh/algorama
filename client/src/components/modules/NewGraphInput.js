@@ -58,7 +58,7 @@ const NewGraphInput = (props) => {
       let factor = (2 * Math.PI) / valueNodes;
       let radiusHere = 100;
       for (let i in range(parseInt(valueNodes))) {
-        console.log(i);
+        /* console.log(i); */
         currentNodes.push({
           name: props.nodes.length + parseInt(i),
           x: props.width / 2 + radiusHere * Math.sin(factor * i),
@@ -78,18 +78,19 @@ const NewGraphInput = (props) => {
     props.hideDijkstraLegend();
     if (
       isNaN(valueEdges) ||
-      valueEdges === "" ||
-      isNaN(valueEdges2) | (valueEdges2 === "") ||
+      valueEdges.trim() === "" ||
+      isNaN(valueEdges2) ||
+      valueEdges2.trim() === "" ||
       isNaN(valueWeight)
     ) {
-      alert("Invalid input. Please put the node's numbers.");
+      alert("Invalid input. Please put the nodes' numbers.");
     } else if (
       parseInt(valueEdges) >= props.nodes.length ||
       parseInt(valueEdges2) >= props.nodes.length
     ) {
       alert("Invalid input. One or both of those nodes don't exist.");
     } else {
-      if (valueWeight === "") {
+      if (valueWeight.trim() === "") {
         props.update(props.nodes, [
           ...props.links,
           {
@@ -144,7 +145,7 @@ const NewGraphInput = (props) => {
     props.GraphSimulation(nodes, links, directed);
   };
 
-  console.log(valueWeight, "value weight");
+  /* console.log(valueWeight, "value weight"); */
   return (
     <div className="u-flex u-flex-wrap">
       <div className="u-flex u-flex-alignCenter Graph-names">

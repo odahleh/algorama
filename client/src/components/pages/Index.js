@@ -21,7 +21,7 @@ const Index = ({ userId, handleLogin, handleLogout }) => {
         <div className="landing-page-title">
           <Typewriter
             options={{
-              strings: ["Algorama", "Algorithm Visualizer", "Data Visualizer", "MIT 6.006 Helper"],
+              strings: ["Algorama", "Algorithm Visualizer", "MIT 6.006 Helper"],
               autoStart: true,
               loop: true,
             }}
