@@ -541,9 +541,11 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   //force upon creation
   function ticked() {
     let widthHere = window.innerWidth;
-    let navbox = document.querySelector(".top-bar-container");
-
-    let offsetTopHere = navbox.clientHeight;
+    let offsetTopHere = 220
+    if (document.querySelector(".top-bar-container")) {
+      let navbox = document.querySelector(".top-bar-container");
+      offsetTopHere = navbox.clientHeight;
+    }
     let heightHere = window.innerHeight - offsetTopHere;
     let radius = 10;
     vertex
