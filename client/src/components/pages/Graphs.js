@@ -98,6 +98,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     setWidth(window.innerWidth);
   }, [HEIGHT, WIDTH]);
 
+  console.log(isWeighted, "line 101");
   let isWeightedVariable = isWeighted;
   console.log(isWeightedVariable);
 
@@ -927,6 +928,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   update={update}
                   nodes={nodesGlobal}
                   links={linksGlobal}
+                  height={HEIGHT}
+                  width={WIDTH}
                 />
               </div>
             </>

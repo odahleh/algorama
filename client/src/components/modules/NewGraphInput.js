@@ -41,23 +41,29 @@ const NewGraphInput = (props) => {
   const addNode = () => {
     props.hideBFSLegend();
     props.hideDijkstraLegend();
-    if (valueNodes === "") {
+    /*  if (valueNodes === "") {
       console.log("zero");
       if (props.nodes.length === 0) {
         props.GraphSimulation([{ name: props.nodes.length }], props.links);
       } else {
         props.update([...props.nodes, { name: props.nodes.length }], props.links);
       }
-    } else if (isNaN(valueNodes)) {
+    } else  */ if (isNaN(valueNodes)) {
       alert("Invalid input. Please put a number.");
     } else if (parseInt(valueNodes) > 100) {
       alert("Invalid input. You can't add more than 100 nodes at a time.");
     } else {
       let currentNodes = [...props.nodes];
       let newNodes = [];
+      let factor = (2 * Math.PI) / valueNodes;
+      let radiusHere = 100;
       for (let i in range(parseInt(valueNodes))) {
         console.log(i);
-        currentNodes.push({ name: props.nodes.length + parseInt(i) });
+        currentNodes.push({
+          name: props.nodes.length + parseInt(i),
+          x: props.width / 2 + radiusHere * Math.sin(factor * i),
+          y: props.height / 2 + radiusHere * Math.cos(factor * i),
+        });
       }
       if (props.nodes.length === 0) {
         props.GraphSimulation(currentNodes, props.links);
