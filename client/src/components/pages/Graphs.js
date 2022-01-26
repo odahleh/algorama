@@ -318,10 +318,11 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         ) {
           onNode = true;
           let dragEndNodeId = "v" + i.toString();
+          let thisWeight = window.prompt("Give this edge a weight", "1");
           var newLink = {
             source: parseInt(dragStartNodeId.substring(1)),
             target: parseInt(i), //parseInt(dragEndNodeId.substring(1)),
-            weight: 1,
+            weight: parseInt(thisWeight),
           };
           update([...nodesGlobal], [...linksGlobal, newLink]);
         }
