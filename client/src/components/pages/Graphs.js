@@ -129,7 +129,12 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   };
 
   const GraphSimulation = (nodes, links) => {
-    setIsSimulation(true);
+    if (nodes.length === 0) {
+      console.log("no");
+      setIsSimulation(false);
+    } else {
+      setIsSimulation(true);
+    }
     console.log("generating graph for", nodes, links);
     if (displaySimulation === false) {
       const svg = d3
