@@ -41,6 +41,8 @@ let linksGlobal = [];
 let dragStartX, dragStartY, dragStartNodeId;
 let isDragLine = false;
 let timeOutFunctionId;
+let weightsDisplay = 0; 
+let directionDisplay = 0; 
 
 let legend = <div></div>;
 
@@ -63,6 +65,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   let [showDijkstraLegend, setShowedDijkstra] = useState(false);
   let [currentMode, setCurrentMode] = useState("cre");
 
+  console.log("is Weighted", isWeighted);
   useLayoutEffect(() => {
     function updateSize() {
       console.log("updateSize");
@@ -254,9 +257,28 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     d.fy = null;
   }
 
-  function beginDragLine(d) {
+  const changeWeighted = (int) => {
+    console.log("changeWeighted");
+    if (isWeighted === 0) {
+      d3.select(main.current)
+        .selectAll("svg")
+        .selectAll(".gSingleLine")
+        .selectAll("text")
+        .style("opacity", 1);
+    } else {
+      d3.select(main.current)
+        .selectAll("svg")
+        .selectAll(".gSingleLine")
+        .selectAll("text")
+        .style("opacity", 0);
+    }
+    setWeighted(1 - isWeighted);
+    weightsDisplay = 1 - weightsDisplay;
+  };
+
+function beginDragLine(d) {
     isDragLine = true;
-    console.log("Start");
+    console.log("Start", isWeighted, isWeightedVariable, weightsDisplay);
     dragStartNodeId = d.path[0].id;
     mousedownNode = d.path[0];
     dragStartX = mousedownNode.cx.baseVal.value;
@@ -325,7 +347,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           let dragEndNodeId = "v" + i.toString();
           let thisWeight = "1";
           console.log(isWeightedVariable);
-          if (isWeightedVariable === 1) {
+          if (weightsDisplay === 1) {
             console.log("prompt");
             thisWeight = window.prompt("Give this edge a weight", "1");
             console.log(thisWeight);
@@ -415,7 +437,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       })
       .merge(edge);
 
-    if (isDirected === 0) {
+    if (directionDisplay === 0) {
       d3.select(main.current).select("path").attr("opacity", 0);
     }
     d3.selectAll(".gSingleLine").selectAll("text").remove();
@@ -459,7 +481,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .attr("stroke-width", 0)
       .style("fill", "black");
 
-    if (isWeightedVariable === 0) {
+    if (weightsDisplay === 0) {
       console.log("weight disapper");
       linkText2.attr("opacity", 0);
     }
@@ -475,14 +497,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     simulation.alpha(0.7).restart();
   }
 
-  const addNode = () => {
-    if (nodesGlobal.length === 0) {
-      //nodesGlobal.push({ name: 0 });
-      GraphSimulation([nodesGlobal, { name: 0 }], linksGlobal);
-    } else {
-      update([...nodesGlobal, { name: nodesGlobal.length }], linksGlobal);
-    }
-  };
 
   //force upon creation
   function ticked() {
@@ -627,24 +641,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       d3.select(main.current).select("path").attr("opacity", 0);
     }
     setDirected(1 - isDirected);
-  };
-
-  const changeWeighted = (int) => {
-    console.log("changeWeighted");
-    if (isWeighted === 0) {
-      d3.select(main.current)
-        .selectAll("svg")
-        .selectAll(".gSingleLine")
-        .selectAll("text")
-        .style("opacity", 1);
-    } else {
-      d3.select(main.current)
-        .selectAll("svg")
-        .selectAll(".gSingleLine")
-        .selectAll("text")
-        .style("opacity", 0);
-    }
-    setWeighted(1 - isWeighted);
+    directionDisplay = 1 - directionDisplay; 
   };
 
   const displayBFSLegend = () => {
