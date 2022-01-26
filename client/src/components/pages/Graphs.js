@@ -430,7 +430,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
         }
       })
       .style("font-size", 16)
-      .attr("stroke-width", 0);
+      .attr("stroke-width", 0)
+      .style("user-select", "none")
+      .on("click", hala);
 
     nodeText = svg
       .selectAll(".gSingleNode")
@@ -810,9 +812,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     );
   }
 
-  /* const hala = () => {
+  const hala = () => {
     console.log("barca");
-  }; */
+  };
 
   const changeMode = () => {
     if (currentMode === "alg") {
