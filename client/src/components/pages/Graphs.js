@@ -1073,7 +1073,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           <></>
         ) : (
           <div className="Graphs-instructions" onClick={mama}>
-            <p>Click to add a node.</p>
+            <p>Click here to add a node or select one of your saved graphs.</p>
             <p>Drag from one node to another to add an edge.</p>
             <p>Choose Algorithms in the menu above to move the nodes by dragging them. </p>
           </div>
