@@ -41,6 +41,8 @@ let linksGlobal = [];
 let dragStartX, dragStartY, dragStartNodeId;
 let isDragLine = false;
 let timeOutFunctionId;
+let weightsDisplay = 0;
+let directionDisplay = 0;
 
 let legend = <div></div>;
 
@@ -63,6 +65,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   let [showDijkstraLegend, setShowedDijkstra] = useState(false);
   let [currentMode, setCurrentMode] = useState("cre");
 
+  console.log("is Weighted", isWeighted);
   useLayoutEffect(() => {
     function updateSize() {
       console.log("updateSize");
@@ -254,9 +257,28 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     d.fy = null;
   }
 
+  const changeWeighted = (int) => {
+    console.log("changeWeighted");
+    if (isWeighted === 0) {
+      d3.select(main.current)
+        .selectAll("svg")
+        .selectAll(".gSingleLine")
+        .selectAll("text")
+        .style("opacity", 1);
+    } else {
+      d3.select(main.current)
+        .selectAll("svg")
+        .selectAll(".gSingleLine")
+        .selectAll("text")
+        .style("opacity", 0);
+    }
+    setWeighted(1 - isWeighted);
+    weightsDisplay = 1 - weightsDisplay;
+  };
+
   function beginDragLine(d) {
     isDragLine = true;
-    console.log("Start");
+    console.log("Start", isWeighted, isWeightedVariable, weightsDisplay);
     dragStartNodeId = d.path[0].id;
     mousedownNode = d.path[0];
     dragStartX = mousedownNode.cx.baseVal.value;
@@ -325,9 +347,9 @@ const Graphs = ({ userId, handleLogout, userName }) => {
           onNode = true;
           let dragEndNodeId = "v" + i.toString();
           let thisWeight = "1";
-          /* console.log(isWeightedVariable); */
-          if (isWeightedVariable === 1) {
-            /* console.log("prompt"); */
+          console.log(isWeightedVariable);
+          if (weightsDisplay === 1) {
+            console.log("prompt");
             thisWeight = window.prompt("Give this edge a weight", "1");
             /* console.log(thisWeight); */
           }
@@ -430,7 +452,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       })
       .merge(edge);
 
-    if (isDirected === 0) {
+    if (directionDisplay === 0) {
       d3.select(main.current).select("path").attr("opacity", 0);
     }
     d3.selectAll(".gSingleLine").selectAll("text").remove();
@@ -460,6 +482,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .style("font-size", 16)
       .attr("stroke-width", 0)
       .style("user-select", "none")
+      //.style("filter", "drop-shadow( 0px 0px 6px white) drop-shadow( 0px 0px 6px white)")
       .on("click", hala);
 
     nodeText = svg
@@ -473,9 +496,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       .style("user-select", "none")
       .attr("stroke-width", 0)
       .style("fill", "black");
+    //.style("filter", "drop-shadow( 0px 0px 6px white) drop-shadow( 0px 0px 6px white)");
 
-    if (isWeightedVariable === 0) {
-      /* console.log("weight disapper"); */
+    if (weightsDisplay === 0) {
+      console.log("weight disapper");
       linkText2.attr("opacity", 0);
     }
 
@@ -489,15 +513,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     simulation.force("link").links(links);
     simulation.alpha(0.7).restart();
   }
-
-  const addNode = () => {
-    if (nodesGlobal.length === 0) {
-      //nodesGlobal.push({ name: 0 });
-      GraphSimulation([nodesGlobal, { name: 0 }], linksGlobal);
-    } else {
-      update([...nodesGlobal, { name: nodesGlobal.length }], linksGlobal);
-    }
-  };
 
   //force upon creation
   function ticked() {
@@ -555,34 +570,53 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             correctionCoeff = correctionCoeff - 2;
           }
         }
+
+        let h = d.target.y - d.source.y;
+        let w = d.target.x - d.source.x;
+        let r = 15;
+        let OSCx = (h * r) / Math.sqrt(Math.pow(h, 2) + Math.pow(w, 2));
+        let OSCy = (w * r) / Math.sqrt(Math.pow(h, 2) + Math.pow(w, 2));
         if (d.target.x > d.source.x) {
-          return Math.max(
-            radius,
-            Math.min(
-              widthHere - radius,
-              d.source.x + (d.target.x - d.source.x) / 2 - correctionCoeff
-            )
+          return (
+            Math.max(
+              radius,
+              Math.min(
+                widthHere - radius,
+                d.source.x + (d.target.x - d.source.x) / 2 - correctionCoeff
+              )
+            ) + OSCx
           );
         } else {
-          return Math.max(
-            radius,
-            Math.min(
-              widthHere - radius,
-              d.target.x + (d.source.x - d.target.x) / 2 - correctionCoeff
-            )
+          return (
+            Math.max(
+              radius,
+              Math.min(
+                widthHere - radius,
+                d.target.x + (d.source.x - d.target.x) / 2 - correctionCoeff
+              )
+            ) + OSCx
           );
         }
       })
       .attr("y", function (d) {
+        let h = d.target.y - d.source.y;
+        let w = d.target.x - d.source.x;
+        let r = 10;
+        let OSCx = (h * r) / Math.sqrt(Math.pow(h, 2) + Math.pow(w, 2));
+        let OSCy = (w * r) / Math.sqrt(Math.pow(h, 2) + Math.pow(w, 2));
         if (d.target.y > d.source.y) {
-          return Math.max(
-            radius,
-            Math.min(heightHere - radius, d.source.y + (d.target.y - d.source.y) / 2 + 4)
+          return (
+            Math.max(
+              radius,
+              Math.min(heightHere - radius, d.source.y + (d.target.y - d.source.y) / 2 + 4)
+            ) - OSCy
           );
         } else {
-          return Math.max(
-            radius,
-            Math.min(heightHere - radius, d.target.y + (d.source.y - d.target.y) / 2 + 4)
+          return (
+            Math.max(
+              radius,
+              Math.min(heightHere - radius, d.target.y + (d.source.y - d.target.y) / 2 + 4)
+            ) - OSCy
           );
         }
       });
@@ -642,24 +676,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       d3.select(main.current).select("path").attr("opacity", 0);
     }
     setDirected(1 - isDirected);
-  };
-
-  const changeWeighted = (int) => {
-    /* console.log("changeWeighted"); */
-    if (isWeighted === 0) {
-      d3.select(main.current)
-        .selectAll("svg")
-        .selectAll(".gSingleLine")
-        .selectAll("text")
-        .style("opacity", 1);
-    } else {
-      d3.select(main.current)
-        .selectAll("svg")
-        .selectAll(".gSingleLine")
-        .selectAll("text")
-        .style("opacity", 0);
-    }
-    setWeighted(1 - isWeighted);
+    directionDisplay = 1 - directionDisplay;
   };
 
   const displayBFSLegend = () => {
