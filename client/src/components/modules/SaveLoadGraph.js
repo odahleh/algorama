@@ -109,8 +109,10 @@ const SaveLoadGraph = (props) => {
 
   return (
     <>
-      <div className="Graphs-text">Save and load your graphs</div>
-      <div className="Graphs-topbar u-flex u-flex-wrap " id="Graphs-loadingMenu">
+      {/* 
+      <div className="Graphs-text">Save and load your graphs</div> */}
+      <div className="Graphs-topbar u-flex u-flex-wrap u-flex-alignCenter" id="Graphs-loadingMenu">
+        <span>Your Graphs:</span>
         <span className="Graph-names u-flex u-flex-alignCenter">
           <input
             type="text"

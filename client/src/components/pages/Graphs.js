@@ -697,7 +697,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
       currentNodeBFS = target;
       visitedNodesBFS.add(target);
       previousExploredBFS.add(target);
-      currentEdgeBFS = "From " + target.toString() + " to " + source.toString();
+      currentEdgeBFS = target.toString() + " -> " + source.toString();
     } else if (target === BFS_STEP_State[index][1]) {
       currentNodeBFS = source;
       visitedNodesBFS.add(source);
@@ -767,51 +767,6 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     }
   };
 
-  let legend = <div></div>;
-  if (showBFSLegend === true || showDijkstraLegend === true) {
-    legend = (
-      <div className="container">
-        <div className="Algorithm-legend">
-          {" "}
-          <table className="legend-table">
-            <tr>{showBFSLegend ? <th>BFS Legend</th> : <th>Dijkstra Legend</th>}</tr>
-            <tr>
-              <td width="34%" />
-            </tr>
-            <tr>
-              <td>
-                <div className="aquaEdge" />
-              </td>
-              <td>Current Path</td>
-            </tr>
-            <tr>
-              <td>
-                <div className="pinkCircle" />
-              </td>
-              <td>Visited Nodes</td>
-            </tr>
-          </table>
-          <div>
-            <button onClick={prevStep} className="button u-marginButton">
-              Previous Step
-            </button>
-            <button onClick={nextStep} className="button u-marginButton">
-              Next Step
-            </button>
-          </div>
-        </div>
-        <div className="infoLegend u-flex u-flexColumn">
-          <div>Start Node = {startNodeBFS}</div>
-          <div>Current Node = {currentNodeBFS} </div>
-          <div>Current Edge = {currentEdgeBFS}</div>
-          <div>Visited Nodes = {Array.from(visitedNodesBFS).join(", ")} </div>
-          <div>Queue = {queue}</div>
-          <div>Table = {levelSets}</div>
-        </div>
-      </div>
-    );
-  }
-
   const hala = () => {
     console.log("barca");
   };
@@ -859,7 +814,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   return (
     <div className="Graphs-pageContainer">
       <div className="top-bar-container">
-        <div className="u-flex">
+        {/* Title Block */}{" "}
+        <div className="u-flex u-flex-alignCenter">
           <div className="Graphs-title left-side ">
             {" "}
             {userName
@@ -875,7 +831,10 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             />
           </div>
         </div>
-        <div className="u-flex u-flex-alignCenter u-flex-wrap">
+        <div className="abcdefg">
+          <hr />
+        </div>
+        <div className="u-flex">
           <div className="Graphs-ModeSelector" onClick={changeMode}>
             <div
               className={
@@ -909,39 +868,38 @@ const Graphs = ({ userId, handleLogout, userName }) => {
             </div>
           </div>
           {currentMode === "cre" ? (
+            <div className="u-flex u-flex-alignCenter">
+              Create, edit, save and load your graphs.
+            </div>
+          ) : (
+            <div className="u-flex u-flex-alignCenter">
+              Run a graph algorithm and move the nodes of your graph.
+            </div>
+          )}
+        </div>
+        <div className="abcdefh">
+          <hr />
+        </div>
+        <div className="Graphs-topbar">
+          {currentMode === "cre" ? (
             <>
-              <div className="Graphs-topbar">
-                <div className=" u-flex u-flex-wrap">
-                  <NewGraphInput
-                    GraphSimulation={GraphSimulation}
-                    directed={isDirected}
-                    changeDirected={changeDirected}
-                    weighted={isWeighted}
-                    changeWeighted={changeWeighted}
-                    hideBFSLegend={hideBFSLegend}
-                    hideDijkstraLegend={hideDijkstraLegend}
-                    update={update}
-                    nodes={nodesGlobal}
-                    links={linksGlobal}
-                  />
-                </div>
-              </div>
-              <div className="second-bar">
-                <SaveLoadGraph
-                  userId={userId}
-                  nodesState={nodesGlobal}
-                  linksState={linksGlobal}
+              <div className=" u-flex u-flex-wrap">
+                <NewGraphInput
                   GraphSimulation={GraphSimulation}
-                  isCurrentDirected={isCurrentDirected}
+                  directed={isDirected}
+                  changeDirected={changeDirected}
+                  weighted={isWeighted}
+                  changeWeighted={changeWeighted}
                   hideBFSLegend={hideBFSLegend}
                   hideDijkstraLegend={hideDijkstraLegend}
+                  update={update}
+                  nodes={nodesGlobal}
+                  links={linksGlobal}
                 />
               </div>
             </>
           ) : (
             <>
-              <div className="Graphs-text">Run a graph algorithm:</div>
-
               <div className="Graphs-topbar u-flex">
                 <BFS
                   recolorNode={recolorNode}
@@ -978,17 +936,93 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                   hideDijkstraLegend={hideDijkstraLegend}
                 />
               </div>
-              <div>
-                <Legend />
-              </div>
             </>
+          )}
+        </div>
+        <div className="second-bar">
+          {currentMode === "cre" ? (
+            <>
+              <SaveLoadGraph
+                userId={userId}
+                nodesState={nodesGlobal}
+                linksState={linksGlobal}
+                GraphSimulation={GraphSimulation}
+                isCurrentDirected={isCurrentDirected}
+                hideBFSLegend={hideBFSLegend}
+                hideDijkstraLegend={hideDijkstraLegend}
+              />
+            </>
+          ) : (
+            <></>
           )}
         </div>
       </div>
       <div id="main" className="Graphs-svgContainer" ref={main} /* width="500px" height="500px" */>
-        {legend}
         <svg width={window.innerWidth} height={window.innerHeight} onClick={mama} />
-        {""}
+        {showBFSLegend === true || showDijkstraLegend === true ? (
+          <>
+            <div className="Graphs-infoBox">
+              <table>
+                <tr>
+                  <td>Start Node</td>
+                  <td>{startNodeBFS}</td>
+                </tr>
+
+                <tr>
+                  <td>Current Node</td>
+                  <td>{currentNodeBFS}</td>
+                </tr>
+
+                <tr>
+                  <td>Current Edge</td>
+                  <td>{currentEdgeBFS}</td>
+                </tr>
+
+                <tr>
+                  <td>Visited Nodes</td>
+                  <td>{Array.from(visitedNodesBFS).join(", ")}</td>
+                </tr>
+
+                <tr>
+                  <td>Queue</td>
+                  <td>{queue}</td>
+                </tr>
+
+                <tr>
+                  <td>Table</td>
+                  <td>{levelSets}</td>
+                </tr>
+              </table>
+            </div>
+            <div className="Graphs-infoBoxRightTop">
+              <button onClick={prevStep} className="button u-marginButton">
+                Previous Step
+              </button>
+
+              <button onClick={nextStep} className="button u-marginButton">
+                Next Step
+              </button>
+              <div className="u-flex u-flex-justifyRight">
+                <table className="Graph-legend-new">
+                  <tr>
+                    <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
+                      <div className="aquaEdge" />
+                    </td>
+                    <td>Current Path</td>
+                  </tr>
+                  <tr>
+                    <td className="u-flex u-flex-justifyCenter u-flex-alignCenter">
+                      <div className="pinkCircle" />
+                    </td>
+                    <td>Visited Nodes</td>
+                  </tr>
+                </table>
+              </div>
+            </div>{" "}
+          </>
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   );

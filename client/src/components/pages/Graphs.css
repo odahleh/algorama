@@ -109,18 +109,23 @@
 .Graphs-svgContainer {
   width: 100%;
   height: 100%;
+  position: relative;
 }
 
 .Graphs-topbar {
-  margin: 8px;
+  margin: 8px 8px;;
   display: flex;
   /* border-bottom: 1px solid; */
   /* border: 1px solid;
-  border-color: #000;
-  border-radius: var(--xl); */
-  max-width: 100;
+  border-color: #aaa;
+  border-radius: 16px;  */
+  /* max-width: 100; */
   /* transition: all 1s; */
   padding: 0px 8px;
+}
+
+.second-bar{
+  margin: 8px;
 }
 
 .Graphs-text {
@@ -308,12 +313,14 @@ input[type="range"]::-webkit-slider-thumb {
   height: 16px;
   width: 16px;
   background-color: pink;
+  margin-top: 2px;
 }
 
 
 .aquaEdge{
   border-bottom:8px solid #00c2a5;
   width: 40px;
+  margin-top: 6px;
 }
 
 .gLinkText{
@@ -321,4 +328,68 @@ input[type="range"]::-webkit-slider-thumb {
   height: 16px;
   width: 16px;
   background-color: pink;
+}
+
+.Graphs-infoBubble{
+  border: 1px solid;
+  border-color: #aaa;
+  border-radius: 16px;
+  margin: 8px;
+  padding: 8px;
+}
+
+.Graphs-infoBlock{
+  text-align: center;
+  margin: 8px;
+}
+
+.Graphs-infoBox{
+  position: absolute;
+  top: 8px;
+  left: 25px;
+}
+
+.Graphs-infoBoxRight{
+  position: absolute;
+  top: 8px;
+  right: 25px;
+}
+
+.abcdefg{
+  margin: 8px 25px;
+  height: 1px;
+  background-color: #000000;
+  /* width: 1000px; */
+}
+
+.abcdefh{
+  margin: 8px 25px 24px;
+  height: 1px;
+  background-color: #000000;
+  /* width: 1000px; */
+}
+
+.ghijklm{
+  margin-bottom: 32px;
+}
+
+.Graph-legend-new td:nth-child(1){
+text-align: center;
+width: 40px;
+
+}
+
+.Graph-legend-new td:nth-child(2){
+  text-align: right;
+
+  }
+
+  .Graph-legend-new{
+    margin-right: 8px;
+  }
+
+.Graphs-infoBoxRightTop{
+  position: absolute;
+  top: 8px;
+  right: 25px;
 }

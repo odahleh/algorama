@@ -60,6 +60,10 @@ form {
   align-items: center;
 }
 
+.u-flex-justifyRight{
+  justify-content: right;
+}
+
 .u-inlineBlock {
   display: inline-block;
 }
