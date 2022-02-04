@@ -1,7 +1,7 @@
 import React, { Component, useEffect, useState } from "react";
 import "../../utilities.css";
 import "../pages/Graphs.css";
-
+import BFS from "./BFS";
 const Dijkstra = ({
   recolorNode,
   recolorEdge,
@@ -16,6 +16,51 @@ const Dijkstra = ({
   isWeighted,
   isDirected,
 }) => {
+  function run_bfs() {
+    let start = { name: parseInt(startNode) };
+    let links = linksState;
+    let nodes = nodesState;
+    console.log(links, nodes);
+    let visited = new Set();
+    let distanceArrayBFS = [];
+    for (let node in nodes) {
+      if (node !== start.name) {
+        distanceArrayBFS.push(Infinity);
+      } else {
+        distanceArrayBFS.push(0);
+      }
+    }
+    let queue = [parseInt(startNode)];
+    let level = 0;
+    while (queue.length > 0) {
+      let neighbors = [];
+      for (let next of queue) {
+        if (!visited.has(next)) {
+          visited.add(next);
+          distanceArrayBFS[next] = level;
+        }
+      }
+      level += 1;
+      for (let next of queue) {
+        // console.log("NEXT", next);
+        let [currNeighbors, currNeighborsEdges] = findNeighbors({ name: parseInt(next) }, links);
+        // console.log(currNeighbors);
+        for (let neigh in currNeighbors) {
+          // console.log("NEIGH");
+          if (!visited.has(currNeighbors[neigh])) {
+            if (!neighbors.includes(currNeighbors[neigh])) {
+              neighbors.push(currNeighbors[neigh]);
+            }
+            //BFS_STEP.push([currNeighborsEdges[neigh], currNeighbors[neigh], next]);
+          }
+        }
+      }
+
+      queue = neighbors;
+      // console.log("queue", queue);
+    }
+    return distanceArrayBFS;
+  }
   function dijkstra() {
     recolorNode("all", "black");
     recolorEdge("all", "all", "grey");
@@ -41,10 +86,10 @@ const Dijkstra = ({
         }
       }
       if (!negativeWeights) {
-        recolorNode(startNode, "red");
         displayDijkstraLegend();
         setDijkstra_INDEX(-1);
         emptyDijkstraCounter();
+        let distanceBFS = run_bfs();
         let links = linksState;
         let nodes = nodesState;
         let Dijkstra_STEP = [];
@@ -58,7 +103,9 @@ const Dijkstra = ({
           } else {
             distanceArray.push(0);
           }
-          pqueue.push(node.name);
+          if (distanceBFS[node.name] !== Infinity) {
+            pqueue.push(node.name);
+          }
         }
         while (pqueue.length > 0) {
           let u = null;
