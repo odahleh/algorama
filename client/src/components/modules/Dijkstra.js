@@ -20,7 +20,6 @@ const Dijkstra = ({
     let start = { name: parseInt(startNode) };
     let links = linksState;
     let nodes = nodesState;
-    console.log(links, nodes);
     let visited = new Set();
     let distanceArrayBFS = [];
     for (let node in nodes) {
@@ -75,12 +74,11 @@ const Dijkstra = ({
     } else if (parseInt(startNode) >= nodesState.length || parseInt(startNode) < 0) {
       alert("This is not a valid starting node. Please select a valid starting node.");
     } else {
-      console.log(nodesState.length, "lenght");
       let negativeWeights = false;
       for (let edge of linksState) {
         if (edge.weight < 0) {
           alert(
-            "This algorithm does not support negative weights, please choose a different graph."
+            "This Algorithm does not support negative weights, please choose a different graph."
           );
           negativeWeights = true;
         }
@@ -143,7 +141,7 @@ const Dijkstra = ({
             }
           }
         }
-        console.log(distanceArray);
+        //console.log(distanceArray);
         // console.log(Dijkstra_STEP);
         Dijkstra_STEP.shift();
         setDijkstra_State(Dijkstra_STEP);

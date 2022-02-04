@@ -75,7 +75,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   /* console.log("is Weighted", isWeighted); */
   useLayoutEffect(() => {
     function updateSize() {
-      console.log("updateSize");
+      //console.log("updateSize");
       let navbox = document.querySelector(".top-bar-container");
       let offsetTop; //= 220;
       offsetTop = navbox.clientHeight;
@@ -539,9 +539,11 @@ const Graphs = ({ userId, handleLogout, userName }) => {
   //force upon creation
   function ticked() {
     let widthHere = window.innerWidth;
-    let navbox = document.querySelector(".top-bar-container");
-
-    let offsetTopHere = navbox.clientHeight;
+    let offsetTopHere = 220;
+    if (document.querySelector(".top-bar-container")) {
+      let navbox = document.querySelector(".top-bar-container");
+      offsetTopHere = navbox.clientHeight;
+    }
     let heightHere = window.innerHeight - offsetTopHere;
     let radius = 10;
     vertex
@@ -807,7 +809,7 @@ const Graphs = ({ userId, handleLogout, userName }) => {
 
   function Dijkstra_stepper(index) {
     // reset all nodes + edges to original color
-    console.log(Dijkstra_STEP_State, "djk state");
+
     recolorNode("all", "black");
     recolorEdge("all", "all", "grey");
     visitedNodesDijkstra = new Set();
@@ -852,9 +854,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
     let nextQueue = Dijkstra_STEP_State[Math.min(index + 1, Dijkstra_STEP_State.length - 1)][4];
     queueDijkstra = Array.from(nextQueue).sort(sortBasedOnDistance);
     for (let j = 0; j <= index; j++) {
-      const node = Dijkstra_STEP_State[j][0]; 
-      if (nextDistances[node] === Infinity){
-        console.log(node, "target");
+      const node = Dijkstra_STEP_State[j][0];
+      if (nextDistances[node] === Infinity) {
         recolorNode(node, "black");
       }
     }
@@ -937,17 +938,13 @@ const Graphs = ({ userId, handleLogout, userName }) => {
 
   /* console.log(isWeighted, "isWei");
   console.log(isDirected, "isDir"); */
+
   return (
     <div className="Graphs-pageContainer">
       <div className="top-bar-container">
         {/* Title Block */}{" "}
         <div className="u-flex u-flex-alignCenter">
-          <div className="Graphs-title left-side ">
-            {" "}
-            {userName
-              ? "Welcome to Algorama, " + userName.split(" ")[0] + "!"
-              : "Welcome to Algorama!"}
-          </div>
+          <div className="Graphs-title left-side "> Welcome to Algorama!</div>
           <div className="right-side">
             <GoogleLogout
               clientId={GOOGLE_CLIENT_ID}
@@ -1131,8 +1128,8 @@ const Graphs = ({ userId, handleLogout, userName }) => {
                       <td>{Array.from(queue).join(", ")}</td>
                     </tr>
 
-                    {levelSets.map((level) => (
-                      <tr>
+                    {levelSets.map((level, index) => (
+                      <tr key={"levelsets" + index.toString()}>
                         <td>{level.split(":")[0]}</td>
                         <td>{level.split(":")[1]}</td>
                       </tr>
